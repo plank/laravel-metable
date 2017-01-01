@@ -1,0 +1,32 @@
+{
+    "name": "plank/laravel-metable",
+    "description": "A package for attaching arbitrary data to Eloquent models",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sean Fraser",
+            "email": "sean@plankdesign.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Plank\\Metable\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.0.0",
+        "illuminate/support": "~5.0",
+        "illuminate/database": "~5.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.0",
+        "phpunit/phpunit": "~5.0",
+        "satooshi/php-coveralls": "^1.0"
+    },
+    "autoload-dev":{
+        "classmap": ["tests/", "migrations/"]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
