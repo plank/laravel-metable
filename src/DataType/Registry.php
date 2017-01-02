@@ -71,8 +71,6 @@ class Registry
 				return $type;
 			}
 		}
-
-		//fallback to string
-		return 'string';
+		throw DataTypeException::handlerNotFoundForValue($value);
 	}
 }

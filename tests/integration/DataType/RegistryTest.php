@@ -40,8 +40,33 @@ class RegistryTest extends TestCase
 
 	public function test_it_determines_best_handler_for_a_value()
 	{
+		$stringHandler = $this->getMock(Handler::class);
+		$stringHandler->method('canHandleValue')
+			->will($this->returnCallback(function($value){
+			return is_string($value);
+		}));
+		$integerHandler = $this->getMock(Handler::class);
+		$integerHandler->method('canHandleValue')
+			->will($this->returnCallback(function($value){
+			return is_integer($value);
+		}));
 		$registry = new Registry;
-		//TODO
+		$registry->setHandlerForType($stringHandler, 'str');
+		$registry->setHandlerForType($integerHandler, 'int');
 
+		$type1 = $registry->getTypeForValue(123);
+		$type2 = $registry->getTypeForValue('abc');
+
+		$this->assertEquals('int', $type1);
+		$this->assertEquals('str', $type2);
+	}
+
+	public function test_it_throws_an_exception_if_no_type_matches_value()
+	{
+		$registry = new Registry;
+
+		$this->setExpectedException(DataTypeException::class);
+
+		$registry->getTypeForValue([]);
 	}
 }
