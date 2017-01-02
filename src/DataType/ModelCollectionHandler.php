@@ -42,14 +42,20 @@ class ModelCollectionHandler implements Handler
 	}
 
 	private function loadModels($items){
+		$classes = [];
+		$results = [];
+
 		foreach ($items as $item) {
-			$classes[$item['class']][] = $item['key'];
+			if(!is_null($item['key'])){
+				$classes[$item['class']][] = $item['key'];
+			}
 		}
 
 		foreach ($classes as $class => $keys) {
 			$model = new $class;
 			$results[$class] = $model->whereIn($model->getKeyName(), $keys)->get()->keyBy($model->getKeyName());
 		}
+
 		return $results;
 	}
 }

@@ -2,12 +2,14 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 use Plank\Metable\DataType\ArrayHandler;
 use Plank\Metable\DataType\BooleanHandler;
 use Plank\Metable\DataType\DateTimeHandler;
 use Plank\Metable\DataType\DoubleHandler;
 use Plank\Metable\DataType\Handler;
 use Plank\Metable\DataType\IntegerHandler;
+use Plank\Metable\DataType\ModelCollectionHandler;
 use Plank\Metable\DataType\ModelHandler;
 use Plank\Metable\DataType\NullHandler;
 use Plank\Metable\DataType\ObjectHandler;
@@ -44,6 +46,7 @@ class HandlerTest extends TestCase
 			'model'   => [new ModelHandler, new SampleMetable,
 				[new stdClass]
 			],
+			'model collection' => [new ModelCollectionHandler, new Collection([new SampleMetable]), [collect()]],
 			'null'    => [new NullHandler, null,
 				[0, '', 'null', [], false]
 			],

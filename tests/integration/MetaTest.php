@@ -18,9 +18,7 @@ class MetaTest extends TestCase
 	public function test_it_caches_unserialized_value()
 	{
 		$meta = factory(Meta::class)->make();
-
 		$meta->value = 'foo';
-
 		$this->assertEquals('foo', $meta->value);
 
 		$meta->setRawAttributes(['value' => 'bar'], true);
@@ -32,9 +30,7 @@ class MetaTest extends TestCase
 	public function test_it_clears_cache_on_set()
 	{
 		$meta = factory(Meta::class)->make();
-
 		$meta->value = 'foo';
-
 		$this->assertEquals('foo', $meta->value);
 
 		$meta->value = 'bar';

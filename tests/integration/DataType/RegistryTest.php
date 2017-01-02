@@ -37,4 +37,11 @@ class RegistryTest extends TestCase
 		$this->setExpectedException(DataTypeException::class);
 		$registry->getHandlerForType('foo');
 	}
+
+	public function test_it_determines_best_handler_for_a_value()
+	{
+		$registry = new Registry;
+		//TODO
+
+	}
 }

@@ -22,11 +22,12 @@ class Meta extends Model
 
 	public function getValueAttribute()
 	{
-		if (isset($this->cachedValue)) {
-			return $this->cachedValue;
+		if (! isset($this->cachedValue)) {
+			$this->cachedValue = $this->getDataTypeRegistry()
+				->getHandlerForType($this->type)
+				->unserializeValue($this->attributes['value']);
 		}
-		$handler = $this->getDataTypeRegistry()->getHandlerForType($this->type);
-		return $this->cachedValue = $handler->unserializeValue($this->attributes['value']);
+		return $this->cachedValue;
 	}
 
 	public function setValueAttribute($value)
@@ -34,7 +35,8 @@ class Meta extends Model
 		$registry = $this->getDataTypeRegistry();
 
 		$this->attributes['type'] = $registry->getTypeForValue($value);
-		$this->attributes['value'] = $registry->getHandlerForType($this->type)->serializeValue($value);
+		$this->attributes['value'] = $registry->getHandlerForType($this->type)
+			->serializeValue($value);
 
 		$this->cachedValue = null;
 	}
