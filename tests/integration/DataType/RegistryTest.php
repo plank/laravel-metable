@@ -9,10 +9,10 @@ class RegistryTest extends TestCase
 	public function test_it_can_set_a_handler()
 	{
 		$registry = new Registry;
-		$handler = $this->getMock(Handler::class);
+		$handler = $this->mockHandlerWithType('foo');
 		$this->assertFalse($registry->hasHandlerForType('foo'));
 		
-		$registry->setHandlerForType($handler, 'foo');
+		$registry->addHandler($handler);
 
 		$this->assertTrue($registry->hasHandlerForType('foo'));
 		$this->assertEquals($handler, $registry->getHandlerForType('foo'));
@@ -21,8 +21,8 @@ class RegistryTest extends TestCase
 	public function test_it_can_remove_a_handler()
 	{
 		$registry = new Registry;
-		$handler = $this->getMock(Handler::class);
-		$registry->setHandlerForType($handler, 'foo');
+		$handler = $this->mockHandlerWithType('foo');
+		$registry->addHandler($handler);
 		$this->assertTrue($registry->hasHandlerForType('foo'));
 		
 		$registry->removeHandlerForType('foo');
@@ -40,19 +40,19 @@ class RegistryTest extends TestCase
 
 	public function test_it_determines_best_handler_for_a_value()
 	{
-		$stringHandler = $this->getMock(Handler::class);
+		$stringHandler = $this->mockHandlerWithType('str');
 		$stringHandler->method('canHandleValue')
 			->will($this->returnCallback(function($value){
 			return is_string($value);
 		}));
-		$integerHandler = $this->getMock(Handler::class);
+		$integerHandler = $this->mockHandlerWithType('int');
 		$integerHandler->method('canHandleValue')
 			->will($this->returnCallback(function($value){
 			return is_integer($value);
 		}));
 		$registry = new Registry;
-		$registry->setHandlerForType($stringHandler, 'str');
-		$registry->setHandlerForType($integerHandler, 'int');
+		$registry->addHandler($stringHandler);
+		$registry->addHandler($integerHandler);
 
 		$type1 = $registry->getTypeForValue(123);
 		$type2 = $registry->getTypeForValue('abc');
@@ -68,5 +68,12 @@ class RegistryTest extends TestCase
 		$this->setExpectedException(DataTypeException::class);
 
 		$registry->getTypeForValue([]);
+	}
+
+	protected function mockHandlerWithType($type)
+	{
+		$handler = $this->getMock(Handler::class);
+		$handler->method('getDataType')->willReturn($type);
+		return $handler;
 	}
 }

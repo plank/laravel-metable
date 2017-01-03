@@ -10,6 +10,11 @@ class DateTimeHandler implements Handler
 
 	protected $format = 'Y-m-d H:i:s.uO';
 
+	public function getDataType() : string
+	{
+		return 'datetime';
+	}
+
 	public function canHandleValue($value) : bool
 	{
 		return $value instanceof DateTimeInterface;

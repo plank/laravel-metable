@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Collection;
 class ModelCollectionHandler implements Handler
 {
 
+	public function getDataType() : string
+	{
+		return 'collection';
+	}
+
 	public function canHandleValue($value) : bool
 	{
 		return $value instanceof Collection;

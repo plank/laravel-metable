@@ -6,6 +6,11 @@ abstract class PrimitiveHandler implements Handler
 {
 	protected $type;
 
+	public function getDataType() : string
+	{
+		return $this->type;
+	}
+
 	public function canHandleValue($value) : bool
 	{
 		return gettype($value) == $this->type;

@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class ModelHandler implements Handler
 {
 
+	public function getDataType() : string
+	{
+		return 'model';
+	}
+
 	public function canHandleValue($value) : bool
 	{
 		return $value instanceof Model;

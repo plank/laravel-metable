@@ -5,6 +5,11 @@ namespace Plank\Metable\DataType;
 class ArrayHandler implements Handler
 {
 
+	public function getDataType() : string
+	{
+		return 'array';
+	}
+
 	public function canHandleValue($value) : bool
 	{
 		return is_array($value);

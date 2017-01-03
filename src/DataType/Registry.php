@@ -13,6 +13,17 @@ class Registry
 	protected $handlers = [];
 
 	/**
+	 * Append a Handler to use for a given type identifier
+	 * @param Handler $handler
+	 * @param string  $type
+	 * @return void
+	 */
+	public function addHandler(Handler $handler)
+	{
+		$this->handlers[$handler->getDataType()] = $handler;
+	}
+
+	/**
 	 * Retrieve the handler assigned to a given type identifier
 	 * @param string $type
 	 * @return Handler
@@ -46,18 +57,6 @@ class Registry
 	{
 		unset($this->handlers[$type]);
 	}
-	
-	/**
-	 * Append a Handler to use for a given type identifier
-	 * @param Handler $handler
-	 * @param string  $type
-	 * @return void
-	 */
-	public function setHandlerForType(Handler $handler, string $type)
-	{
-		$this->handlers[$type] = $handler;
-	}
-
 
 	/**
 	 * Find a data type Handler that is able to operate on the value, return the type identifier associated with it. 

@@ -5,6 +5,11 @@ namespace Plank\Metable\DataType;
 class ObjectHandler implements Handler
 {
 
+	public function getDataType() : string
+	{
+		return 'object';
+	}
+
 	public function canHandleValue($value) : bool
 	{
 		return is_object($value);

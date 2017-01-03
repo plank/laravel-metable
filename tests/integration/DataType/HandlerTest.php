@@ -28,32 +28,63 @@ class HandlerTest extends TestCase
 
 
 		return [
-			'array' => [new ArrayHandler, ['foo' => ['bar'], 'baz'],
+			'array' => [
+				new ArrayHandler, 
+				'array', 
+				['foo' => ['bar'], 'baz'],
 				[new stdClass],
 			],
-			'boolean' => [new BooleanHandler, true, 
+			'boolean' => [
+				new BooleanHandler, 
+				'boolean', 
+				true, 
 				[1, 0, '', [], null]
 			],
-			'datetime' => [new DateTimeHandler, $datetime,
+			'datetime' => [
+				new DateTimeHandler, 
+				'datetime', 
+				$datetime,
 				[2017, '2017-01-01']
 			],
-			'double'  => [new DoubleHandler, 1.1, 
+			'double'  => [
+				new DoubleHandler, 
+				'double', 
+				1.1, 
 				['1.1', 1]
 			],
-			'integer' => [new IntegerHandler, 3,
+			'integer' => [
+				new IntegerHandler, 
+				'integer', 
+				3,
 				[1.1, '1']
 			],
-			'model'   => [new ModelHandler, new SampleMetable,
+			'model'   => [
+				new ModelHandler, 
+				'model', 
+				new SampleMetable,
 				[new stdClass]
 			],
-			'model collection' => [new ModelCollectionHandler, new Collection([new SampleMetable]), [collect()]],
-			'null'    => [new NullHandler, null,
+			'model collection' => [
+				new ModelCollectionHandler, 
+				'collection', 
+				new Collection([new SampleMetable]), 
+				[collect()]],
+			'null'    => [
+				new NullHandler, 
+				'null', 
+				null,
 				[0, '', 'null', [], false]
 			],
-			'object'  => [new ObjectHandler, $object,
+			'object'  => [
+				new ObjectHandler, 
+				'object', 
+				$object,
 				[[]]
 			],
-			'string'  => [new StringHandler, 'foo',
+			'string'  => [
+				new StringHandler, 
+				'string', 
+				'foo',
 				[1, 1.1]
 			],
 		];
@@ -62,7 +93,15 @@ class HandlerTest extends TestCase
 	/**
 	 * @dataProvider handlerProvider
 	 */
-	public function test_it_can_verify_compatibility(Handler $handler, $value, $incompatible)
+	public function test_it_specifies_a_datatype_identifier(Handler $handler, $type)
+	{
+		$this->assertEquals($type, $handler->getDataType());
+	}
+
+	/**
+	 * @dataProvider handlerProvider
+	 */
+	public function test_it_can_verify_compatibility(Handler $handler, $type, $value, $incompatible)
 	{
 		$this->assertTrue($handler->canHandleValue($value));
 		
@@ -74,7 +113,7 @@ class HandlerTest extends TestCase
 	/**
 	 * @dataProvider handlerProvider
 	 */
-	public function test_it_can_serialize_and_unserialize_values(Handler $handler, $value)
+	public function test_it_can_serialize_and_unserialize_values(Handler $handler, $type, $value)
 	{
 		$serialized = $handler->serializeValue($value);
 		$unserialized = $handler->unserializeValue($serialized);
