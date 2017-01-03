@@ -15,6 +15,14 @@ class MetaTest extends TestCase
 		$this->assertEquals('string', $meta->type);
 	}
 
+	public function test_it_exposes_its_serialized_value()
+	{
+		$meta = factory(Meta::class)->make();
+		$meta->value = 123;
+
+		$this->assertEquals('123', $meta->getRawValue());
+	}
+	
 	public function test_it_caches_unserialized_value()
 	{
 		$meta = factory(Meta::class)->make();
@@ -24,7 +32,7 @@ class MetaTest extends TestCase
 		$meta->setRawAttributes(['value' => 'bar'], true);
 
 		$this->assertEquals('foo', $meta->value);
-		$this->assertEquals('bar', $meta->getAttributes()['value']);
+		$this->assertEquals('bar', $meta->getRawValue());
 	}
 
 	public function test_it_clears_cache_on_set()
@@ -47,6 +55,5 @@ class MetaTest extends TestCase
 		$this->assertInstanceOf(MorphTo::class, $relation);
 		$this->assertEquals('metable_type', $relation->getMorphType());
 		$this->assertEquals('metable_id', $relation->getForeignKey());
-		
 	}
 }

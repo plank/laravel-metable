@@ -18,11 +18,11 @@ class MetableServiceProvider extends ServiceProvider
             __DIR__.'/../config/metable.php' => config_path('metable.php'),
         ], 'config');
 
-        // if (! class_exists(CreateMediableTables::class)) {
-        //     $this->publishes([
-        //         __DIR__.'/../migrations/2016_06_27_000000_create_mediable_tables.php' => database_path('migrations/'.date('Y_m_d_His').'_create_mediable_tables.php'),
-        //     ], 'migrations');
-        // }
+        if (! class_exists(CreateMetaTable::class)) {
+            $this->publishes([
+                __DIR__.'/../migrations/2017_01_01_000000_create_meta_table.php' => database_path('migrations/'.date('Y_m_d_His').'_create_meta_table.php'),
+            ], 'migrations');
+        }
     }
 
     /**
@@ -44,7 +44,7 @@ class MetableServiceProvider extends ServiceProvider
         $this->app->singleton(Registry::class, function($app){
             $registry = new Registry;
             foreach (config('metable.datatypes') as $type => $handler) {
-                $registry->setHandlerForType(new $handler, $type);
+                $registry->addHandler(new $handler);
             }
             return $registry;
         });
