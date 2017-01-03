@@ -2,7 +2,10 @@
 
 namespace Plank\Metable\DataType;
 
-class DoubleHandler extends PrimitiveHandler
+class DoubleHandler extends ScalarHandler
 {
+    /**
+	 * {@InheritDoc}
+	 */
     protected $type = 'double';
 }

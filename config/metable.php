@@ -1,6 +1,11 @@
 <?php
 
 return [
+	/**
+	 * Model class to use for Meta
+	 */
+	'model' => Plank\Metable\Meta::class,
+
 	/*
 	 * List of handlers for recognized data types
 	 *

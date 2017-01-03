@@ -33,13 +33,13 @@ class Meta extends Model
 	];
 
 	/**
-	 * Cache of unserialized value
+	 * Cache of unserialized value.
 	 * @var mixed
 	 */
 	protected $cachedValue;
 
 	/**
-	 * Metable Relation
+	 * Metable Relation.
 	 * @return MorphTo
 	 */
 	public function metable() : MorphTo
@@ -48,11 +48,11 @@ class Meta extends Model
 	}
 
 	/**
-	 * Accessor for value
+	 * Accessor for value.
 	 *
 	 * Will unserialize the value before returning it.
 	 * 
-	 * Successive access will be loaded from cache
+	 * Successive access will be loaded from cache.
 	 * @return mixed
 	 */
 	public function getValueAttribute()
@@ -66,9 +66,9 @@ class Meta extends Model
 	}
 
 	/**
-	 * Mutator for value
+	 * Mutator for value.
 	 *
-	 * The `type` attribute will be updated to match the datatype of the input
+	 * The `type` attribute will be updated to match the datatype of the input.
 	 * @param mixed $value
 	 */
 	public function setValueAttribute($value)
@@ -82,13 +82,17 @@ class Meta extends Model
 		$this->cachedValue = null;
 	}
 
-	public function getRawValue()
+	/**
+	 * Retrieve the underlying serialized value.
+	 * @return string
+	 */
+	public function getRawValue() : string
 	{
 		return $this->attributes['value'];
 	}
 
 	/**
-	 * Load the datatype Registry from the container
+	 * Load the datatype Registry from the container.
 	 * @return Registry
 	 */
 	protected function getDataTypeRegistry() : Registry

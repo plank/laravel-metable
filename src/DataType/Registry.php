@@ -7,13 +7,13 @@ use Plank\Metable\Exceptions\DataTypeException;
 class Registry
 {
 	/**
-	 * List of registered handlers 
+	 * List of registered handlers .
 	 * @var array
 	 */
 	protected $handlers = [];
 
 	/**
-	 * Append a Handler to use for a given type identifier
+	 * Append a Handler to use for a given type identifier.
 	 * @param Handler $handler
 	 * @param string  $type
 	 * @return void
@@ -24,10 +24,10 @@ class Registry
 	}
 
 	/**
-	 * Retrieve the handler assigned to a given type identifier
+	 * Retrieve the handler assigned to a given type identifier.
 	 * @param string $type
 	 * @return Handler
-	 * @throws DataTypeException  if no handler is found
+	 * @throws DataTypeException  if no handler is found.
 	 */
 	public function getHandlerForType(string $type) : Handler
 	{
@@ -39,7 +39,7 @@ class Registry
 	}
 
 	/**
-	 * Check if a handler has been set for a given type identifier
+	 * Check if a handler has been set for a given type identifier.
 	 * @param string  $type
 	 * @return boolean
 	 */
@@ -49,7 +49,7 @@ class Registry
 	}
 
 	/**
-	 * Removes the handler with a given type identifier
+	 * Removes the handler with a given type identifier.
 	 * @param string $type
 	 * @return void
 	 */

@@ -39,6 +39,10 @@ class MetableServiceProvider extends ServiceProvider
         $this->registerDataTypeRegistry();
     }
 
+    /**
+     * Add the DataType Registry to the service container.
+     * @return void
+     */
     protected function registerDataTypeRegistry()
     {
         $this->app->singleton(Registry::class, function($app){

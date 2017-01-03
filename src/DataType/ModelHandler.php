@@ -6,17 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class ModelHandler implements Handler
 {
-
+	/**
+	 * {@InheritDoc}
+	 */
 	public function getDataType() : string
 	{
 		return 'model';
 	}
 
+	/**
+	 * {@InheritDoc}
+	 */
 	public function canHandleValue($value) : bool
 	{
 		return $value instanceof Model;
 	}
 
+	/**
+	 * {@InheritDoc}
+	 */
 	public function serializeValue($value) : string
 	{
 		if ($value->exists) {
@@ -26,6 +34,9 @@ class ModelHandler implements Handler
 		}
 	}
 
+	/**
+	 * {@InheritDoc}
+	 */
 	public function unserializeValue(string $value)
 	{
 		if(strpos($value, '#') === false) {

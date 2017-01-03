@@ -7,16 +7,25 @@ use Illuminate\Database\Eloquent\Collection;
 class ModelCollectionHandler implements Handler
 {
 
+	/**
+	 * {@InheritDoc}
+	 */
 	public function getDataType() : string
 	{
 		return 'collection';
 	}
 
+	/**
+	 * {@InheritDoc}
+	 */
 	public function canHandleValue($value) : bool
 	{
 		return $value instanceof Collection;
 	}
 
+	/**
+	 * {@InheritDoc}
+	 */
 	public function serializeValue($value) : string
 	{
 		foreach ($value as $key => $model) {
@@ -28,6 +37,9 @@ class ModelCollectionHandler implements Handler
 		return json_encode(['class'=> get_class($value), 'items' => $items]);
 	}
 
+	/**
+	 * {@InheritDoc}
+	 */
 	public function unserializeValue(string $value)
 	{
 		$map = json_decode($value, true);
@@ -46,7 +58,12 @@ class ModelCollectionHandler implements Handler
 		return $collection;
 	}
 
-	private function loadModels($items){
+	/**
+	 * Load each model instance, grouped by class.
+	 * @param  array $items 
+	 * @return array
+	 */
+	private function loadModels(array $items){
 		$classes = [];
 		$results = [];
 

@@ -2,7 +2,10 @@
 
 namespace Plank\Metable\DataType;
 
-class IntegerHandler extends PrimitiveHandler
+class IntegerHandler extends ScalarHandler
 {
+    /**
+	 * {@InheritDoc}
+	 */
     protected $type = 'integer';
 }

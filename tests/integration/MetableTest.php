@@ -151,7 +151,7 @@ class MetableTest extends TestCase
 		$metable = factory(SampleMetable::class)->create();
 		$metable->setMeta('foo', 123);
 
-		$result = SampleMetable::whereMeta('foo', '>', 4)->first();
+		$result = SampleMetable::whereMetaNumeric('foo', '>', 4)->first();
 
 		$this->assertEquals($metable->getKey(), $result->getKey());
 	}
