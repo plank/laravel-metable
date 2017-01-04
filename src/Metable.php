@@ -4,25 +4,26 @@ namespace Plank\Metable;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Query\JoinClause;
 
 trait Metable
 {
-	/**
+    /**
      * Relationship to the `Meta` model.
      * @return MorphMany
      */
     public function meta() : MorphMany
-	{
-		$class = config('metable.model', Meta::class);
+    {
+        $class = config('metable.model', Meta::class);
         return $this->morphMany($class, 'metable');
-	}
+    }
 
     /**
      * Add or update the value of the `Meta` at a given key.
      * @param string $key
      * @param mixed $value
      */
-	public function setMeta(string $key, $value)
+    public function setMeta(string $key, $value)
     {
         $key = strtolower($key);
 
@@ -37,13 +38,13 @@ trait Metable
 
         //update cached relationship, if necessary
         if ($this->relationLoaded('meta')) {
-        	$this->meta[$key] = $meta;
+            $this->meta[$key] = $meta;
         }
     }
 
     /**
      * Replace all associated `Meta` with the keys and values provided.
-     * @param  array|traversable $array 
+     * @param  array|traversable $array
      * @return void
      */
     public function syncMeta($array)
@@ -110,7 +111,7 @@ trait Metable
      * Query scope to restrict the query to records which have `Meta` attached to a given key.
      *
      * If an array of keys is passed instead, will restrict the query to records having one or more Meta with any of the keys.
-     * 
+     *
      * @param  Builder $q
      * @param  string|array $key
      * @return void
@@ -200,11 +201,69 @@ trait Metable
         $values = array_map(function($val){
             return is_string($val) ? $val :$this->makeMeta($key, $values)->getRawValue();
         }, $values);
+
         $q->whereHas('meta', function(Builder $q) use($key, $values){
             $q->where('key', $key);
             $q->whereIn('value', $values);
         });
     }
+
+    /**
+     * Query scope to order the query results by the string value of an attached meta.
+     * @param  Builder $q
+     * @param  string  $key
+     * @param  string  $direction
+     * @return void
+     */
+    public function scopeOrderByMeta(Builder $q, string $key, string $direction = 'asc')
+    {
+        $this->joinMetaTable($q, $key);
+        $q->orderBy($this->meta()->getRelated()->getTable().'.value', $direction);
+    }
+
+    /**
+     * Query scope to order the query results by the numeric value of an attached meta.
+     * @param  Builder $q
+     * @param  string  $key
+     * @param  string  $direction
+     * @return void
+     */
+    public function scopeOrderByMetaNumeric(Builder $q, string $key, string $direction = 'asc')
+    {
+        $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
+        $grammar = $q->getConnection()->getQueryGrammar();
+        $field = $grammar->wrap($this->meta()->getRelated()->getTable().'.value');
+
+        $this->joinMetaTable($q, $key);
+        $q->orderByRaw("cast({$field} as numeric) $direction");
+    }
+
+    /**
+     * Join the meta table to the query
+     * @param  Builder $q
+     * @param  string  $key
+     * @param  string  $type Join type
+     * @return void
+     */
+    private function joinMetaTable(Builder $q, string $key, $type = 'left')
+    {
+    	$relation = $this->meta();
+
+    	// If no explicit select columns are specified,
+        // avoid column collision by excluding meta table from select
+        if (!$q->getQuery()->columns) {
+            $q->select($this->getTable().'.*');
+        }
+
+        // Join the meta table to the query
+        $q->join($relation->getRelated()->getTable(), function(JoinClause $q) use($relation, $key) {
+            $q->on($relation->getQualifiedParentKeyName(), $relation->getForeignKey())
+        	    ->on($relation->getMorphType(), get_class($this))
+        	    ->on($relation->getRelated()->getTable().'.key', $key);
+        }, null, null, $type);
+    }
+
+
 
 
     /**
@@ -236,5 +295,5 @@ trait Metable
         ]);
         return $meta;
     }
-    
+
 }
