@@ -13,6 +13,7 @@ use Plank\Metable\DataType\ModelCollectionHandler;
 use Plank\Metable\DataType\ModelHandler;
 use Plank\Metable\DataType\NullHandler;
 use Plank\Metable\DataType\ObjectHandler;
+use Plank\Metable\DataType\SerializableHandler;
 use Plank\Metable\DataType\StringHandler;
 
 class HandlerTest extends TestCase
@@ -80,6 +81,12 @@ class HandlerTest extends TestCase
 				'object', 
 				$object,
 				[[]]
+			],
+			'serializable' => [
+				new SerializableHandler,
+				'serializable',
+				new SampleSerializable(['foo' => 'bar']),
+				[]
 			],
 			'string'  => [
 				new StringHandler, 

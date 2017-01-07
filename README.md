@@ -9,7 +9,7 @@ Laravel-Metable is a package for easily attaching arbitrary data to Eloquent mod
 ## Features
 
 - One-to-many polymorphic relationship allows attaching data to Eloquent models without needing to adjust the database schema. 
-- Data type conversion system allows data of numerous different types (null, boolean, integer, float, string, array, object, eloquent model, eloquent collection) to be stored, queried and retrieved.
+- Type conversion system allows data of numerous different scalar and object types to be stored and retrieved. See the documentation for the list of supported types.
 
 ## Example Usage
 
@@ -83,7 +83,7 @@ class Post extends Model
 
 ## Documentation
 
-Read the documentation [here](http://laravel-metable.readthedocs.io/en/latest/).
+The full documentation is available on [ReadTheDocs](http://laravel-metable.readthedocs.io/en/latest/).
 
 ## License
 
