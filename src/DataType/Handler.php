@@ -5,7 +5,7 @@ namespace Plank\Metable\DataType;
 interface Handler
 {
 	/**
-	 * Return the identifier for the datatype being handled.
+	 * Return the identifier for the data type being handled.
 	 * @return string
 	 */
 	public function getDataType() : string;
@@ -18,7 +18,7 @@ interface Handler
 	public function canHandleValue($value) : bool;
 
 	/**
-	 * Convert the value to a string, which can be stored in the database.
+	 * Convert the value to a string, so that it can be stored in the database.
 	 * @param  mixed $value
 	 * @return string
 	 */

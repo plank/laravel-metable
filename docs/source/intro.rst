@@ -1,0 +1,76 @@
+Introduction
+=============
+
+.. highlight:: php
+
+Laravel-Metable is a package for easily attaching arbitrary data to Eloquent models for Laravel 5. 
+   
+Features
+---------------
+
+* One-to-many polymorphic relationship allows attaching data to Eloquent models without needing to adjust the database schema. 
+* Type conversion system allows data of numerous different scalar and object types to be stored, queried and retrieved. See the list of supported `data types <datatypes.html>`_.
+
+Installation
+-------------
+
+Add the package to your Laravel app using composer
+
+::
+
+	composer require plank/laravel-metable
+
+
+Register the package's service provider in ``config/app.php``
+
+::
+
+	<?php
+	'providers' => [
+	    ...
+	    Plank\Metable\MetableServiceProvider::class,
+	    ...
+	];
+
+
+Publish the config file (``config/metable.php``) and migration file (``database/migrations/####_##_##_######_create_metable_table.php``) of the package using artisan.
+
+::
+
+	php artisan vendor:publish --provider="Plank\Metable\MetableServiceProvider"
+
+
+Run the migrations to add the required table to your database.
+
+::
+
+	php artisan migrate
+
+
+Add the `Plank\\Metable\\Metable <https://github.com/plank/laravel-metable/blob/master/src/Metable.php>`_ trait to any eloquent model class that you want to be able to attach metadata to.
+
+Example Usage
+----------------
+
+Attach some metadata to an eloquent model 
+
+::
+	
+	<?php
+	$post = Post::create($this->request->input());
+	$post->setMeta('color', 'blue');
+
+
+Query the model by its metadata
+
+::
+
+	<?php
+	$post = Post::whereMeta('color', 'blue');
+
+Retrieve the metadata from a model
+
+::
+
+	<?php
+	$value = $post->getMeta('color');

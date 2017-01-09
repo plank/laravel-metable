@@ -62,7 +62,7 @@ Run the migrations to add the required table to your database.
 php artisan migrate
 ```
 
-Add the `Metable` trait to any eloquent model class that you want to be able toattach metadata to.
+Add the `Plank\Metable\Metable` trait to any eloquent model class that you want to be able to attach metadata to.
 
 
 ```php

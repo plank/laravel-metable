@@ -18,9 +18,10 @@ return [
 		Plank\Metable\DataType\DoubleHandler::class,
 		Plank\Metable\DataType\StringHandler::class,
 		Plank\Metable\DataType\DateTimeHandler::class,
+		Plank\Metable\DataType\ArrayHandler::class,
 		Plank\Metable\DataType\ModelHandler::class,
 		Plank\Metable\DataType\ModelCollectionHandler::class,
-		Plank\Metable\DataType\ArrayHandler::class,
+		Plank\Metable\DataType\SerializableHandler::class,
 		Plank\Metable\DataType\ObjectHandler::class,
 	]
 ];
