@@ -90,6 +90,19 @@ class MetableTest extends TestCase
 		$this->assertFalse($metable->fresh()->hasMeta('foo'));
 	}
 
+	public function test_it_can_delete_all_meta()
+	{
+		$this->useDatabase();
+		$metable = factory(SampleMetable::class)->create();
+		$metable->setMeta('foo', 'bar');
+		$metable->setMeta('baz', 2);
+
+		$metable->purgeMeta();
+
+		$this->assertEquals(0, $metable->meta->count());
+		$this->assertEquals(0, $metable->meta()->count());
+	}
+
 	public function test_it_can_be_queried_by_single_meta_key()
 	{
 		$this->useDatabase();

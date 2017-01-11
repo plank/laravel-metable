@@ -29,7 +29,7 @@ trait Metable
 
         if ($this->hasMeta($key)) {
             $meta = $this->getMetaRecord($key);
-            $meta->value = $value;
+            $meta->setAttribute('value', $value);
             $meta->save();
         } else {
             $meta = $this->makeMeta($key, $value);
@@ -52,14 +52,15 @@ trait Metable
         $meta = [];
 
         foreach ($array as $key => $value) {
-            $meta[] = $this->makeMeta($key, $value);
+            $meta[$key] = $this->makeMeta($key, $value);
         }
 
         $this->meta()->delete();
         $this->meta()->saveMany($meta);
 
         //update cached relationship
-        $this->setRelation('meta', $this->newCollection($meta));
+        $collection = $this->makeMeta()->newCollection($meta);
+        $this->setRelation('meta', $collection);
     }
 
     /**
@@ -95,6 +96,16 @@ trait Metable
     {
         $this->getMetaRecord($key)->delete();
         $this->meta->forget($key);
+    }
+
+    /**
+     * Delete all meta attached to the model
+     * @return void
+     */
+    public function purgeMeta()
+    {
+        $this->meta()->delete();
+        $this->setRelation('meta', $this->makeMeta()->newCollection([]));
     }
 
     /**
@@ -263,9 +274,6 @@ trait Metable
         }, null, null, $type);
     }
 
-
-
-
     /**
      * {@InheritDoc}
      */
@@ -278,14 +286,13 @@ trait Metable
         return parent::setRelation($relation, $value);
     }
 
-
     /**
      * Create a new `Meta` record.
      * @param  string $key
      * @param  mixed $value
      * @return Meta
      */
-    private function makeMeta(string $key, $value) : Meta
+    private function makeMeta(string $key = '', $value = '') : Meta
     {
         $class = config('metable.model', Meta::class);
 
