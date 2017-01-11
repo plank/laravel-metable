@@ -9,7 +9,7 @@ Features
 ---------------
 
 * One-to-many polymorphic relationship allows attaching data to Eloquent models without needing to adjust the database schema. 
-* Type conversion system allows data of numerous different scalar and object types to be stored, queried and retrieved. See the list of supported `data types <datatypes.html>`_.
+* Type conversion system allows data of numerous different scalar and object types to be stored, queried and retrieved. See the list of supported :ref:`datatypes`.
 
 Installation
 -------------
