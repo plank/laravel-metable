@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Plank\Metable\Meta;
 
 class MetableTest extends TestCase
 {
@@ -101,6 +102,19 @@ class MetableTest extends TestCase
 
 		$this->assertEquals(0, $metable->meta->count());
 		$this->assertEquals(0, $metable->meta()->count());
+	}
+
+	public function test_it_clears_meta_on_deletion()
+	{
+		$this->useDatabase();
+		$metable = factory(SampleMetable::class)->create();
+		$metable->setMeta('foo', 'bar');
+
+		$metable->delete();
+		$meta = Meta::all();
+
+		$this->assertEquals(0, $meta->count());
+
 	}
 
 	public function test_it_can_be_queried_by_single_meta_key()

@@ -3,11 +3,20 @@
 namespace Plank\Metable;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Query\JoinClause;
 
 trait Metable
 {
+    
+    public static function bootMetable()
+    {
+        static::deleted(function(Model $model) {
+            $model->purgeMeta();
+        });
+    }
+
     /**
      * Relationship to the `Meta` model.
      * @return MorphMany
