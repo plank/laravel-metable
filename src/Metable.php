@@ -9,9 +9,13 @@ use Illuminate\Database\Query\JoinClause;
 
 trait Metable
 {
-    
+    /**
+     * Initialize the trait
+     * @return void
+     */
     public static function bootMetable()
     {
+        // delete all attached meta on deletion
         static::deleted(function(Model $model) {
             $model->purgeMeta();
         });
@@ -23,8 +27,8 @@ trait Metable
      */
     public function meta() : MorphMany
     {
-        $class = config('metable.model', Meta::class);
-        return $this->morphMany($class, 'metable');
+        $className = $this->getMetaClassName();
+        return $this->morphMany($className, 'metable');
     }
 
     /**
@@ -194,7 +198,7 @@ trait Metable
      * @param  Builder $q
      * @param  string  $key
      * @param  string  $operator
-     * @param  number  $value
+     * @param  integer|float  $value
      * @return void
      */
     public function scopeWhereMetaNumeric(Builder $q, string $key, string $operator, $value)
@@ -219,7 +223,7 @@ trait Metable
     public function scopeWhereMetaIn(Builder $q, string $key, array $values)
     {
         $values = array_map(function($val){
-            return is_string($val) ? $val :$this->makeMeta($key, $values)->getRawValue();
+            return is_string($val) ? $val :$this->makeMeta($key, $val)->getRawValue();
         }, $values);
 
         $q->whereHas('meta', function(Builder $q) use($key, $values){
@@ -233,12 +237,13 @@ trait Metable
      * @param  Builder $q
      * @param  string  $key
      * @param  string  $direction
+     * @param  boolean $strict if true, will exclude records that do not have meta for the provided $key
      * @return void
      */
-    public function scopeOrderByMeta(Builder $q, string $key, string $direction = 'asc')
+    public function scopeOrderByMeta(Builder $q, string $key, string $direction = 'asc', $strict = false)
     {
-        $this->joinMetaTable($q, $key);
-        $q->orderBy($this->meta()->getRelated()->getTable().'.value', $direction);
+        $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
+        $q->orderBy("{$table}.value", $direction);
     }
 
     /**
@@ -246,15 +251,16 @@ trait Metable
      * @param  Builder $q
      * @param  string  $key
      * @param  string  $direction
+     * @param  boolean $strict if true, will exclude records that do not have meta for the provided $key
      * @return void
      */
-    public function scopeOrderByMetaNumeric(Builder $q, string $key, string $direction = 'asc')
+    public function scopeOrderByMetaNumeric(Builder $q, string $key, string $direction = 'asc', $strict = false)
     {
+        $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
         $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
         $grammar = $q->getConnection()->getQueryGrammar();
-        $field = $grammar->wrap($this->meta()->getRelated()->getTable().'.value');
+        $field = $grammar->wrap("{$table}.value");
 
-        $this->joinMetaTable($q, $key);
         $q->orderByRaw("cast({$field} as numeric) $direction");
     }
 
@@ -268,19 +274,28 @@ trait Metable
     private function joinMetaTable(Builder $q, string $key, $type = 'left')
     {
     	$relation = $this->meta();
+        $metaTable = $relation->getRelated()->getTable();
+
+        // create an alias for the join, to allow the same 
+        // table to be joined multiple times for different keys.
+        $alias = $metaTable.'__'.$key;
 
     	// If no explicit select columns are specified,
-        // avoid column collision by excluding meta table from select
+        // avoid column collision by excluding meta table from select.
         if (!$q->getQuery()->columns) {
             $q->select($this->getTable().'.*');
         }
 
         // Join the meta table to the query
-        $q->join($relation->getRelated()->getTable(), function(JoinClause $q) use($relation, $key) {
-            $q->on($relation->getQualifiedParentKeyName(), $relation->getForeignKey())
-        	    ->on($relation->getMorphType(), get_class($this))
-        	    ->on($relation->getRelated()->getTable().'.key', $key);
+        $q->join("{$metaTable} as {$alias}", function(JoinClause $q) use($relation, $key, $alias) {
+            $q->on($relation->getQualifiedParentKeyName(), $alias.'.'.$relation->getPlainForeignKey())
+        	    ->on($alias.'.'.$relation->getPlainMorphType(), get_class($this))
+        	    ->on($alias.'.key', $key);
         }, null, null, $type);
+
+        // return the alias so that the calling context can 
+        // reference the table.
+        return $alias;
     }
 
     /**
@@ -296,16 +311,25 @@ trait Metable
     }
 
     /**
+     * Retrieve the FQCN of the class to use for Meta models 
+     * @return string
+     */
+    protected function getMetaClassName()
+    {
+        return config('metable.model', Meta::class);
+    }
+
+    /**
      * Create a new `Meta` record.
      * @param  string $key
      * @param  mixed $value
      * @return Meta
      */
-    private function makeMeta(string $key = '', $value = '') : Meta
+    protected function makeMeta(string $key = '', $value = '') : Meta
     {
-        $class = config('metable.model', Meta::class);
+        $className = $this->getMetaClassName();
 
-        $meta = new $class([
+        $meta = new $className([
             'key' => $key,
             'value' => $value
         ]);

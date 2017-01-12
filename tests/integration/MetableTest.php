@@ -213,6 +213,23 @@ class MetableTest extends TestCase
 		$this->assertEquals([2, 1, 3], $results2->pluck('id')->toArray());
 	}
 
+	public function test_it_can_order_query_by_meta_value_strict()
+	{
+		$this->useDatabase();
+		$metable1 = factory(SampleMetable::class)->create(['id' => 1]);
+		$metable2 = factory(SampleMetable::class)->create(['id' => 2]);
+		$metable3 = factory(SampleMetable::class)->create(['id' => 3]);
+		$metable1->setMeta('foo', 'b');
+		$metable2->setMeta('bar', 'c');
+		$metable3->setMeta('foo', 'a');
+
+		$results1 = SampleMetable::orderByMeta('foo', 'asc', true)->get();
+		$results2 = SampleMetable::orderByMeta('foo', 'desc', true)->get();
+
+		$this->assertEquals([3, 1], $results1->pluck('id')->toArray());
+		$this->assertEquals([1, 3], $results2->pluck('id')->toArray());
+	}
+
 	public function test_it_can_order_query_by_numeric_meta_value()
 	{
 		$this->useDatabase();
@@ -228,5 +245,22 @@ class MetableTest extends TestCase
 
 		$this->assertEquals([2, 3, 1], $results1->pluck('id')->toArray());
 		$this->assertEquals([1, 3, 2], $results2->pluck('id')->toArray());
+	}
+
+	public function test_it_can_order_query_by_numeric_meta_value_strict()
+	{
+		$this->useDatabase();
+		$metable1 = factory(SampleMetable::class)->create(['id' => 1]);
+		$metable2 = factory(SampleMetable::class)->create(['id' => 2]);
+		$metable3 = factory(SampleMetable::class)->create(['id' => 3]);
+		$metable1->setMeta('foo', 123);
+		$metable2->setMeta('bar', 4);
+		$metable3->setMeta('foo', 40);
+
+		$results1 = SampleMetable::orderByMetaNumeric('foo', 'asc', true)->get();
+		$results2 = SampleMetable::orderByMetaNumeric('foo', 'desc', true)->get();
+
+		$this->assertEquals([3, 1], $results1->pluck('id')->toArray());
+		$this->assertEquals([1, 3], $results2->pluck('id')->toArray());
 	}
 }
