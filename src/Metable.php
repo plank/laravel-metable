@@ -95,6 +95,17 @@ trait Metable
     }
 
     /**
+     * Retrieve all meta attached to the model as a key/value map
+     * @return Illuminate\Support\Collection
+     */
+    public function getAllMeta()
+    {
+        return $this->getMetaCollection()->toBase()->map(function(Meta $meta){
+            return $meta->getAttribute('value');
+        });
+    }
+
+    /**
      * Check if a `Meta` has been set at a given key.
      * @param  string  $key
      * @return boolean
