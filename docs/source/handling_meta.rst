@@ -3,7 +3,7 @@ Handling Meta
 
 .. highlight:: php
 
-before you can attach meta to an Eloquent model, you must first add the eloquent trait to your model.
+before you can attach meta to an Eloquent model, you must first add the ``Metable`` trait to your Eloquent model.
 
 ::
 
@@ -11,12 +11,12 @@ before you can attach meta to an Eloquent model, you must first add the eloquent
 
 	namespace App;
 
-	use Plank\Mediable\Mediable;
+	use Plank\Metable\Metable;
 	use Illuminate\Database\Eloquent\Model;
 
 	class Page extends Model
 	{
-		use Mediable;
+		use Metable;
 
 		// ...
 	}
@@ -124,7 +124,7 @@ To Remove all meta from a model, use ``purgeMeta()``.
 Eager Loading Meta
 ------------------
 
-When working with collections of Metable models, be sure to eager load the meta relation for all instances together to avoid repeated database queries (i.e. N+1 problem).
+When working with collections of ``Metable`` models, be sure to eager load the meta relation for all instances together to avoid repeated database queries (i.e. N+1 problem).
 
 Eager load from the query builder:
 

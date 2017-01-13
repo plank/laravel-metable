@@ -3,7 +3,7 @@ Querying Meta
 
 .. highlight:: php
 
-The Metable trait provides a number of query scopes to facilitate modifying queries based on the meta attached to your models
+The ``Metable`` trait provides a number of query scopes to facilitate modifying queries based on the meta attached to your models
 
 Checking for Presence of a key
 ------------------------------
