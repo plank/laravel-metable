@@ -4,16 +4,16 @@
 [![Coveralls](https://img.shields.io/coveralls/plank/laravel-metable.svg?style=flat-square)](https://coveralls.io/github/plank/laravel-metable)
 [![Packagist](https://img.shields.io/packagist/v/plank/laravel-metable.svg?style=flat-square)](https://packagist.org/packages/plank/laravel-metable)
 
-Laravel-Metable is a package for easily attaching arbitrary data to Eloquent models for Laravel 5. 
+Laravel-Metable is a package for easily attaching arbitrary data to Eloquent models for Laravel 5.
 
 ## Features
 
-- One-to-many polymorphic relationship allows attaching data to Eloquent models without needing to adjust the database schema. 
+- One-to-many polymorphic relationship allows attaching data to Eloquent models without needing to adjust the database schema.
 - Type conversion system allows data of numerous different scalar and object types to be stored and retrieved. See the documentation for the list of supported types.
 
 ## Example Usage
 
-Attach some metadata to an eloquent model 
+Attach some metadata to an eloquent model
 
 ```php
 $post = Post::create($this->request->input());
@@ -34,13 +34,13 @@ $value = $post->getMeta('color');
 
 ## Installation
 
-Add the package to your Laravel app using composer
+1. Add the package to your Laravel app using composer
 
 ```bash
 composer require plank/laravel-metable
 ```
 
-Register the package's service provider in `config/app.php`
+2. Register the package's service provider in `config/app.php`
 
 ```php
 'providers' => [
@@ -50,19 +50,19 @@ Register the package's service provider in `config/app.php`
 ];
 ```
 
-Publish the config file (`config/metable.php`) and migration file (`database/migrations/####_##_##_######_create_metable_table.php`) of the package using artisan.
+3. Publish the config file (`config/metable.php`) and migration file (`database/migrations/####_##_##_######_create_metable_table.php`) of the package using artisan.
 
 ```bash
 php artisan vendor:publish --provider="Plank\Metable\MetableServiceProvider"
 ```
 
-Run the migrations to add the required table to your database.
+4. Run the migrations to add the required table to your database.
 
 ```bash
 php artisan migrate
 ```
 
-Add the `Plank\Metable\Metable` trait to any eloquent model class that you want to be able to attach metadata to.
+5. Add the `Plank\Metable\Metable` trait to any eloquent model class that you want to be able to attach metadata to.
 
 
 ```php
