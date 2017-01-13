@@ -28,6 +28,7 @@ class ModelCollectionHandler implements Handler
 	 */
 	public function serializeValue($value) : string
 	{
+		$items = [];
 		foreach ($value as $key => $model) {
 			$items[$key] = [
 				'class' => get_class($model), 
@@ -42,15 +43,16 @@ class ModelCollectionHandler implements Handler
 	 */
 	public function unserializeValue(string $value)
 	{
-		$map = json_decode($value, true);
+		$data = json_decode($value, true);
 		
-		$collection = new $map['class'];
-		$models = $this->loadModels($map['items']);
+		$collection = new $data['class'];
+		$models = $this->loadModels($data['items']);
 
-		foreach ($map['items'] as $key => $item) {
+		//repopulate collection keys with loaded models
+		foreach ($data['items'] as $key => $item) {
 			if (is_null($item['key'])) {
 				$collection[$key] = new $item['class'];
-			}else{
+			}elseif(isset($models[$item['class']][$item['key']])){
 				$collection[$key] = $models[$item['class']][$item['key']];
 			}
 		}	
@@ -67,12 +69,14 @@ class ModelCollectionHandler implements Handler
 		$classes = [];
 		$results = [];
 
+		// retrieve a list of keys to load from each class
 		foreach ($items as $item) {
 			if(!is_null($item['key'])){
 				$classes[$item['class']][] = $item['key'];
 			}
 		}
 
+		// iterate list of classes and load all records matching a key
 		foreach ($classes as $class => $keys) {
 			$model = new $class;
 			$results[$class] = $model->whereIn($model->getKeyName(), $keys)->get()->keyBy($model->getKeyName());

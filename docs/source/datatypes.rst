@@ -80,6 +80,8 @@ Objects
 
 The following classes and interfaces are supported.
 
+.. _eloquent_models:
+
 Eloquent Models
 ^^^^^^^^^^^^^^^^^
 
