@@ -72,6 +72,11 @@ class MetableTest extends TestCase
         $metable->setMeta('foo', 'bar');
 
         $metable->syncMeta(['a' => 'b', 'c' => 'd']);
+
+        $this->assertFalse($metable->hasMeta('foo'));
+        $this->assertEquals('b', $metable->getMeta('a'));
+        $this->assertEquals('d', $metable->getMeta('c'));
+
         $metable = $metable->fresh(['meta']);
 
         $this->assertFalse($metable->hasMeta('foo'));

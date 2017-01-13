@@ -32,8 +32,7 @@ trait Metable
      */
     public function meta() : MorphMany
     {
-        $className = $this->getMetaClassName();
-        return $this->morphMany($className, 'metable');
+        return $this->morphMany($this->getMetaClassName(), 'metable');
     }
 
     /**
@@ -102,8 +101,7 @@ trait Metable
      */
     public function hasMeta(string $key) : bool
     {
-        $this->loadMetaIfNotLoaded();
-        return $this->meta->has($key);
+        return $this->getMetaCollection()->has($key);
     }
 
     /**
@@ -113,9 +111,7 @@ trait Metable
      */
     public function removeMeta(string $key)
     {
-        $this->loadMetaIfNotLoaded();
-        $this->getMetaRecord($key)->delete();
-        $this->meta->forget($key);
+        $this->getMetaCollection()->pull($key)->delete();
     }
 
     /**
@@ -135,8 +131,7 @@ trait Metable
      */
     public function getMetaRecord(string $key)
     {
-        $this->loadMetaIfNotLoaded();
-        return $this->meta->get($key);
+        return $this->getMetaCollection()->get($key);
     }
 
     /**
@@ -193,7 +188,7 @@ trait Metable
             $value = $this->makeMeta($key, $value)->getRawValue();
         }
 
-        $q->whereHas('meta', function (Builder $q) use ($key, $operator,$value) {
+        $q->whereHas('meta', function (Builder $q) use ($key, $operator, $value) {
             $q->where('key', $key);
             $q->where('value', $operator, $value);
         });
@@ -216,7 +211,7 @@ trait Metable
         $validOperators = ['<', '<=', '>', '>=', '=', '<>', '!='];
         $operator = in_array($operator, $validOperators) ? $operator : '=';
 
-        $q->whereHas('meta', function (Builder $q) use ($key, $operator,$value) {
+        $q->whereHas('meta', function (Builder $q) use ($key, $operator, $value) {
             $q->where('key', $key);
             $q->whereRaw("cast(value as numeric) {$operator} ?", [(float)$value]);
         });
@@ -235,7 +230,7 @@ trait Metable
             return is_string($val) ? $val :$this->makeMeta($key, $val)->getRawValue();
         }, $values);
 
-        $q->whereHas('meta', function (Builder $q) use ($key,$values) {
+        $q->whereHas('meta', function (Builder $q) use ($key, $values) {
             $q->where('key', $key);
             $q->whereIn('value', $values);
         });
@@ -295,7 +290,7 @@ trait Metable
         }
 
         // Join the meta table to the query
-        $q->join("{$metaTable} as {$alias}", function (JoinClause $q) use ($relation, $key,$alias) {
+        $q->join("{$metaTable} as {$alias}", function (JoinClause $q) use ($relation, $key, $alias) {
             $q->on($relation->getQualifiedParentKeyName(), '=', $alias.'.'.$relation->getPlainForeignKey())
                 ->on($alias.'.'.$relation->getPlainMorphType(), '=', get_class($this))
                 ->on($alias.'.key', '=', $key);
@@ -307,18 +302,20 @@ trait Metable
     }
 
     /**
-     * Load all meta for the model, if necessary
+     * fetch all meta for the model, if necessary
      *
-     * Addresses a bug in Laravel versions prior to 5.3, where relations that are
-     * lazy loaded by the `getAttribute()` method or the `__get()` magic method are
-     * not passed through the `setRelation()` method.
+     * In Laravel versions prior to 5.3, relations that are lazy loaded by the
+     * `getRelationFromMethod()` method ( invoked by the `__get()` magic method)
+     * are not passed through the `setRelation()` method, so we load the relation
+     * manually.
      * @return void
      */
-    private function loadMetaIfNotLoaded()
+    private function getMetaCollection()
     {
         if (!$this->relationLoaded('meta')) {
-            $this->load('meta');
+            $this->setRelation('meta', $this->meta()->get());
         }
+        return $this->getRelation('meta');
     }
 
     /**
