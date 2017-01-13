@@ -2,10 +2,15 @@
 
 namespace Plank\Metable\DataType;
 
+/**
+ * Handle serialization of integers.
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class IntegerHandler extends ScalarHandler
 {
     /**
-	 * {@InheritDoc}
-	 */
+     * {@InheritDoc}
+     */
     protected $type = 'integer';
 }

@@ -4,6 +4,11 @@ namespace Plank\Metable\Exceptions;
 
 use Exception;
 
+/**
+ * Data Type registry exception
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class DataTypeException extends Exception
 {
 

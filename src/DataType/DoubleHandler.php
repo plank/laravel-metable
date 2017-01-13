@@ -2,10 +2,15 @@
 
 namespace Plank\Metable\DataType;
 
+/**
+ * Handle serialization of floats.
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class DoubleHandler extends ScalarHandler
 {
     /**
-	 * {@InheritDoc}
-	 */
+     * {@InheritDoc}
+     */
     protected $type = 'double';
 }

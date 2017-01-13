@@ -5,14 +5,14 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateMetaTable extends Migration
 {
-	/**
+    /**
      * Run the migrations.
      *
      * @return void
      */
-	public function up()
-	{
-		Schema::create('meta', function(Blueprint $table){
+    public function up()
+    {
+        Schema::create('meta', function (Blueprint $table) {
             $table->increments('id');
             $table->string('metable_type');
             $table->unsignedInteger('metable_id');
@@ -22,15 +22,15 @@ class CreateMetaTable extends Migration
 
             $table->index(['metable_type', 'metable_id']);
         });
-	}
+    }
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::drop('meta');
-	}
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('meta');
+    }
 }

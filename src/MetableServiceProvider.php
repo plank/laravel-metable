@@ -5,6 +5,11 @@ namespace Plank\Metable;
 use Illuminate\Support\ServiceProvider;
 use Plank\Metable\DataType\Registry;
 
+/**
+ * Laravel-Metable Service Provider.
+ *
+ * @author Sean Fraser <sean@plankdesign.com>
+ */
 class MetableServiceProvider extends ServiceProvider
 {
     /**
@@ -45,7 +50,7 @@ class MetableServiceProvider extends ServiceProvider
      */
     protected function registerDataTypeRegistry()
     {
-        $this->app->singleton(Registry::class, function($app){
+        $this->app->singleton(Registry::class, function ($app) {
             $registry = new Registry;
             foreach (config('metable.datatypes') as $type => $handler) {
                 $registry->addHandler(new $handler);
