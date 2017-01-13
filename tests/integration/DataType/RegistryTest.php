@@ -11,7 +11,7 @@ class RegistryTest extends TestCase
         $registry = new Registry;
         $handler = $this->mockHandlerWithType('foo');
         $this->assertFalse($registry->hasHandlerForType('foo'));
-        
+
         $registry->addHandler($handler);
 
         $this->assertTrue($registry->hasHandlerForType('foo'));
@@ -24,7 +24,7 @@ class RegistryTest extends TestCase
         $handler = $this->mockHandlerWithType('foo');
         $registry->addHandler($handler);
         $this->assertTrue($registry->hasHandlerForType('foo'));
-        
+
         $registry->removeHandlerForType('foo');
 
         $this->assertFalse($registry->hasHandlerForType('foo'));
@@ -72,7 +72,7 @@ class RegistryTest extends TestCase
 
     protected function mockHandlerWithType($type)
     {
-        $handler = $this->getMock(Handler::class);
+        $handler = $this->createMock(Handler::class);
         $handler->method('getDataType')->willReturn($type);
         return $handler;
     }

@@ -102,6 +102,7 @@ trait Metable
      */
     public function hasMeta(string $key) : bool
     {
+        $this->loadMetaIfNotLoaded();
         return $this->meta->has($key);
     }
 
@@ -112,6 +113,7 @@ trait Metable
      */
     public function removeMeta(string $key)
     {
+        $this->loadMetaIfNotLoaded();
         $this->getMetaRecord($key)->delete();
         $this->meta->forget($key);
     }
@@ -133,6 +135,7 @@ trait Metable
      */
     public function getMetaRecord(string $key)
     {
+        $this->loadMetaIfNotLoaded();
         return $this->meta->get($key);
     }
 
@@ -264,8 +267,7 @@ trait Metable
     {
         $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
         $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
-        $grammar = $q->getConnection()->getQueryGrammar();
-        $field = $grammar->wrap("{$table}.value");
+        $field = $q->getQuery()->getGrammar()->wrap("{$table}.value");
 
         $q->orderByRaw("cast({$field} as numeric) $direction");
     }
@@ -294,14 +296,29 @@ trait Metable
 
         // Join the meta table to the query
         $q->join("{$metaTable} as {$alias}", function (JoinClause $q) use ($relation, $key,$alias) {
-            $q->on($relation->getQualifiedParentKeyName(), $alias.'.'.$relation->getPlainForeignKey())
-                ->on($alias.'.'.$relation->getPlainMorphType(), get_class($this))
-                ->on($alias.'.key', $key);
+            $q->on($relation->getQualifiedParentKeyName(), '=', $alias.'.'.$relation->getPlainForeignKey())
+                ->on($alias.'.'.$relation->getPlainMorphType(), '=', get_class($this))
+                ->on($alias.'.key', '=', $key);
         }, null, null, $type);
 
         // Return the alias so that the calling context can
         // reference the table.
         return $alias;
+    }
+
+    /**
+     * Load all meta for the model, if necessary
+     *
+     * Addresses a bug in Laravel versions prior to 5.3, where relations that are
+     * lazy loaded by the `getAttribute()` method or the `__get()` magic method are
+     * not passed through the `setRelation()` method.
+     * @return void
+     */
+    private function loadMetaIfNotLoaded()
+    {
+        if (!$this->relationLoaded('meta')) {
+            $this->load('meta');
+        }
     }
 
     /**
