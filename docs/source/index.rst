@@ -11,12 +11,13 @@ Laravel-Metable Documentation
     :target: https://packagist.org/packages/plank/laravel-metable
     :alt: Packagist
 
-Laravel-Metable is a package for easily attaching arbitrary data to Eloquent models for Laravel 5. 
+Laravel-Metable is a package for easily attaching arbitrary data to Eloquent models for Laravel 5.
 
 .. toctree::
    :maxdepth: 2
 
    intro
    handling_meta
+   querying_meta
    datatypes
 
