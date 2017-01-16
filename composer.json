@@ -25,7 +25,7 @@
         "satooshi/php-coveralls": "^1.0.1"
     },
     "autoload-dev":{
-        "classmap": ["tests/", "migrations/"]
+        "classmap": ["tests/"]
     },
     "minimum-stability": "stable",
     "prefer-stable": true
