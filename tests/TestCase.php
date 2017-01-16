@@ -5,7 +5,6 @@ use Plank\Metable\MetableServiceProvider;
 
 class TestCase extends BaseTestCase
 {
-
     public function setUp()
     {
         parent::setUp();
@@ -15,7 +14,7 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            MetableServiceProvider::class
+            MetableServiceProvider::class,
         ];
     }
 
@@ -29,9 +28,9 @@ class TestCase extends BaseTestCase
         date_default_timezone_set('GMT');
         //use in-memory database
         $app['config']->set('database.connections.testing', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => ''
+            'prefix'   => '',
         ]);
         $app['config']->set('database.default', 'testing');
     }
@@ -41,6 +40,7 @@ class TestCase extends BaseTestCase
         $reflector = new ReflectionClass($class);
         $property = $reflector->getProperty($property_name);
         $property->setAccessible(true);
+
         return $property;
     }
 
@@ -49,6 +49,7 @@ class TestCase extends BaseTestCase
         $reflector = new ReflectionClass($class);
         $method = $reflector->getMethod($method_name);
         $method->setAccessible(true);
+
         return $method;
     }
 

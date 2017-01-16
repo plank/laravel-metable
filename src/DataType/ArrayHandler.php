@@ -9,9 +9,8 @@ namespace Plank\Metable\DataType;
  */
 class ArrayHandler implements Handler
 {
-
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function getDataType() : string
     {
@@ -19,7 +18,7 @@ class ArrayHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function canHandleValue($value) : bool
     {
@@ -27,7 +26,7 @@ class ArrayHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function serializeValue($value) : string
     {
@@ -35,7 +34,7 @@ class ArrayHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function unserializeValue(string $value)
     {

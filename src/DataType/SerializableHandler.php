@@ -12,7 +12,7 @@ use Serializable;
 class SerializableHandler implements Handler
 {
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function getDataType() : string
     {
@@ -20,7 +20,7 @@ class SerializableHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function canHandleValue($value) : bool
     {
@@ -28,7 +28,7 @@ class SerializableHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function serializeValue($value) : string
     {
@@ -36,7 +36,7 @@ class SerializableHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function unserializeValue(string $value)
     {

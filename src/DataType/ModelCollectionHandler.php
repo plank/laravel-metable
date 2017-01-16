@@ -11,9 +11,8 @@ use Illuminate\Database\Eloquent\Collection;
  */
 class ModelCollectionHandler implements Handler
 {
-
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function getDataType() : string
     {
@@ -21,7 +20,7 @@ class ModelCollectionHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function canHandleValue($value) : bool
     {
@@ -29,7 +28,7 @@ class ModelCollectionHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function serializeValue($value) : string
     {
@@ -37,26 +36,27 @@ class ModelCollectionHandler implements Handler
         foreach ($value as $key => $model) {
             $items[$key] = [
                 'class' => get_class($model),
-                'key' => $model->exists ? $model->getKey() : null
+                'key'   => $model->exists ? $model->getKey() : null,
             ];
         }
+
         return json_encode(['class'=> get_class($value), 'items' => $items]);
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function unserializeValue(string $value)
     {
         $data = json_decode($value, true);
 
-        $collection = new $data['class'];
+        $collection = new $data['class']();
         $models = $this->loadModels($data['items']);
 
         // Repopulate collection keys with loaded models.
         foreach ($data['items'] as $key => $item) {
             if (is_null($item['key'])) {
-                $collection[$key] = new $item['class'];
+                $collection[$key] = new $item['class']();
             } elseif (isset($models[$item['class']][$item['key']])) {
                 $collection[$key] = $models[$item['class']][$item['key']];
             }
@@ -67,7 +67,9 @@ class ModelCollectionHandler implements Handler
 
     /**
      * Load each model instance, grouped by class.
-     * @param  array $items
+     *
+     * @param array $items
+     *
      * @return array
      */
     private function loadModels(array $items)
@@ -84,7 +86,7 @@ class ModelCollectionHandler implements Handler
 
         // Iterate list of classes and load all records matching a key.
         foreach ($classes as $class => $keys) {
-            $model = new $class;
+            $model = new $class();
             $results[$class] = $model->whereIn($model->getKeyName(), $keys)->get()->keyBy($model->getKeyName());
         }
 

@@ -11,12 +11,13 @@ abstract class ScalarHandler implements Handler
 {
     /**
      * The name of the scalar data type.
+     *
      * @var string
      */
     protected $type;
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function getDataType() : string
     {
@@ -24,7 +25,7 @@ abstract class ScalarHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function canHandleValue($value) : bool
     {
@@ -32,20 +33,22 @@ abstract class ScalarHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function serializeValue($value) : string
     {
         settype($value, 'string');
+
         return $value;
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function unserializeValue(string $value)
     {
         settype($value, $this->type);
+
         return $value;
     }
 }

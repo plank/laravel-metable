@@ -23,7 +23,7 @@ class MetableServiceProvider extends ServiceProvider
             __DIR__.'/../config/metable.php' => config_path('metable.php'),
         ], 'config');
 
-        if (! class_exists(CreateMetaTable::class)) {
+        if (!class_exists(CreateMetaTable::class)) {
             $this->publishes([
                 __DIR__.'/../migrations/2017_01_01_000000_create_meta_table.php' => database_path('migrations/'.date('Y_m_d_His').'_create_meta_table.php'),
             ], 'migrations');
@@ -46,15 +46,17 @@ class MetableServiceProvider extends ServiceProvider
 
     /**
      * Add the DataType Registry to the service container.
+     *
      * @return void
      */
     protected function registerDataTypeRegistry()
     {
         $this->app->singleton(Registry::class, function () {
-            $registry = new Registry;
+            $registry = new Registry();
             foreach (config('metable.datatypes') as $handler) {
-                $registry->addHandler(new $handler);
+                $registry->addHandler(new $handler());
             }
+
             return $registry;
         });
         $this->app->alias(Registry::class, 'metable.datatype.registry');
