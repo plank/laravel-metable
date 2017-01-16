@@ -7,7 +7,7 @@ namespace Plank\Metable\DataType;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class DoubleHandler extends ScalarHandler
+class FloatHandler extends ScalarHandler
 {
     /**
      * {@InheritDoc}

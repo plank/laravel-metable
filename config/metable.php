@@ -16,7 +16,7 @@ return [
         Plank\Metable\DataType\BooleanHandler::class,
         Plank\Metable\DataType\NullHandler::class,
         Plank\Metable\DataType\IntegerHandler::class,
-        Plank\Metable\DataType\DoubleHandler::class,
+        Plank\Metable\DataType\FloatHandler::class,
         Plank\Metable\DataType\StringHandler::class,
         Plank\Metable\DataType\DateTimeHandler::class,
         Plank\Metable\DataType\ArrayHandler::class,
