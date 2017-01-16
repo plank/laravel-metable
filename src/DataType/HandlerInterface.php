@@ -7,7 +7,7 @@ namespace Plank\Metable\DataType;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-interface Handler
+interface HandlerInterface
 {
     /**
      * Return the identifier for the data type being handled.

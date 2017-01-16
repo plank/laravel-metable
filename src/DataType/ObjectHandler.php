@@ -7,7 +7,7 @@ namespace Plank\Metable\DataType;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class ObjectHandler implements Handler
+class ObjectHandler implements HandlerInterface
 {
     /**
      * {@inheritdoc}

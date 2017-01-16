@@ -21,12 +21,12 @@ class Registry
     /**
      * Append a Handler to use for a given type identifier.
      *
-     * @param Handler $handler
+     * @param HandlerInterface $handler
      * @param string  $type
      *
      * @return void
      */
-    public function addHandler(Handler $handler)
+    public function addHandler(HandlerInterface $handler)
     {
         $this->handlers[$handler->getDataType()] = $handler;
     }
@@ -38,9 +38,9 @@ class Registry
      *
      * @throws DataTypeException if no handler is found.
      *
-     * @return Handler
+     * @return HandlerInterface
      */
-    public function getHandlerForType(string $type) : Handler
+    public function getHandlerForType(string $type) : HandlerInterface
     {
         if ($this->hasHandlerForType($type)) {
             return $this->handlers[$type];

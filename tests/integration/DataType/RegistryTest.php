@@ -1,6 +1,6 @@
 <?php
 
-use Plank\Metable\DataType\Handler;
+use Plank\Metable\DataType\HandlerInterface;
 use Plank\Metable\DataType\Registry;
 use Plank\Metable\Exceptions\DataTypeException;
 
@@ -72,7 +72,7 @@ class RegistryTest extends TestCase
 
     protected function mockHandlerWithType($type)
     {
-        $handler = $this->createMock(Handler::class);
+        $handler = $this->createMock(HandlerInterface::class);
         $handler->method('getDataType')->willReturn($type);
 
         return $handler;

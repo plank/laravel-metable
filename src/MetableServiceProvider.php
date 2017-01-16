@@ -4,6 +4,7 @@ namespace Plank\Metable;
 
 use Illuminate\Support\ServiceProvider;
 use Plank\Metable\DataType\Registry;
+use CreateMetaTable;
 
 /**
  * Laravel-Metable Service Provider.

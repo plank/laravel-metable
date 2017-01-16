@@ -10,7 +10,7 @@ use DateTimeInterface;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class DateTimeHandler implements Handler
+class DateTimeHandler implements HandlerInterface
 {
     /**
      * The date format to use for serializing.

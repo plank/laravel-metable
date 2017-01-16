@@ -7,7 +7,7 @@ use Plank\Metable\DataType\ArrayHandler;
 use Plank\Metable\DataType\BooleanHandler;
 use Plank\Metable\DataType\DateTimeHandler;
 use Plank\Metable\DataType\FloatHandler;
-use Plank\Metable\DataType\Handler;
+use Plank\Metable\DataType\HandlerInterface;
 use Plank\Metable\DataType\IntegerHandler;
 use Plank\Metable\DataType\ModelCollectionHandler;
 use Plank\Metable\DataType\ModelHandler;
@@ -99,7 +99,7 @@ class HandlerTest extends TestCase
     /**
      * @dataProvider handlerProvider
      */
-    public function test_it_specifies_a_datatype_identifier(Handler $handler, $type)
+    public function test_it_specifies_a_datatype_identifier(HandlerInterface $handler, $type)
     {
         $this->assertEquals($type, $handler->getDataType());
     }
@@ -107,7 +107,7 @@ class HandlerTest extends TestCase
     /**
      * @dataProvider handlerProvider
      */
-    public function test_it_can_verify_compatibility(Handler $handler, $type, $value, $incompatible)
+    public function test_it_can_verify_compatibility(HandlerInterface $handler, $type, $value, $incompatible)
     {
         $this->assertTrue($handler->canHandleValue($value));
 
@@ -119,7 +119,7 @@ class HandlerTest extends TestCase
     /**
      * @dataProvider handlerProvider
      */
-    public function test_it_can_serialize_and_unserialize_values(Handler $handler, $type, $value)
+    public function test_it_can_serialize_and_unserialize_values(HandlerInterface $handler, $type, $value)
     {
         $serialized = $handler->serializeValue($value);
         $unserialized = $handler->unserializeValue($serialized);

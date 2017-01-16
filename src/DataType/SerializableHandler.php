@@ -9,7 +9,7 @@ use Serializable;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class SerializableHandler implements Handler
+class SerializableHandler implements HandlerInterface
 {
     /**
      * {@inheritdoc}

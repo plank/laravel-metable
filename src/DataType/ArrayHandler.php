@@ -7,7 +7,7 @@ namespace Plank\Metable\DataType;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class ArrayHandler implements Handler
+class ArrayHandler implements HandlerInterface
 {
     /**
      * {@inheritdoc}

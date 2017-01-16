@@ -7,7 +7,7 @@ namespace Plank\Metable\DataType;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-abstract class ScalarHandler implements Handler
+abstract class ScalarHandler implements HandlerInterface
 {
     /**
      * The name of the scalar data type.

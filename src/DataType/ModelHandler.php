@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @author Sean Fraser <sean@plankdesign.com>
  */
-class ModelHandler implements Handler
+class ModelHandler implements HandlerInterface
 {
     /**
      * {@inheritdoc}
