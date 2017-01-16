@@ -34,9 +34,8 @@ class ModelHandler implements Handler
     {
         if ($value->exists) {
             return get_class($value).'#'.$value->getKey();
-        } else {
-            return get_class($value);
         }
+        return get_class($value);
     }
 
     /**

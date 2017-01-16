@@ -50,9 +50,9 @@ class MetableServiceProvider extends ServiceProvider
      */
     protected function registerDataTypeRegistry()
     {
-        $this->app->singleton(Registry::class, function ($app) {
+        $this->app->singleton(Registry::class, function () {
             $registry = new Registry;
-            foreach (config('metable.datatypes') as $type => $handler) {
+            foreach (config('metable.datatypes') as $handler) {
                 $registry->addHandler(new $handler);
             }
             return $registry;
