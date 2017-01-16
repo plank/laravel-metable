@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Plank\Metable\DataType\ArrayHandler;
 use Plank\Metable\DataType\BooleanHandler;
 use Plank\Metable\DataType\DateTimeHandler;
-use Plank\Metable\DataType\DoubleHandler;
+use Plank\Metable\DataType\FloatHandler;
 use Plank\Metable\DataType\Handler;
 use Plank\Metable\DataType\IntegerHandler;
 use Plank\Metable\DataType\ModelCollectionHandler;
@@ -47,9 +47,9 @@ class HandlerTest extends TestCase
                 $datetime,
                 [2017, '2017-01-01']
             ],
-            'double'  => [
-                new DoubleHandler,
-                'double',
+            'float'  => [
+                new FloatHandler,
+                'float',
                 1.1,
                 ['1.1', 1]
             ],
@@ -111,7 +111,7 @@ class HandlerTest extends TestCase
     public function test_it_can_verify_compatibility(Handler $handler, $type, $value, $incompatible)
     {
         $this->assertTrue($handler->canHandleValue($value));
-        
+
         foreach ($incompatible as $value) {
             $this->assertFalse($handler->canHandleValue($value));
         }

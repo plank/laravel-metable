@@ -13,4 +13,12 @@ class FloatHandler extends ScalarHandler
      * {@InheritDoc}
      */
     protected $type = 'double';
+
+    /**
+     * {@InheritDoc}
+     */
+    public function getDataType() : string
+    {
+        return 'float';
+    }
 }
