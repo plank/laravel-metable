@@ -112,13 +112,23 @@ To remove the meta stored at a given key, use ``removeMeta()``.
 
 ::
 
-	<?php $model->removeMeta('prefered_language');
+	<?php
+    $model->removeMeta('prefered_language');
 
 To Remove all meta from a model, use ``purgeMeta()``.
 
 ::
 
-	<?php $model->purgeMeta();
+	<?php
+    $model->purgeMeta();
+
+Attached meta is automatically purged from the database when a ``Metable`` model is manually deleted. Meta will `not` be cascaded if the model is deleted by the query builder.
+
+::
+
+    <?php
+    $model->delete(); // will delete attached meta
+    MyModel::where(...)->delete() // will NOT delete attached meta
 
 
 Eager Loading Meta
