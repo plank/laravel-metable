@@ -1,8 +1,8 @@
 <?php
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Plank\Metable\DataType\ArrayHandler;
 use Plank\Metable\DataType\BooleanHandler;
 use Plank\Metable\DataType\DateTimeHandler;
@@ -23,76 +23,75 @@ class HandlerTest extends TestCase
         $timestamp = '2017-01-01 00:00:00.000000+0000';
         $datetime = Carbon::createFromFormat('Y-m-d H:i:s.uO', $timestamp);
 
-        $object = new stdClass;
+        $object = new stdClass();
         $object->foo = 'bar';
         $object->baz = 3;
 
-
         return [
             'array' => [
-                new ArrayHandler,
+                new ArrayHandler(),
                 'array',
                 ['foo' => ['bar'], 'baz'],
-                [new stdClass],
+                [new stdClass()],
             ],
             'boolean' => [
-                new BooleanHandler,
+                new BooleanHandler(),
                 'boolean',
                 true,
-                [1, 0, '', [], null]
+                [1, 0, '', [], null],
             ],
             'datetime' => [
-                new DateTimeHandler,
+                new DateTimeHandler(),
                 'datetime',
                 $datetime,
-                [2017, '2017-01-01']
+                [2017, '2017-01-01'],
             ],
             'float'  => [
-                new FloatHandler,
+                new FloatHandler(),
                 'float',
                 1.1,
-                ['1.1', 1]
+                ['1.1', 1],
             ],
             'integer' => [
-                new IntegerHandler,
+                new IntegerHandler(),
                 'integer',
                 3,
-                [1.1, '1']
+                [1.1, '1'],
             ],
             'model'   => [
-                new ModelHandler,
+                new ModelHandler(),
                 'model',
-                new SampleMetable,
-                [new stdClass]
+                new SampleMetable(),
+                [new stdClass()],
             ],
             'model collection' => [
-                new ModelCollectionHandler,
+                new ModelCollectionHandler(),
                 'collection',
-                new Collection([new SampleMetable]),
-                [collect()]],
+                new Collection([new SampleMetable()]),
+                [collect()], ],
             'null'    => [
-                new NullHandler,
+                new NullHandler(),
                 'null',
                 null,
-                [0, '', 'null', [], false]
+                [0, '', 'null', [], false],
             ],
             'object'  => [
-                new ObjectHandler,
+                new ObjectHandler(),
                 'object',
                 $object,
-                [[]]
+                [[]],
             ],
             'serializable' => [
-                new SerializableHandler,
+                new SerializableHandler(),
                 'serializable',
                 new SampleSerializable(['foo' => 'bar']),
-                []
+                [],
             ],
             'string'  => [
-                new StringHandler,
+                new StringHandler(),
                 'string',
                 'foo',
-                [1, 1.1]
+                [1, 1.1],
             ],
         ];
     }

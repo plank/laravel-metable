@@ -1,7 +1,7 @@
 <?php
 
 return [
-    /**
+    /*
      * Model class to use for Meta.
      */
     'model' => Plank\Metable\Meta::class,

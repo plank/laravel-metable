@@ -10,12 +10,12 @@ namespace Plank\Metable\DataType;
 class FloatHandler extends ScalarHandler
 {
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     protected $type = 'double';
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function getDataType() : string
     {

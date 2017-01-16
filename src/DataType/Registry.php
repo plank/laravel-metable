@@ -13,14 +13,17 @@ class Registry
 {
     /**
      * List of registered handlers .
+     *
      * @var array
      */
     protected $handlers = [];
 
     /**
      * Append a Handler to use for a given type identifier.
+     *
      * @param Handler $handler
      * @param string  $type
+     *
      * @return void
      */
     public function addHandler(Handler $handler)
@@ -30,9 +33,12 @@ class Registry
 
     /**
      * Retrieve the handler assigned to a given type identifier.
+     *
      * @param string $type
+     *
+     * @throws DataTypeException if no handler is found.
+     *
      * @return Handler
-     * @throws DataTypeException  if no handler is found.
      */
     public function getHandlerForType(string $type) : Handler
     {
@@ -44,8 +50,10 @@ class Registry
 
     /**
      * Check if a handler has been set for a given type identifier.
-     * @param string  $type
-     * @return boolean
+     *
+     * @param string $type
+     *
+     * @return bool
      */
     public function hasHandlerForType(string $type) : bool
     {
@@ -54,7 +62,9 @@ class Registry
 
     /**
      * Removes the handler with a given type identifier.
+     *
      * @param string $type
+     *
      * @return void
      */
     public function removeHandlerForType(string $type)
@@ -64,9 +74,12 @@ class Registry
 
     /**
      * Find a data type Handler that is able to operate on the value, return the type identifier associated with it.
-     * @param  mixed $value
+     *
+     * @param mixed $value
+     *
+     * @throws DataTypeException if no handler can handle the value.
+     *
      * @return string
-     * @throws DataTypeException  if no handler can handle the value.
      */
     public function getTypeForValue($value) : string
     {

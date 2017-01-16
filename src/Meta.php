@@ -13,38 +13,39 @@ use Plank\Metable\DataType\Registry;
  */
 class Meta extends Model
 {
-
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public $timestamps = false;
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     protected $table = 'meta';
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     protected $guarded = ['id', 'metable_type', 'metable_id', 'type'];
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     protected $attributes = [
-        'type' => 'null',
-        'value' => ''
+        'type'  => 'null',
+        'value' => '',
     ];
 
     /**
      * Cache of unserialized value.
+     *
      * @var mixed
      */
     protected $cachedValue;
 
     /**
      * Metable Relation.
+     *
      * @return MorphTo
      */
     public function metable() : MorphTo
@@ -58,15 +59,17 @@ class Meta extends Model
      * Will unserialize the value before returning it.
      *
      * Successive access will be loaded from cache.
+     *
      * @return mixed
      */
     public function getValueAttribute()
     {
-        if (! isset($this->cachedValue)) {
+        if (!isset($this->cachedValue)) {
             $this->cachedValue = $this->getDataTypeRegistry()
                 ->getHandlerForType($this->type)
                 ->unserializeValue($this->attributes['value']);
         }
+
         return $this->cachedValue;
     }
 
@@ -74,6 +77,7 @@ class Meta extends Model
      * Mutator for value.
      *
      * The `type` attribute will be automatically updated to match the datatype of the input.
+     *
      * @param mixed $value
      */
     public function setValueAttribute($value)
@@ -89,6 +93,7 @@ class Meta extends Model
 
     /**
      * Retrieve the underlying serialized value.
+     *
      * @return string
      */
     public function getRawValue() : string
@@ -98,6 +103,7 @@ class Meta extends Model
 
     /**
      * Load the datatype Registry from the container.
+     *
      * @return Registry
      */
     protected function getDataTypeRegistry() : Registry

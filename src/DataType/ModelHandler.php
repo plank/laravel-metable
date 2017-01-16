@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 class ModelHandler implements Handler
 {
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function getDataType() : string
     {
@@ -20,7 +20,7 @@ class ModelHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function canHandleValue($value) : bool
     {
@@ -28,28 +28,30 @@ class ModelHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function serializeValue($value) : string
     {
         if ($value->exists) {
             return get_class($value).'#'.$value->getKey();
         }
+
         return get_class($value);
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function unserializeValue(string $value)
     {
         // Return blank instances.
         if (strpos($value, '#') === false) {
-            return new $value;
+            return new $value();
         }
 
         // Fetch specific instances.
         list($class, $id) = explode('#', $value);
-        return with(new $class)->findOrFail($id);
+
+        return with(new $class())->findOrFail($id);
     }
 }

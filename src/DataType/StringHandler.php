@@ -10,7 +10,7 @@ namespace Plank\Metable\DataType;
 class StringHandler extends ScalarHandler
 {
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     protected $type = 'string';
 }

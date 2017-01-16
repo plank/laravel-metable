@@ -10,12 +10,12 @@ namespace Plank\Metable\DataType;
 class NullHandler extends ScalarHandler
 {
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     protected $type = 'NULL';
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function getDataType() : string
     {

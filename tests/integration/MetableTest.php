@@ -47,14 +47,14 @@ class MetableTest extends TestCase
         $metable = factory(SampleMetable::class)->create();
         $metable->setMeta('foo', 123);
         $metable->setMeta('bar', 'hello');
-        $metable->setMeta('baz', ['a','b','c']);
+        $metable->setMeta('baz', ['a', 'b', 'c']);
 
         $collection = $metable->getAllMeta();
 
         $this->assertEquals([
             'foo' => 123,
             'bar' => 'hello',
-            'baz' => ['a','b','c']
+            'baz' => ['a', 'b', 'c'],
         ], $collection->toArray());
     }
 

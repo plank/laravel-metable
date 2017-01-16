@@ -2,8 +2,8 @@
 
 namespace Plank\Metable\DataType;
 
-use DateTimeInterface;
 use Carbon\Carbon;
+use DateTimeInterface;
 
 /**
  * Handle serialization of DateTimeInterface objects.
@@ -12,15 +12,15 @@ use Carbon\Carbon;
  */
 class DateTimeHandler implements Handler
 {
-
     /**
      * The date format to use for serializing.
+     *
      * @var string
      */
     protected $format = 'Y-m-d H:i:s.uO';
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function getDataType() : string
     {
@@ -28,7 +28,7 @@ class DateTimeHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function canHandleValue($value) : bool
     {
@@ -36,7 +36,7 @@ class DateTimeHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function serializeValue($value) : string
     {
@@ -44,7 +44,7 @@ class DateTimeHandler implements Handler
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritdoc}
      */
     public function unserializeValue(string $value)
     {

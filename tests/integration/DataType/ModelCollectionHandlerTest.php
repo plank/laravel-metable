@@ -1,7 +1,7 @@
 <?php
 
-use Plank\Metable\DataType\ModelCollectionHandler;
 use Illuminate\Database\Eloquent\Collection;
+use Plank\Metable\DataType\ModelCollectionHandler;
 
 class ModelCollectionHandlerTest extends TestCase
 {
@@ -14,7 +14,6 @@ class ModelCollectionHandlerTest extends TestCase
         $model3 = factory(SampleMetable::class)->create(['id' => 1]);
         $collection = new Collection([$model1, $model2, 'foo' => $model3]);
         $handler = new ModelCollectionHandler();
-
 
         $serialized = $handler->serializeValue($collection);
         $unserialized = $handler->unserializeValue($serialized);

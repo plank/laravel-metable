@@ -1,7 +1,7 @@
 <?php
 
-use Plank\Metable\Meta;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Plank\Metable\Meta;
 
 class MetaTest extends TestCase
 {
@@ -22,7 +22,7 @@ class MetaTest extends TestCase
 
         $this->assertEquals('123', $meta->getRawValue());
     }
-    
+
     public function test_it_caches_unserialized_value()
     {
         $meta = factory(Meta::class)->make();
