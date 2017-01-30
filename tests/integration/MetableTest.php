@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Plank\Metable\Meta;
 
 class MetableTest extends TestCase
