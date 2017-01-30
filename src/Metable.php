@@ -333,8 +333,12 @@ trait Metable
 
         // Join the meta table to the query
         $q->join("{$metaTable} as {$alias}", function (JoinClause $q) use ($relation, $key, $alias) {
-            $q->on($relation->getQualifiedParentKeyName(), '=', $alias.'.'.$relation->getPlainForeignKey())
-                ->on($alias.'.'.$relation->getPlainMorphType(), '=', get_class($this))
+            // Laravel 5.4 changed the method names here
+            $foreign_key = method_exists($relation, 'getForeignKeyName') ? $relation->getForeignKeyName() : $relation->getPlainForeignKey();
+            $type = method_exists($relation, 'getForeignKeyName') ? $relation->getMorphType() : $relation->getPlainMorphType();
+
+            $q->on($relation->getQualifiedParentKeyName(), '=', $alias.'.'.$foreign_key)
+                ->on($alias.'.'.$type, '=', get_class($this))
                 ->on($alias.'.key', '=', $key);
         }, null, null, $type);
 

@@ -5,18 +5,6 @@ use Plank\Metable\Meta;
 
 class MetableTest extends TestCase
 {
-    public function test_it_can_load_its_meta_relation()
-    {
-        $metable = factory(SampleMetable::class)->make();
-
-        $relation = $metable->meta();
-
-        $this->assertInstanceOf(MorphMany::class, $relation);
-        $this->assertEquals('meta.metable_type', $relation->getMorphType());
-        $this->assertEquals('meta.metable_id', $relation->getForeignKey());
-        $this->assertEquals('sample_metables.id', $relation->getQualifiedParentKeyName());
-    }
-
     public function test_it_can_get_and_set_meta_value_by_key()
     {
         $this->useDatabase();

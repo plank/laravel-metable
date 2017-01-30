@@ -7,7 +7,7 @@ env:
     - PREFER_LOWEST="--prefer-lowest"
     - PREFER_LOWEST=""
 before_script:
-  - composer update --prefer-dist $PREFER_LOWEST
+  - composer update --prefer-dist --prefer-stable $PREFER_LOWEST
 script:
   - mkdir -p build/logs
   - phpunit --coverage-clover build/logs/clover.xml

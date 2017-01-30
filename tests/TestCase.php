@@ -9,6 +9,7 @@ class TestCase extends BaseTestCase
     {
         parent::setUp();
         $this->withFactories(__DIR__.'/_data/factories');
+        
     }
 
     protected function getPackageProviders($app)
@@ -57,11 +58,10 @@ class TestCase extends BaseTestCase
     {
         $artisan = $this->app->make('Illuminate\Contracts\Console\Kernel');
         $database = $this->app['config']->get('database.default');
-
+        $this->app->useDatabasePath(realpath(__DIR__).'/..');
         //Remigrate all database tables
         $artisan->call('migrate:refresh', [
             '--database' => $database,
-            '--realpath' => realpath(__DIR__.'/../migrations'),
         ]);
     }
 }
