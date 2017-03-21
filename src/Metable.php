@@ -244,7 +244,7 @@ trait Metable
         // escape the operator to protect against injection.
         $validOperators = ['<', '<=', '>', '>=', '=', '<>', '!='];
         $operator = in_array($operator, $validOperators) ? $operator : '=';
-        $field = $q->getQuery()->getGrammar()->wrap($this->meta()->getRelated()->getTable().".value");
+        $field = $q->getQuery()->getGrammar()->wrap($this->meta()->getRelated()->getTable().'.value');
 
         $q->whereHas('meta', function (Builder $q) use ($key, $operator, $value, $field) {
             $q->where('key', $key);
@@ -263,7 +263,7 @@ trait Metable
      */
     public function scopeWhereMetaIn(Builder $q, string $key, array $values)
     {
-        $values = array_map(function ($val) {
+        $values = array_map(function ($val) use($key) {
             return is_string($val) ? $val : $this->makeMeta($key, $val)->getRawValue();
         }, $values);
 
