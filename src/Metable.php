@@ -263,7 +263,7 @@ trait Metable
      */
     public function scopeWhereMetaIn(Builder $q, string $key, array $values)
     {
-        $values = array_map(function ($val) use($key) {
+        $values = array_map(function ($val) use ($key) {
             return is_string($val) ? $val : $this->makeMeta($key, $val)->getRawValue();
         }, $values);
 
