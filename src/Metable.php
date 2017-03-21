@@ -244,10 +244,11 @@ trait Metable
         // escape the operator to protect against injection.
         $validOperators = ['<', '<=', '>', '>=', '=', '<>', '!='];
         $operator = in_array($operator, $validOperators) ? $operator : '=';
+        $field = $q->getQuery()->getGrammar()->wrap($this->meta()->getRelated()->getTable().".value");
 
-        $q->whereHas('meta', function (Builder $q) use ($key, $operator, $value) {
+        $q->whereHas('meta', function (Builder $q) use ($key, $operator, $value, $field) {
             $q->where('key', $key);
-            $q->whereRaw("cast(value as numeric) {$operator} ?", [(float) $value]);
+            $q->whereRaw("cast({$field} as decimal) {$operator} ?", [(float) $value]);
         });
     }
 
@@ -304,7 +305,7 @@ trait Metable
         $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
         $field = $q->getQuery()->getGrammar()->wrap("{$table}.value");
 
-        $q->orderByRaw("cast({$field} as numeric) $direction");
+        $q->orderByRaw("cast({$field} as decimal) $direction");
     }
 
     /**
@@ -338,8 +339,8 @@ trait Metable
             $type = method_exists($relation, 'getForeignKeyName') ? $relation->getMorphType() : $relation->getPlainMorphType();
 
             $q->on($relation->getQualifiedParentKeyName(), '=', $alias.'.'.$foreign_key)
-                ->on($alias.'.'.$type, '=', get_class($this))
-                ->on($alias.'.key', '=', $key);
+                ->where($alias.'.key', '=', $key)
+                ->where($alias.'.'.$type, '=', get_class($this));
         }, null, null, $type);
 
         // Return the alias so that the calling context can
