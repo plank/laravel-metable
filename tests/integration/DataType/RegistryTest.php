@@ -34,7 +34,7 @@ class RegistryTest extends TestCase
     {
         $registry = new Registry();
 
-        $this->setExpectedException(DataTypeException::class);
+        $this->expectException(DataTypeException::class);
         $registry->getHandlerForType('foo');
     }
 
@@ -65,7 +65,7 @@ class RegistryTest extends TestCase
     {
         $registry = new Registry();
 
-        $this->setExpectedException(DataTypeException::class);
+        $this->expectException(DataTypeException::class);
 
         $registry->getTypeForValue([]);
     }
