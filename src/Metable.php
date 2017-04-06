@@ -179,6 +179,23 @@ trait Metable
     }
 
     /**
+     * Query scope to restrict the query to records which doesnt have `Meta` attached to a given key.
+     *
+     * If an array of keys is passed instead, will restrict the query to records having one or more Meta with any of the keys.
+     *
+     * @param Builder      $q
+     * @param string|array $key
+     *
+     * @return void
+     */
+    public function scopeWhereDoesntHaveMeta(Builder $q, $key)
+    {
+        $q->whereDoesntHave('meta', function (Builder $q) use ($key) {
+            $q->whereIn('key', (array) $key);
+        });
+    }
+
+    /**
      * Query scope to restrict the query to records which have `Meta` for all of the provided keys.
      *
      * @param Builder $q
