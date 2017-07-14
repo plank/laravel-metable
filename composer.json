@@ -33,7 +33,7 @@
         "laravel": {
             "providers": [
                 "Plank\\Metable\\MetableServiceProvider"
-            ],
+            ]
         }
     }
 }
