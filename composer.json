@@ -28,5 +28,12 @@
         "classmap": ["tests/"]
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Plank\\Metable\\MetableServiceProvider"
+            ],
+        }
+    }
 }

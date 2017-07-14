@@ -21,7 +21,7 @@ Installation
 	composer require plank/laravel-metable
 
 
-2. Register the package's service provider in ``config/app.php``
+2. Register the package's service provider in ``config/app.php``. In Laravel versions 5.5 and beyond, this step can be skipped if package auto-discovery is enabled.
 
 ::
 
