@@ -16,6 +16,18 @@ class MetableTest extends TestCase
         $this->assertEquals('bar', $metable->getMeta('foo'));
     }
 
+    public function test_it_can_set_uppercase_key()
+    {
+        $this->useDatabase();
+        $metable = factory(SampleMetable::class)->create();
+
+        $metable->setMeta('FOO', 'bar');
+
+        $this->assertTrue($metable->hasMeta('FOO'));
+        $this->assertFalse($metable->hasMeta('foo'));
+        $this->assertEquals('bar', $metable->getMeta('FOO'));
+    }
+
     public function test_it_can_get_meta_record()
     {
         $this->useDatabase();

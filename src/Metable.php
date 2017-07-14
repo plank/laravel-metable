@@ -45,8 +45,6 @@ trait Metable
      */
     public function setMeta(string $key, $value)
     {
-        $key = strtolower($key);
-
         if ($this->hasMeta($key)) {
             $meta = $this->getMetaRecord($key);
             $meta->setAttribute('value', $value);
