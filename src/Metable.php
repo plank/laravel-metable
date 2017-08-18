@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Collection;
 
 /**
  * Trait for giving Eloquent models the ability to handle Meta.
@@ -103,7 +104,7 @@ trait Metable
     /**
      * Retrieve all meta attached to the model as a key/value map.
      *
-     * @return Illuminate\Support\Collection
+     * @return Collection
      */
     public function getAllMeta()
     {
