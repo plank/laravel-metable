@@ -3,9 +3,11 @@
 namespace Plank\Metable;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Query\JoinClause;
+use Traversable;
 
 /**
  * Trait for giving Eloquent models the ability to handle Meta.
@@ -63,7 +65,7 @@ trait Metable
     /**
      * Replace all associated `Meta` with the keys and values provided.
      *
-     * @param array|traversable $array
+     * @param array|Traversable $array
      *
      * @return void
      */
@@ -103,7 +105,7 @@ trait Metable
     /**
      * Retrieve all meta attached to the model as a key/value map.
      *
-     * @return Illuminate\Support\Collection
+     * @return Collection
      */
     public function getAllMeta()
     {
@@ -313,7 +315,7 @@ trait Metable
      * @param string  $key
      * @param string  $type Join type.
      *
-     * @return void
+     * @return string
      */
     private function joinMetaTable(Builder $q, string $key, $type = 'left')
     {
@@ -354,7 +356,7 @@ trait Metable
      * are not passed through the `setRelation()` method, so we load the relation
      * manually.
      *
-     * @return void
+     * @return mixed
      */
     private function getMetaCollection()
     {
