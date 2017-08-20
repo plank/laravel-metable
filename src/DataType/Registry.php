@@ -45,6 +45,7 @@ class Registry
         if ($this->hasHandlerForType($type)) {
             return $this->handlers[$type];
         }
+
         throw DataTypeException::handlerNotFound($type);
     }
 
@@ -88,6 +89,7 @@ class Registry
                 return $type;
             }
         }
+
         throw DataTypeException::handlerNotFoundForValue($value);
     }
 }
