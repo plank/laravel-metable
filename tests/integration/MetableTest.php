@@ -148,6 +148,21 @@ class MetableTest extends TestCase
         $this->assertEquals($metable->getKey(), $result->getKey());
     }
 
+    public function test_it_can_be_queried_by_missing_single_meta_key()
+    {
+        $this->useDatabase();
+        $metable = factory(SampleMetable::class)->create();
+        $metable->setMeta('foo', 'bar');
+
+        $metable2 = factory(SampleMetable::class)->create();
+        $metable2->setMeta('bar', 'foo');
+
+        $result = SampleMetable::whereDoesntHaveMeta('foo')->first();
+
+        $this->assertEquals($metable2->getKey(), $result->getKey());
+        $this->assertNotEquals($metable->getKey(), $result->getKey());
+    }
+
     public function test_it_can_be_queried_by_any_meta_keys()
     {
         $this->useDatabase();
@@ -160,6 +175,27 @@ class MetableTest extends TestCase
 
         $this->assertEquals($metable->getKey(), $result1->getKey());
         $this->assertEquals($metable->getKey(), $result2->getKey());
+    }
+
+    public function test_it_can_be_queried_by_any_missing_meta_keys()
+    {
+        $this->useDatabase();
+        $metable = factory(SampleMetable::class)->create();
+        $metable->setMeta('foo', 'bar');
+        $metable->setMeta('baz', 'bat');
+
+        $metable2 = factory(SampleMetable::class)->create();
+        $metable2->setMeta('bee', 'bop');
+        $metable2->setMeta('bop', 'bee');
+
+        $result1 = SampleMetable::whereDoesntHaveMeta(['foo', 'baz'])->first();
+        $result2 = SampleMetable::whereDoesntHaveMeta(['foo', 'zzz'])->first();
+
+        $this->assertEquals($metable2->getKey(), $result1->getKey());
+        $this->assertEquals($metable2->getKey(), $result2->getKey());
+
+        $this->assertNotEquals($metable->getKey(), $result1->getKey());
+        $this->assertNotEquals($metable->getKey(), $result2->getKey());
     }
 
     public function test_it_can_be_queried_by_all_meta_keys()

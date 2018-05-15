@@ -23,6 +23,14 @@ If you would like to restrict your query to only return models with meta for `al
     <?php
     $models = MyModel::whereHasMetaKeys(['step1', 'step2', 'step3'])->get();
 
+You can also query for records that does not contain a meta key using the ``whereDoesntHaveMeta()``. It's signature is identical to that of ``whereHasMeta()`.
+
+::
+
+    <?php 
+    $models = MyModel::whereDoesntHaveMeta('notes')->get();
+    $models = MyModel::whereDoesntHaveMeta(['queued_at', 'sent_at'])->get();
+
 Comparing value
 ---------------
 
