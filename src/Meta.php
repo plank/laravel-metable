@@ -38,7 +38,7 @@ class Meta extends Model
      * {@inheritdoc}
      */
     protected $attributes = [
-        'type'  => 'null',
+        'type' => 'null',
         'value' => '',
     ];
 
@@ -54,7 +54,7 @@ class Meta extends Model
      *
      * @return MorphTo
      */
-    public function metable() : MorphTo
+    public function metable(): MorphTo
     {
         return $this->morphTo();
     }
@@ -104,7 +104,7 @@ class Meta extends Model
      *
      * @return string
      */
-    public function getRawValue() : string
+    public function getRawValue(): string
     {
         return $this->attributes['value'];
     }
@@ -114,7 +114,7 @@ class Meta extends Model
      *
      * @return Registry
      */
-    protected function getDataTypeRegistry() : Registry
+    protected function getDataTypeRegistry(): Registry
     {
         return app('metable.datatype.registry');
     }

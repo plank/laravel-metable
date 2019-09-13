@@ -15,7 +15,7 @@ class FloatHandler extends ScalarHandler
     /**
      * {@inheritdoc}
      */
-    public function getDataType() : string
+    public function getDataType(): string
     {
         return 'float';
     }

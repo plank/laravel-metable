@@ -15,7 +15,7 @@ class NullHandler extends ScalarHandler
     /**
      * {@inheritdoc}
      */
-    public function getDataType() : string
+    public function getDataType(): string
     {
         return 'null';
     }

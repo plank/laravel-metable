@@ -20,7 +20,7 @@ class DateTimeHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataType() : string
+    public function getDataType(): string
     {
         return 'datetime';
     }
@@ -28,7 +28,7 @@ class DateTimeHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value) : bool
+    public function canHandleValue($value): bool
     {
         return $value instanceof DateTimeInterface;
     }
@@ -36,7 +36,7 @@ class DateTimeHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value) : string
+    public function serializeValue($value): string
     {
         return $value->format($this->format);
     }

@@ -12,7 +12,7 @@ class SerializableHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataType() : string
+    public function getDataType(): string
     {
         return 'serializable';
     }
@@ -20,7 +20,7 @@ class SerializableHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value) : bool
+    public function canHandleValue($value): bool
     {
         return $value instanceof Serializable;
     }
@@ -28,7 +28,7 @@ class SerializableHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value) : string
+    public function serializeValue($value): string
     {
         return serialize($value);
     }

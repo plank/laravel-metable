@@ -12,7 +12,7 @@ class ModelHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataType() : string
+    public function getDataType(): string
     {
         return 'model';
     }
@@ -20,7 +20,7 @@ class ModelHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value) : bool
+    public function canHandleValue($value): bool
     {
         return $value instanceof Model;
     }
@@ -28,10 +28,10 @@ class ModelHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value) : string
+    public function serializeValue($value): string
     {
         if ($value->exists) {
-            return get_class($value).'#'.$value->getKey();
+            return get_class($value) . '#' . $value->getKey();
         }
 
         return get_class($value);

@@ -19,12 +19,12 @@ class MetableServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__.'/../config/metable.php' => config_path('metable.php'),
+            __DIR__ . '/../config/metable.php' => config_path('metable.php'),
         ], 'config');
 
         if (!class_exists(CreateMetaTable::class)) {
             $this->publishes([
-                __DIR__.'/../migrations/2017_01_01_000000_create_meta_table.php' => database_path('migrations/'.date('Y_m_d_His').'_create_meta_table.php'),
+                __DIR__ . '/../migrations/2017_01_01_000000_create_meta_table.php' => database_path('migrations/' . date('Y_m_d_His') . '_create_meta_table.php'),
             ], 'migrations');
         }
     }
@@ -37,7 +37,7 @@ class MetableServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/metable.php', 'metable'
+            __DIR__ . '/../config/metable.php', 'metable'
         );
 
         $this->registerDataTypeRegistry();
