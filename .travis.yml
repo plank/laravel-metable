@@ -1,7 +1,7 @@
 language: php
 php:
-  - '7.0'
-  - '7.1'
+  - '7.2'
+  - '7.3'
 env:
   matrix:
     - PREFER_LOWEST="--prefer-lowest"
@@ -12,7 +12,7 @@ script:
   - mkdir -p build/logs
   - phpunit --coverage-clover build/logs/clover.xml
 after_script:
-  - php vendor/bin/coveralls -v
+  - php vendor/bin/php-coveralls -v
 branches:
   only:
   - master
