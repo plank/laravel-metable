@@ -5,7 +5,7 @@ use Plank\Metable\MetableServiceProvider;
 
 class TestCase extends BaseTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->withFactories(__DIR__.'/_data/factories');

@@ -16,7 +16,7 @@ class MetableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
             __DIR__.'/../config/metable.php' => config_path('metable.php'),
@@ -34,7 +34,7 @@ class MetableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(
             __DIR__.'/../config/metable.php', 'metable'
@@ -48,7 +48,7 @@ class MetableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerDataTypeRegistry()
+    protected function registerDataTypeRegistry(): void
     {
         $this->app->singleton(Registry::class, function () {
             $registry = new Registry();

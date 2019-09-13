@@ -7,7 +7,7 @@ class MetableTest extends TestCase
     public function test_it_can_get_and_set_meta_value_by_key()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $this->assertFalse($metable->hasMeta('foo'));
 
         $metable->setMeta('foo', 'bar');
@@ -19,7 +19,7 @@ class MetableTest extends TestCase
     public function test_it_can_set_uppercase_key()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
 
         $metable->setMeta('FOO', 'bar');
 
@@ -31,7 +31,7 @@ class MetableTest extends TestCase
     public function test_it_can_get_meta_record()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 123);
 
         $record = $metable->getMetaRecord('foo');
@@ -43,7 +43,7 @@ class MetableTest extends TestCase
     public function test_it_can_get_meta_all_values()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 123);
         $metable->setMeta('bar', 'hello');
         $metable->setMeta('baz', ['a', 'b', 'c']);
@@ -60,7 +60,7 @@ class MetableTest extends TestCase
     public function test_it_updates_existing_meta_records()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 123);
         $record = $metable->getMetaRecord('foo');
 
@@ -74,7 +74,7 @@ class MetableTest extends TestCase
     public function test_it_returns_default_value_if_no_meta_set()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
 
         $result = $metable->getMeta('foo', 'not-found');
 
@@ -84,7 +84,7 @@ class MetableTest extends TestCase
     public function test_it_can_replace_all_keys()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
 
         $metable->syncMeta(['a' => 'b', 'c' => 'd']);
@@ -103,7 +103,7 @@ class MetableTest extends TestCase
     public function test_it_can_delete_meta()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
 
         $metable->removeMeta('foo');
@@ -115,7 +115,7 @@ class MetableTest extends TestCase
     public function test_it_can_delete_all_meta()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
         $metable->setMeta('baz', 2);
 
@@ -128,7 +128,7 @@ class MetableTest extends TestCase
     public function test_it_clears_meta_on_deletion()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
 
         $metable->delete();
@@ -140,7 +140,7 @@ class MetableTest extends TestCase
     public function test_it_can_be_queried_by_single_meta_key()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
 
         $result = SampleMetable::whereHasMeta('foo')->first();
@@ -151,10 +151,10 @@ class MetableTest extends TestCase
     public function test_it_can_be_queried_by_missing_single_meta_key()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
 
-        $metable2 = factory(SampleMetable::class)->create();
+        $metable2 = $this->createMetable();
         $metable2->setMeta('bar', 'foo');
 
         $result = SampleMetable::whereDoesntHaveMeta('foo')->first();
@@ -166,7 +166,7 @@ class MetableTest extends TestCase
     public function test_it_can_be_queried_by_any_meta_keys()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
         $metable->setMeta('baz', 'bat');
 
@@ -180,11 +180,11 @@ class MetableTest extends TestCase
     public function test_it_can_be_queried_by_any_missing_meta_keys()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
         $metable->setMeta('baz', 'bat');
 
-        $metable2 = factory(SampleMetable::class)->create();
+        $metable2 = $this->createMetable();
         $metable2->setMeta('bee', 'bop');
         $metable2->setMeta('bop', 'bee');
 
@@ -201,7 +201,7 @@ class MetableTest extends TestCase
     public function test_it_can_be_queried_by_all_meta_keys()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
         $metable->setMeta('baz', 'bat');
 
@@ -215,7 +215,7 @@ class MetableTest extends TestCase
     public function test_it_can_be_queried_by_meta_value()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
         $metable->setMeta('array', ['a' => 'b']);
 
@@ -231,7 +231,7 @@ class MetableTest extends TestCase
     public function test_it_can_be_queried_by_numeric_meta_value()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 123);
 
         $result = SampleMetable::whereMetaNumeric('foo', '>', 4)->first();
@@ -242,7 +242,7 @@ class MetableTest extends TestCase
     public function test_it_can_be_queried_by_in_array()
     {
         $this->useDatabase();
-        $metable = factory(SampleMetable::class)->create();
+        $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
 
         $result1 = SampleMetable::whereMetaIn('foo', ['baz', 'bar'])->first();
@@ -255,9 +255,9 @@ class MetableTest extends TestCase
     public function test_it_can_order_query_by_meta_value()
     {
         $this->useDatabase();
-        $metable1 = factory(SampleMetable::class)->create(['id' => 1]);
-        $metable2 = factory(SampleMetable::class)->create(['id' => 2]);
-        $metable3 = factory(SampleMetable::class)->create(['id' => 3]);
+        $metable1 = $this->createMetable(['id' => 1]);
+        $metable2 = $this->createMetable(['id' => 2]);
+        $metable3 = $this->createMetable(['id' => 3]);
         $metable1->setMeta('foo', 'b');
         $metable2->setMeta('foo', 'c');
         $metable3->setMeta('foo', 'a');
@@ -272,9 +272,9 @@ class MetableTest extends TestCase
     public function test_it_can_order_query_by_meta_value_strict()
     {
         $this->useDatabase();
-        $metable1 = factory(SampleMetable::class)->create(['id' => 1]);
-        $metable2 = factory(SampleMetable::class)->create(['id' => 2]);
-        $metable3 = factory(SampleMetable::class)->create(['id' => 3]);
+        $metable1 = $this->createMetable(['id' => 1]);
+        $metable2 = $this->createMetable(['id' => 2]);
+        $metable3 = $this->createMetable(['id' => 3]);
         $metable1->setMeta('foo', 'b');
         $metable2->setMeta('bar', 'c');
         $metable3->setMeta('foo', 'a');
@@ -289,9 +289,9 @@ class MetableTest extends TestCase
     public function test_it_can_order_query_by_numeric_meta_value()
     {
         $this->useDatabase();
-        $metable1 = factory(SampleMetable::class)->create(['id' => 1]);
-        $metable2 = factory(SampleMetable::class)->create(['id' => 2]);
-        $metable3 = factory(SampleMetable::class)->create(['id' => 3]);
+        $metable1 = $this->createMetable(['id' => 1]);
+        $metable2 = $this->createMetable(['id' => 2]);
+        $metable3 = $this->createMetable(['id' => 3]);
         $metable1->setMeta('foo', 123);
         $metable2->setMeta('foo', 4);
         $metable3->setMeta('foo', 40);
@@ -306,9 +306,9 @@ class MetableTest extends TestCase
     public function test_it_can_order_query_by_numeric_meta_value_strict()
     {
         $this->useDatabase();
-        $metable1 = factory(SampleMetable::class)->create(['id' => 1]);
-        $metable2 = factory(SampleMetable::class)->create(['id' => 2]);
-        $metable3 = factory(SampleMetable::class)->create(['id' => 3]);
+        $metable1 = $this->createMetable(['id' => 1]);
+        $metable2 = $this->createMetable(['id' => 2]);
+        $metable3 = $this->createMetable(['id' => 3]);
         $metable1->setMeta('foo', 123);
         $metable2->setMeta('bar', 4);
         $metable3->setMeta('foo', 40);
@@ -318,5 +318,10 @@ class MetableTest extends TestCase
 
         $this->assertEquals([3, 1], $results1->pluck('id')->toArray());
         $this->assertEquals([1, 3], $results2->pluck('id')->toArray());
+    }
+
+    private function createMetable(array $attributes = []): SampleMetable
+    {
+        return factory(SampleMetable::class)->create($attributes);
     }
 }
