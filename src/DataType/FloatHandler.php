@@ -4,8 +4,6 @@ namespace Plank\Metable\DataType;
 
 /**
  * Handle serialization of floats.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class FloatHandler extends ScalarHandler
 {
@@ -17,7 +15,7 @@ class FloatHandler extends ScalarHandler
     /**
      * {@inheritdoc}
      */
-    public function getDataType() : string
+    public function getDataType(): string
     {
         return 'float';
     }

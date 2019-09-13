@@ -4,8 +4,6 @@ namespace Plank\Metable\DataType;
 
 /**
  * Handle serialization of scalar values.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 abstract class ScalarHandler implements HandlerInterface
 {
@@ -19,7 +17,7 @@ abstract class ScalarHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataType() : string
+    public function getDataType(): string
     {
         return $this->type;
     }
@@ -27,7 +25,7 @@ abstract class ScalarHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value) : bool
+    public function canHandleValue($value): bool
     {
         return gettype($value) == $this->type;
     }
@@ -35,7 +33,7 @@ abstract class ScalarHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value) : string
+    public function serializeValue($value): string
     {
         settype($value, 'string');
 

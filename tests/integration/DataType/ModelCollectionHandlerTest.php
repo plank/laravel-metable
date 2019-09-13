@@ -16,6 +16,7 @@ class ModelCollectionHandlerTest extends TestCase
         $handler = new ModelCollectionHandler();
 
         $serialized = $handler->serializeValue($collection);
+        /** @var Collection $unserialized */
         $unserialized = $handler->unserializeValue($serialized);
 
         $this->assertInstanceOf(Collection::class, $unserialized);

@@ -8,8 +8,6 @@ use Plank\Metable\DataType\Registry;
 
 /**
  * Laravel-Metable Service Provider.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class MetableServiceProvider extends ServiceProvider
 {
@@ -18,15 +16,15 @@ class MetableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
-            __DIR__.'/../config/metable.php' => config_path('metable.php'),
+            __DIR__ . '/../config/metable.php' => config_path('metable.php'),
         ], 'config');
 
         if (!class_exists(CreateMetaTable::class)) {
             $this->publishes([
-                __DIR__.'/../migrations/2017_01_01_000000_create_meta_table.php' => database_path('migrations/'.date('Y_m_d_His').'_create_meta_table.php'),
+                __DIR__ . '/../migrations/2017_01_01_000000_create_meta_table.php' => database_path('migrations/' . date('Y_m_d_His') . '_create_meta_table.php'),
             ], 'migrations');
         }
     }
@@ -36,10 +34,10 @@ class MetableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/metable.php', 'metable'
+            __DIR__ . '/../config/metable.php', 'metable'
         );
 
         $this->registerDataTypeRegistry();
@@ -50,7 +48,7 @@ class MetableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerDataTypeRegistry()
+    protected function registerDataTypeRegistry(): void
     {
         $this->app->singleton(Registry::class, function () {
             $registry = new Registry();

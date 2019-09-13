@@ -4,7 +4,6 @@ namespace Plank\Metable;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Query\JoinClause;
 use Traversable;
@@ -12,7 +11,15 @@ use Traversable;
 /**
  * Trait for giving Eloquent models the ability to handle Meta.
  *
- * @author Sean Fraser <sean@plankdesign.com>
+ * @property Collection|Meta[] $meta
+ * @method static Builder whereHasMeta($key): void
+ * @method static Builder WhereDoesntHaveMeta($key)
+ * @method static Builder WhereHasMetaKeys(array $keys)
+ * @method static Builder WhereMeta(string $key, $operator, $value = null)
+ * @method static Builder WhereMetaNumeric(string $key, string $operator, $value)
+ * @method static Builder WhereMetaIn(string $key, array $values)
+ * @method static Builder OrderByMeta(string $key, string $direction = 'asc', $strict = false)
+ * @method static Builder OrderByMetaNumeric(string $key, string $direction = 'asc', $strict = false)
  */
 trait Metable
 {
@@ -24,7 +31,7 @@ trait Metable
     public static function bootMetable()
     {
         // delete all attached meta on deletion
-        static::deleted(function (Model $model) {
+        static::deleted(function (self $model) {
             $model->purgeMeta();
         });
     }
@@ -34,7 +41,7 @@ trait Metable
      *
      * @return MorphMany
      */
-    public function meta() : MorphMany
+    public function meta(): MorphMany
     {
         return $this->morphMany($this->getMetaClassName(), 'metable');
     }
@@ -43,9 +50,9 @@ trait Metable
      * Add or update the value of the `Meta` at a given key.
      *
      * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      */
-    public function setMeta(string $key, $value)
+    public function setMeta(string $key, $value): void
     {
         if ($this->hasMeta($key)) {
             $meta = $this->getMetaRecord($key);
@@ -69,7 +76,7 @@ trait Metable
      *
      * @return void
      */
-    public function syncMeta($array)
+    public function syncMeta($array): void
     {
         $meta = [];
 
@@ -89,7 +96,7 @@ trait Metable
      * Retrieve the value of the `Meta` at a given key.
      *
      * @param string $key
-     * @param mixed  $default Fallback value if no Meta is found.
+     * @param mixed $default Fallback value if no Meta is found.
      *
      * @return mixed
      */
@@ -105,9 +112,9 @@ trait Metable
     /**
      * Retrieve all meta attached to the model as a key/value map.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
-    public function getAllMeta()
+    public function getAllMeta(): \Illuminate\Support\Collection
     {
         return $this->getMetaCollection()->toBase()->map(function (Meta $meta) {
             return $meta->getAttribute('value');
@@ -121,7 +128,7 @@ trait Metable
      *
      * @return bool
      */
-    public function hasMeta(string $key) : bool
+    public function hasMeta(string $key): bool
     {
         return $this->getMetaCollection()->has($key);
     }
@@ -133,7 +140,7 @@ trait Metable
      *
      * @return void
      */
-    public function removeMeta(string $key)
+    public function removeMeta(string $key): void
     {
         $this->getMetaCollection()->pull($key)->delete();
     }
@@ -143,7 +150,7 @@ trait Metable
      *
      * @return void
      */
-    public function purgeMeta()
+    public function purgeMeta(): void
     {
         $this->meta()->delete();
         $this->setRelation('meta', $this->makeMeta()->newCollection([]));
@@ -156,7 +163,7 @@ trait Metable
      *
      * @return Meta|null
      */
-    public function getMetaRecord(string $key)
+    public function getMetaRecord(string $key): ?Meta
     {
         return $this->getMetaCollection()->get($key);
     }
@@ -166,15 +173,15 @@ trait Metable
      *
      * If an array of keys is passed instead, will restrict the query to records having one or more Meta with any of the keys.
      *
-     * @param Builder      $q
+     * @param Builder $q
      * @param string|array $key
      *
      * @return void
      */
-    public function scopeWhereHasMeta(Builder $q, $key)
+    public function scopeWhereHasMeta(Builder $q, $key): void
     {
         $q->whereHas('meta', function (Builder $q) use ($key) {
-            $q->whereIn('key', (array) $key);
+            $q->whereIn('key', (array)$key);
         });
     }
 
@@ -183,15 +190,15 @@ trait Metable
      *
      * If an array of keys is passed instead, will restrict the query to records having one or more Meta with any of the keys.
      *
-     * @param Builder      $q
+     * @param Builder $q
      * @param string|array $key
      *
      * @return void
      */
-    public function scopeWhereDoesntHaveMeta(Builder $q, $key)
+    public function scopeWhereDoesntHaveMeta(Builder $q, $key): void
     {
         $q->whereDoesntHave('meta', function (Builder $q) use ($key) {
-            $q->whereIn('key', (array) $key);
+            $q->whereIn('key', (array)$key);
         });
     }
 
@@ -199,15 +206,20 @@ trait Metable
      * Query scope to restrict the query to records which have `Meta` for all of the provided keys.
      *
      * @param Builder $q
-     * @param array   $keys
+     * @param array $keys
      *
      * @return void
      */
-    public function scopeWhereHasMetaKeys(Builder $q, array $keys)
+    public function scopeWhereHasMetaKeys(Builder $q, array $keys): void
     {
-        $q->whereHas('meta', function (Builder $q) use ($keys) {
-            $q->whereIn('key', $keys);
-        }, '=', count($keys));
+        $q->whereHas(
+            'meta',
+            function (Builder $q) use ($keys) {
+                $q->whereIn('key', $keys);
+            },
+            '=',
+            count($keys)
+        );
     }
 
     /**
@@ -218,13 +230,13 @@ trait Metable
      * Values will be serialized to a string before comparison. If using the `>`, `>=`, `<`, or `<=` comparison operators, note that the value will be compared as a string. If comparing numeric values, use `Metable::scopeWhereMetaNumeric()` instead.
      *
      * @param Builder $q
-     * @param string  $key
-     * @param mixed   $operator
-     * @param mixed   $value
+     * @param string $key
+     * @param mixed $operator
+     * @param mixed $value
      *
      * @return void
      */
-    public function scopeWhereMeta(Builder $q, string $key, $operator, $value = null)
+    public function scopeWhereMeta(Builder $q, string $key, $operator, $value = null): void
     {
         // Shift arguments if no operator is present.
         if (!isset($value)) {
@@ -248,24 +260,26 @@ trait Metable
      *
      * Performs numeric comparison instead of string comparison.
      *
-     * @param Builder   $q
-     * @param string    $key
-     * @param string    $operator
+     * @param Builder $q
+     * @param string $key
+     * @param string $operator
      * @param int|float $value
      *
      * @return void
      */
-    public function scopeWhereMetaNumeric(Builder $q, string $key, string $operator, $value)
+    public function scopeWhereMetaNumeric(Builder $q, string $key, string $operator, $value): void
     {
         // Since we are manually interpolating into the query,
         // escape the operator to protect against injection.
         $validOperators = ['<', '<=', '>', '>=', '=', '<>', '!='];
         $operator = in_array($operator, $validOperators) ? $operator : '=';
-        $field = $q->getQuery()->getGrammar()->wrap($this->meta()->getRelated()->getTable().'.value');
+        $field = $q->getQuery()
+            ->getGrammar()
+            ->wrap($this->meta()->getRelated()->getTable() . '.value');
 
         $q->whereHas('meta', function (Builder $q) use ($key, $operator, $value, $field) {
             $q->where('key', $key);
-            $q->whereRaw("cast({$field} as decimal) {$operator} ?", [(float) $value]);
+            $q->whereRaw("cast({$field} as decimal) {$operator} ?", [(float)$value]);
         });
     }
 
@@ -273,12 +287,12 @@ trait Metable
      * Query scope to restrict the query to records which have `Meta` with a specific key and a value within a specified set of options.
      *
      * @param Builder $q
-     * @param string  $key
-     * @param array   $values
+     * @param string $key
+     * @param array $values
      *
      * @return void
      */
-    public function scopeWhereMetaIn(Builder $q, string $key, array $values)
+    public function scopeWhereMetaIn(Builder $q, string $key, array $values): void
     {
         $values = array_map(function ($val) use ($key) {
             return is_string($val) ? $val : $this->makeMeta($key, $val)->getRawValue();
@@ -294,14 +308,18 @@ trait Metable
      * Query scope to order the query results by the string value of an attached meta.
      *
      * @param Builder $q
-     * @param string  $key
-     * @param string  $direction
-     * @param bool    $strict    if true, will exclude records that do not have meta for the provided `$key`.
+     * @param string $key
+     * @param string $direction
+     * @param bool $strict if true, will exclude records that do not have meta for the provided `$key`.
      *
      * @return void
      */
-    public function scopeOrderByMeta(Builder $q, string $key, string $direction = 'asc', $strict = false)
-    {
+    public function scopeOrderByMeta(
+        Builder $q,
+        string $key,
+        string $direction = 'asc',
+        $strict = false
+    ): void {
         $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
         $q->orderBy("{$table}.value", $direction);
     }
@@ -310,14 +328,18 @@ trait Metable
      * Query scope to order the query results by the numeric value of an attached meta.
      *
      * @param Builder $q
-     * @param string  $key
-     * @param string  $direction
-     * @param bool    $strict    if true, will exclude records that do not have meta for the provided `$key`.
+     * @param string $key
+     * @param string $direction
+     * @param bool $strict if true, will exclude records that do not have meta for the provided `$key`.
      *
      * @return void
      */
-    public function scopeOrderByMetaNumeric(Builder $q, string $key, string $direction = 'asc', $strict = false)
-    {
+    public function scopeOrderByMetaNumeric(
+        Builder $q,
+        string $key,
+        string $direction = 'asc',
+        $strict = false
+    ): void {
         $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
         $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
         $field = $q->getQuery()->getGrammar()->wrap("{$table}.value");
@@ -329,35 +351,31 @@ trait Metable
      * Join the meta table to the query.
      *
      * @param Builder $q
-     * @param string  $key
-     * @param string  $type Join type.
+     * @param string $key
+     * @param string $type Join type.
      *
      * @return string
      */
-    private function joinMetaTable(Builder $q, string $key, $type = 'left')
+    private function joinMetaTable(Builder $q, string $key, $type = 'left'): string
     {
         $relation = $this->meta();
         $metaTable = $relation->getRelated()->getTable();
 
         // Create an alias for the join, to allow the same
         // table to be joined multiple times for different keys.
-        $alias = $metaTable.'__'.$key;
+        $alias = $metaTable . '__' . $key;
 
         // If no explicit select columns are specified,
         // avoid column collision by excluding meta table from select.
         if (!$q->getQuery()->columns) {
-            $q->select($this->getTable().'.*');
+            $q->select($this->getTable() . '.*');
         }
 
         // Join the meta table to the query
         $q->join("{$metaTable} as {$alias}", function (JoinClause $q) use ($relation, $key, $alias) {
-            // Laravel 5.4 changed the method names here
-            $foreign_key = method_exists($relation, 'getForeignKeyName') ? $relation->getForeignKeyName() : $relation->getPlainForeignKey();
-            $type = method_exists($relation, 'getForeignKeyName') ? $relation->getMorphType() : $relation->getPlainMorphType();
-
-            $q->on($relation->getQualifiedParentKeyName(), '=', $alias.'.'.$foreign_key)
-                ->where($alias.'.key', '=', $key)
-                ->where($alias.'.'.$type, '=', get_class($this));
+            $q->on($relation->getQualifiedParentKeyName(), '=', $alias . '.' . $relation->getForeignKeyName())
+                ->where($alias . '.key', '=', $key)
+                ->where($alias . '.' . $relation->getMorphType(), '=', get_class($this));
         }, null, null, $type);
 
         // Return the alias so that the calling context can
@@ -391,6 +409,7 @@ trait Metable
     {
         if ($relation == 'meta') {
             // keep the meta relation indexed by key.
+            /** @var Collection $value */
             $value = $value->keyBy('key');
         }
 
@@ -402,7 +421,7 @@ trait Metable
      *
      * @return string
      */
-    protected function getMetaClassName()
+    protected function getMetaClassName(): string
     {
         return config('metable.model', Meta::class);
     }
@@ -411,16 +430,16 @@ trait Metable
      * Create a new `Meta` record.
      *
      * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return Meta
      */
-    protected function makeMeta(string $key = '', $value = '') : Meta
+    protected function makeMeta(string $key = '', $value = ''): Meta
     {
         $className = $this->getMetaClassName();
 
         $meta = new $className([
-            'key'   => $key,
+            'key' => $key,
             'value' => $value,
         ]);
 

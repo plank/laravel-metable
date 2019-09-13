@@ -4,15 +4,13 @@ namespace Plank\Metable\DataType;
 
 /**
  * Handle serialization of arrays.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class ArrayHandler implements HandlerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getDataType() : string
+    public function getDataType(): string
     {
         return 'array';
     }
@@ -20,7 +18,7 @@ class ArrayHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value) : bool
+    public function canHandleValue($value): bool
     {
         return is_array($value);
     }
@@ -28,7 +26,7 @@ class ArrayHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value) : string
+    public function serializeValue($value): string
     {
         return json_encode($value);
     }

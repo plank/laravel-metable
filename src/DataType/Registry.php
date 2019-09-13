@@ -6,8 +6,6 @@ use Plank\Metable\Exceptions\DataTypeException;
 
 /**
  * List of available data type Handlers.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class Registry
 {
@@ -22,7 +20,7 @@ class Registry
      * Append a Handler to use for a given type identifier.
      *
      * @param HandlerInterface $handler
-     * @param string           $type
+     * @param string $type
      *
      * @return void
      */
@@ -40,7 +38,7 @@ class Registry
      *
      * @return HandlerInterface
      */
-    public function getHandlerForType(string $type) : HandlerInterface
+    public function getHandlerForType(string $type): HandlerInterface
     {
         if ($this->hasHandlerForType($type)) {
             return $this->handlers[$type];
@@ -56,7 +54,7 @@ class Registry
      *
      * @return bool
      */
-    public function hasHandlerForType(string $type) : bool
+    public function hasHandlerForType(string $type): bool
     {
         return array_key_exists($type, $this->handlers);
     }
@@ -82,7 +80,7 @@ class Registry
      *
      * @return string
      */
-    public function getTypeForValue($value) : string
+    public function getTypeForValue($value): string
     {
         foreach ($this->handlers as $type => $handler) {
             if ($handler->canHandleValue($value)) {

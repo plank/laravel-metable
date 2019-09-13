@@ -4,8 +4,6 @@ namespace Plank\Metable\DataType;
 
 /**
  * Handle serialization of null values.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class NullHandler extends ScalarHandler
 {
@@ -17,7 +15,7 @@ class NullHandler extends ScalarHandler
     /**
      * {@inheritdoc}
      */
-    public function getDataType() : string
+    public function getDataType(): string
     {
         return 'null';
     }

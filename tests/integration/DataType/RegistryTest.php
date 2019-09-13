@@ -70,7 +70,11 @@ class RegistryTest extends TestCase
         $registry->getTypeForValue([]);
     }
 
-    protected function mockHandlerWithType($type)
+    /**
+     * @param $type
+     * @return \PHPUnit\Framework\MockObject\MockObject|HandlerInterface
+     */
+    protected function mockHandlerWithType($type): HandlerInterface
     {
         $handler = $this->createMock(HandlerInterface::class);
         $handler->method('getDataType')->willReturn($type);

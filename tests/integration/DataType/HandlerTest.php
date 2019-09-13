@@ -2,7 +2,6 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Plank\Metable\DataType\ArrayHandler;
 use Plank\Metable\DataType\BooleanHandler;
 use Plank\Metable\DataType\DateTimeHandler;
@@ -46,7 +45,7 @@ class HandlerTest extends TestCase
                 $datetime,
                 [2017, '2017-01-01'],
             ],
-            'float'  => [
+            'float' => [
                 new FloatHandler(),
                 'float',
                 1.1,
@@ -58,7 +57,7 @@ class HandlerTest extends TestCase
                 3,
                 [1.1, '1'],
             ],
-            'model'   => [
+            'model' => [
                 new ModelHandler(),
                 'model',
                 new SampleMetable(),
@@ -68,14 +67,15 @@ class HandlerTest extends TestCase
                 new ModelCollectionHandler(),
                 'collection',
                 new Collection([new SampleMetable()]),
-                [collect()], ],
-            'null'    => [
+                [collect()],
+            ],
+            'null' => [
                 new NullHandler(),
                 'null',
                 null,
                 [0, '', 'null', [], false],
             ],
-            'object'  => [
+            'object' => [
                 new ObjectHandler(),
                 'object',
                 $object,
@@ -87,7 +87,7 @@ class HandlerTest extends TestCase
                 new SampleSerializable(['foo' => 'bar']),
                 [],
             ],
-            'string'  => [
+            'string' => [
                 new StringHandler(),
                 'string',
                 'foo',

@@ -4,8 +4,6 @@ namespace Plank\Metable\DataType;
 
 /**
  * Provides means to serialize and unserialize values of different data types.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 interface HandlerInterface
 {
@@ -14,7 +12,7 @@ interface HandlerInterface
      *
      * @return string
      */
-    public function getDataType() : string;
+    public function getDataType(): string;
 
     /**
      * Determine if the value is of the correct type for this handler.
@@ -23,7 +21,7 @@ interface HandlerInterface
      *
      * @return bool
      */
-    public function canHandleValue($value) : bool;
+    public function canHandleValue($value): bool;
 
     /**
      * Convert the value to a string, so that it can be stored in the database.
@@ -32,7 +30,7 @@ interface HandlerInterface
      *
      * @return string
      */
-    public function serializeValue($value) : string;
+    public function serializeValue($value): string;
 
     /**
      * Convert a serialized string back to its original value.

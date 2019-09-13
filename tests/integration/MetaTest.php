@@ -7,7 +7,7 @@ class MetaTest extends TestCase
 {
     public function test_it_can_get_and_set_value()
     {
-        $meta = factory(Meta::class)->make();
+        $meta = $this->makeMeta();
 
         $meta->value = 'foo';
 
@@ -17,7 +17,7 @@ class MetaTest extends TestCase
 
     public function test_it_exposes_its_serialized_value()
     {
-        $meta = factory(Meta::class)->make();
+        $meta = $this->makeMeta();
         $meta->value = 123;
 
         $this->assertEquals('123', $meta->getRawValue());
@@ -25,7 +25,7 @@ class MetaTest extends TestCase
 
     public function test_it_caches_unserialized_value()
     {
-        $meta = factory(Meta::class)->make();
+        $meta = $this->makeMeta();
         $meta->value = 'foo';
         $this->assertEquals('foo', $meta->value);
 
@@ -37,7 +37,7 @@ class MetaTest extends TestCase
 
     public function test_it_clears_cache_on_set()
     {
-        $meta = factory(Meta::class)->make();
+        $meta = $this->makeMeta();
         $meta->value = 'foo';
         $this->assertEquals('foo', $meta->value);
 
@@ -48,12 +48,17 @@ class MetaTest extends TestCase
 
     public function test_it_can_get_its_model_relation()
     {
-        $meta = factory(Meta::class)->make();
+        $meta = $this->makeMeta();
 
         $relation = $meta->metable();
 
         $this->assertInstanceOf(MorphTo::class, $relation);
         $this->assertEquals('metable_type', $relation->getMorphType());
-        $this->assertEquals('metable_id', $relation->getForeignKey());
+        $this->assertEquals('metable_id', $relation->getForeignKeyName());
+    }
+
+    private function makeMeta(array $attributes = []): Meta
+    {
+        return factory(Meta::class)->make($attributes);
     }
 }

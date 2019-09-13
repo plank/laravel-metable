@@ -5,10 +5,10 @@ use Plank\Metable\MetableServiceProvider;
 
 class TestCase extends BaseTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
-        $this->withFactories(__DIR__.'/_data/factories');
+        $this->withFactories(__DIR__ . '/_data/factories');
     }
 
     protected function getPackageProviders($app)
@@ -28,21 +28,21 @@ class TestCase extends BaseTestCase
         date_default_timezone_set('GMT');
         //use in-memory database
         $app['config']->set('database.connections.testing', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
 
         $app['config']->set('database.connections.mysql-test', [
-            'driver'    => 'mysql',
-            'host'      => env('DB_HOST', 'localhost'),
-            'database'  => env('DB_DATABASE', 'metable'),
-            'username'  => env('DB_USERNAME', 'root'),
-            'password'  => env('DB_PASSWORD', 'root'),
-            'charset'   => 'utf8',
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', 'localhost'),
+            'database' => env('DB_DATABASE', 'metable'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', 'root'),
+            'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
-            'prefix'    => '',
-            'strict'    => false,
+            'prefix' => '',
+            'strict' => false,
         ]);
         $app['config']->set('database.default', 'testing');
     }
@@ -69,7 +69,7 @@ class TestCase extends BaseTestCase
     {
         $artisan = $this->app->make('Illuminate\Contracts\Console\Kernel');
         $database = $this->app['config']->get('database.default');
-        $this->app->useDatabasePath(realpath(__DIR__).'/..');
+        $this->app->useDatabasePath(realpath(__DIR__) . '/..');
         //Remigrate all database tables
         $artisan->call('migrate:refresh', [
             '--database' => $database,

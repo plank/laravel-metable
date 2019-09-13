@@ -9,7 +9,13 @@ use Plank\Metable\DataType\Registry;
 /**
  * Model for storing meta data.
  *
- * @author Sean Fraser <sean@plankdesign.com>
+ * @property int $id
+ * @property string $metable_type
+ * @property int $metable_id
+ * @property string $type
+ * @property string $key
+ * @property string $value
+ * @property Model $metable
  */
 class Meta extends Model
 {
@@ -32,7 +38,7 @@ class Meta extends Model
      * {@inheritdoc}
      */
     protected $attributes = [
-        'type'  => 'null',
+        'type' => 'null',
         'value' => '',
     ];
 
@@ -48,7 +54,7 @@ class Meta extends Model
      *
      * @return MorphTo
      */
-    public function metable() : MorphTo
+    public function metable(): MorphTo
     {
         return $this->morphTo();
     }
@@ -61,6 +67,7 @@ class Meta extends Model
      * Successive access will be loaded from cache.
      *
      * @return mixed
+     * @throws Exceptions\DataTypeException
      */
     public function getValueAttribute()
     {
@@ -79,8 +86,9 @@ class Meta extends Model
      * The `type` attribute will be automatically updated to match the datatype of the input.
      *
      * @param mixed $value
+     * @throws Exceptions\DataTypeException
      */
-    public function setValueAttribute($value)
+    public function setValueAttribute($value): void
     {
         $registry = $this->getDataTypeRegistry();
 
@@ -96,7 +104,7 @@ class Meta extends Model
      *
      * @return string
      */
-    public function getRawValue() : string
+    public function getRawValue(): string
     {
         return $this->attributes['value'];
     }
@@ -106,7 +114,7 @@ class Meta extends Model
      *
      * @return Registry
      */
-    protected function getDataTypeRegistry() : Registry
+    protected function getDataTypeRegistry(): Registry
     {
         return app('metable.datatype.registry');
     }
