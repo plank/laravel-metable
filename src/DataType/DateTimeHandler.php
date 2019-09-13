@@ -7,8 +7,6 @@ use DateTimeInterface;
 
 /**
  * Handle serialization of DateTimeInterface objects.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class DateTimeHandler implements HandlerInterface
 {

@@ -11,8 +11,6 @@ use Traversable;
 
 /**
  * Trait for giving Eloquent models the ability to handle Meta.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 trait Metable
 {

@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Handle serialization of Eloquent collections.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class ModelCollectionHandler implements HandlerInterface
 {

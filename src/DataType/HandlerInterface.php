@@ -4,8 +4,6 @@ namespace Plank\Metable\DataType;
 
 /**
  * Provides means to serialize and unserialize values of different data types.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 interface HandlerInterface
 {

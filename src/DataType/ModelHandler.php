@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Handle serialization of Eloquent Models.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class ModelHandler implements HandlerInterface
 {

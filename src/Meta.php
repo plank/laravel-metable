@@ -8,8 +8,6 @@ use Plank\Metable\DataType\Registry;
 
 /**
  * Model for storing meta data.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class Meta extends Model
 {

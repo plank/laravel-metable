@@ -6,8 +6,6 @@ use Serializable;
 
 /**
  * Handle serialization of Serializable objects.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class SerializableHandler implements HandlerInterface
 {

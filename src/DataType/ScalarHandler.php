@@ -4,8 +4,6 @@ namespace Plank\Metable\DataType;
 
 /**
  * Handle serialization of scalar values.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 abstract class ScalarHandler implements HandlerInterface
 {

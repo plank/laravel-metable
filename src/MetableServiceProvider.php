@@ -8,8 +8,6 @@ use Plank\Metable\DataType\Registry;
 
 /**
  * Laravel-Metable Service Provider.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class MetableServiceProvider extends ServiceProvider
 {

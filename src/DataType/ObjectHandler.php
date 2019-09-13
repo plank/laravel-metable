@@ -4,8 +4,6 @@ namespace Plank\Metable\DataType;
 
 /**
  * Handle serialization of plain objects.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class ObjectHandler implements HandlerInterface
 {

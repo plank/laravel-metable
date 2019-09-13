@@ -6,8 +6,6 @@ use Plank\Metable\Exceptions\DataTypeException;
 
 /**
  * List of available data type Handlers.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class Registry
 {

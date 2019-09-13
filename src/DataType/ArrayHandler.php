@@ -4,8 +4,6 @@ namespace Plank\Metable\DataType;
 
 /**
  * Handle serialization of arrays.
- *
- * @author Sean Fraser <sean@plankdesign.com>
  */
 class ArrayHandler implements HandlerInterface
 {
