@@ -12,5 +12,4 @@ class SampleMorph extends SampleMetable
     {
         return SampleMetable::class;
     }
-
 }
