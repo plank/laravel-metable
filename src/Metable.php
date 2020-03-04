@@ -375,7 +375,7 @@ trait Metable
         $q->join("{$metaTable} as {$alias}", function (JoinClause $q) use ($relation, $key, $alias) {
             $q->on($relation->getQualifiedParentKeyName(), '=', $alias . '.' . $relation->getForeignKeyName())
                 ->where($alias . '.key', '=', $key)
-                ->where($alias . '.' . $relation->getMorphType(), '=', get_class($this));
+                ->where($alias . '.' . $relation->getMorphType(), '=', $this->getMorphClass());
         }, null, null, $type);
 
         // Return the alias so that the calling context can
