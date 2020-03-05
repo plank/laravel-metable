@@ -6,7 +6,7 @@
 [![SensioLabsInsight](https://img.shields.io/sensiolabs/i/83f303ee-321e-4860-8638-cc1f513b7fe5.svg?style=flat-square)](https://insight.sensiolabs.com/projects/83f303ee-321e-4860-8638-cc1f513b7fe5)
 [![Packagist](https://img.shields.io/packagist/v/plank/laravel-metable.svg?style=flat-square)](https://packagist.org/packages/plank/laravel-metable)
 
-Laravel-Metable is a package for easily attaching arbitrary data to Eloquent models for Laravel 5.
+Laravel-Metable is a package for easily attaching arbitrary data to Eloquent models for Laravel 5.6+.
 
 ## Features
 
