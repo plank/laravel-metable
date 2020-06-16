@@ -24,6 +24,11 @@ use Traversable;
 trait Metable
 {
     /**
+     * @var Collection|Meta[]
+     */
+    private $indexedMetaCollection;
+
+    /**
      * Initialize the trait.
      *
      * @return void
@@ -65,7 +70,8 @@ trait Metable
 
         // Update cached relationship, if necessary.
         if ($this->relationLoaded('meta')) {
-            $this->meta[$key] = $meta;
+            $this->meta[] = $meta;
+            $this->indexedMetaCollection[$key] = $meta;
         }
     }
 
@@ -318,7 +324,7 @@ trait Metable
         Builder $q,
         string $key,
         string $direction = 'asc',
-        $strict = false
+        bool $strict = false
     ): void {
         $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
         $q->orderBy("{$table}.value", $direction);
@@ -338,7 +344,7 @@ trait Metable
         Builder $q,
         string $key,
         string $direction = 'asc',
-        $strict = false
+        bool $strict = false
     ): void {
         $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
         $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
@@ -399,7 +405,7 @@ trait Metable
             $this->setRelation('meta', $this->meta()->get());
         }
 
-        return $this->getRelation('meta');
+        return $this->indexedMetaCollection;
     }
 
     /**
@@ -410,10 +416,28 @@ trait Metable
         if ($relation == 'meta') {
             // keep the meta relation indexed by key.
             /** @var Collection $value */
-            $value = $value->keyBy('key');
+            $this->indexedMetaCollection = $value->keyBy('key');
         }
 
         return parent::setRelation($relation, $value);
+    }
+
+    /**
+     * Set the entire relations array on the model.
+     *
+     * @param  array  $relations
+     * @return $this
+     */
+    public function setRelations(array $relations)
+    {
+        // keep the meta relation indexed by key.
+        if (isset($relations['meta'])) {
+            $this->indexedMetaCollection = (new Collection($relations['meta']))->keyBy('key');
+        } else {
+            $this->indexedMetaCollection = $this->makeMeta()->newCollection();
+        }
+
+        return parent::setRelations($relations);
     }
 
     /**

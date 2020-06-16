@@ -21,6 +21,9 @@ before you can attach meta to an Eloquent model, you must first add the ``Metabl
 		// ...
 	}
 
+.. note::
+    The Metable trait adds a ``meta()`` relationship to the model. However, it also keeps meta keys indexed separately to speed up reads. As such, it is recommended to not modify this relationship directly and to instead only use the methods described in this document.
+
 Attaching Meta
 --------------
 
