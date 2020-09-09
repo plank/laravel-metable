@@ -5,10 +5,16 @@ use Plank\Metable\MetableServiceProvider;
 
 class TestCase extends BaseTestCase
 {
+    protected $metableFactory;
+    protected $metaFactory;
+    protected $morphFactory;
+
     public function setUp(): void
     {
         parent::setUp();
-        $this->withFactories(__DIR__ . '/_data/factories');
+        $this->metableFactory = new MetableFactory();
+        $this->metaFactory = new MetaFactory();
+        $this->morphFactory = new MorphFactory();
     }
 
     protected function getPackageProviders($app)

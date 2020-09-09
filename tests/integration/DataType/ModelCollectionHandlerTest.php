@@ -9,9 +9,9 @@ class ModelCollectionHandlerTest extends TestCase
     {
         $this->useDatabase();
 
-        $model1 = factory(SampleMetable::class)->create(['id' => 3]);
-        $model2 = factory(SampleMetable::class)->make([]);
-        $model3 = factory(SampleMetable::class)->create(['id' => 1]);
+        $model1 = $this->metableFactory->create(['id' => 3]);
+        $model2 = $this->metableFactory->make([]);
+        $model3 = $this->metableFactory->create(['id' => 1]);
         $collection = new Collection([$model1, $model2, 'foo' => $model3]);
         $handler = new ModelCollectionHandler();
 

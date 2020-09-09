@@ -372,16 +372,16 @@ class MetableTest extends TestCase
 
     private function makeMeta(array $attributes = []): Meta
     {
-        return factory(Meta::class)->make($attributes);
+        return $this->metaFactory->make($attributes);
     }
 
     private function makeMetable(array $attributes = []): SampleMetable
     {
-        return factory(SampleMetable::class)->make($attributes);
+        return $this->metableFactory->make($attributes);
     }
 
     private function createMetable(array $attributes = []): SampleMetable
     {
-        return factory(SampleMetable::class)->create($attributes);
+        return $this->metableFactory->create($attributes);
     }
 }

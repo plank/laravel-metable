@@ -8,7 +8,7 @@ class ModelHandlerTest extends TestCase
     {
         $this->useDatabase();
 
-        $model = factory(SampleMetable::class)->create(['id' => 12]);
+        $model = $this->metableFactory->create(['id' => 12]);
         $handler = new ModelHandler();
 
         $serialized = $handler->serializeValue($model);

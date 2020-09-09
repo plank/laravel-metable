@@ -51,11 +51,11 @@ class MorphTest extends TestCase
 
     private function createMetable(array $attributes = []): SampleMetable
     {
-        return factory(SampleMetable::class)->create($attributes);
+        return $this->metableFactory->create($attributes);
     }
 
     private function createChild(array $attributes = []): SampleMorph
     {
-        return factory(SampleMorph::class)->create($attributes);
+        return $this->morphFactory->create($attributes);
     }
 }

@@ -59,6 +59,6 @@ class MetaTest extends TestCase
 
     private function makeMeta(array $attributes = []): Meta
     {
-        return factory(Meta::class)->make($attributes);
+        return $this->metaFactory->make($attributes);
     }
 }
