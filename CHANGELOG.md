@@ -1,7 +1,7 @@
 # Changelog
 
 # 3.0.0 - 2020-09-13
-- Added support for Laravel 8.0
+- Added support for Laravel 8.0 (Thanks @saulens!)
 - moved minimum requirements to PHP 7.3 and Laravel 6.0+
 
 # 2.1.1 - 2020-06-15
