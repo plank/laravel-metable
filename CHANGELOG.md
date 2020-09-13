@@ -1,6 +1,19 @@
 # Changelog
 
-# 2.0.0
+# 3.0.0 - 2020-09-13
+- Added support for Laravel 8.0
+- moved minimum requirements to PHP 7.3 and Laravel 6.0+
+
+# 2.1.1 - 2020-06-15
+- Fixed array unpacking issue when queuing Metable models
+
+# 2.1.0 2020-03-06
+- Added Laravel 7.0 support (Thanks @saulens22!)
+
+# 2.0.1 - 2020-03-05
+- The `joinMetaTable()` function now uses `getMorphClass()` for `Metable` trait to assist with single table inheritance (Thanks @mbryne!)
+
+# 2.0.0 - 2019-09-12
 - Moved minimum requirements to PHP 7.2 and Laravel 5.6+
 - Added a number of missing return types.
 
