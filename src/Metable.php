@@ -42,6 +42,32 @@ trait Metable
     }
 
     /**
+     * Override: Get attribute from model, then meta
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function getAttribute($key)
+    {
+        return parent::getAttribute($key) ?? $this->getMeta($key);
+    }
+
+    /**
+     * Helper to get the default method value if it's set
+     *
+     * @param string $key
+     * @return void
+     */
+    protected function getDefaultMetaValueByKey($key)
+    {
+        if (isset($this->defaultMetaValues) && array_key_exists($key, $this->defaultMetaValues)) {
+            return $this->defaultMetaValues[$key];
+        }
+
+        return null;
+    }
+
+    /**
      * Relationship to the `Meta` model.
      *
      * @return MorphMany
@@ -112,7 +138,7 @@ trait Metable
             return $this->getMetaRecord($key)->getAttribute('value');
         }
 
-        return $default;
+        return $default ?? $this->getDefaultMetaValueByKey($key);
     }
 
     /**
