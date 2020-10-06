@@ -112,11 +112,15 @@ trait Metable
             return $this->getMetaRecord($key)->getAttribute('value');
         }
 
-        // Check if there is a default meta value in the model
-        // Ideally we'd want this used as the last option (past default)
-        // But due to $default being `null` we have no way of knowing if this isn't set by the user or not.
-        if (property_exists($this, 'defaultMetaValues') && array_key_exists($key, $this->defaultMetaValues)) {
-            return $this->defaultMetaValues[$key];
+        // If we have only one argument provided (i.e. default is not set)
+        // then we check the model for the defaultMetaValues
+        if (func_num_args() == 1) {
+            // Check if there is a default meta value in the model
+            // Ideally we'd want this used as the last option (past default)
+            // But due to $default being `null` we have no way of knowing if this isn't set by the user or not.
+            if (property_exists($this, 'defaultMetaValues') && array_key_exists($key, $this->defaultMetaValues)) {
+                return $this->defaultMetaValues[$key];
+            }
         }
 
         return $default;
