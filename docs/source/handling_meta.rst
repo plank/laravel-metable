@@ -164,3 +164,27 @@ You can also instruct your model class to `always` eager load the meta relations
 
         protected $with = ['meta'];
     }
+
+
+Default Model Meta Values
+------------------
+
+If you want to set a default value for specific keys on the model instead of on a per-use basis.
+
+Open the model and add:
+
+::
+
+    protected $defaultMetaValues = [
+		'foo' => 'bar'
+	];
+
+This parameter provides a global model specific default array of key => values. The best use-case for this would be to default a value for a meta variable you use many places in your codebase.
+The default is stored in one place, and not in many places throughout the codebase.
+
+Order of operation:
+
+1. Check if the meta value exists in the database
+2. Check if the second parameter (`$default`) was provided to `getMeta`
+	- If `$default` IS NOT parameter was provided, check if the `$defaultMetaValues` array is available on the model and if so if the `$key` requested is available within it.
+	- If `$default` IS a provided parameter, default to that if no `getMeta` value exists.
