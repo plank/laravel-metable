@@ -52,7 +52,7 @@ composer require plank/laravel-metable
 ];
 ```
 
-3. Publish the config file (`config/metable.php`) and migration file (`database/migrations/####_##_##_######_create_metable_table.php`) of the package using artisan.
+3. Publish the config file (`config/metable.php`) of the package using artisan.
 
 ```bash
 php artisan vendor:publish --provider="Plank\Metable\MetableServiceProvider"

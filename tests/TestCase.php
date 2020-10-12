@@ -70,6 +70,7 @@ class TestCase extends BaseTestCase
         $artisan = $this->app->make('Illuminate\Contracts\Console\Kernel');
         $database = $this->app['config']->get('database.default');
         $this->app->useDatabasePath(realpath(__DIR__) . '/..');
+        $this->loadMigrationsFrom(__DIR__ . '/_migrations');
         //Remigrate all database tables
         $artisan->call('migrate:refresh', [
             '--database' => $database,

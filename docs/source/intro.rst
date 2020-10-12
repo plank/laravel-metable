@@ -33,7 +33,7 @@ Installation
 	];
 
 
-3. Publish the config file (``config/metable.php``) and migration file (``database/migrations/####_##_##_######_create_metable_table.php``) of the package using artisan.
+3. Publish the config file (``config/metable.php``) of the package using artisan.
 
 ::
 
