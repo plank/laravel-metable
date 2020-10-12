@@ -26,6 +26,6 @@ class CreateSampleClassesTables extends Migration
      */
     public function down()
     {
-        Schema::drop('sample_metables');
+        Schema::dropIfExists('sample_metables');
     }
 }

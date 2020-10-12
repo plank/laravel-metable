@@ -1,7 +1,11 @@
 <?php
 
+namespace Plank\Metable\Tests\Integration\DataType;
+
 use Illuminate\Database\Eloquent\Collection;
 use Plank\Metable\DataType\ModelCollectionHandler;
+use Plank\Metable\Tests\Mocks\SampleMetable;
+use Plank\Metable\Tests\TestCase;
 
 class ModelCollectionHandlerTest extends TestCase
 {

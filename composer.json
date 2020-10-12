@@ -27,7 +27,9 @@
         "php-coveralls/php-coveralls": "^2.1"
     },
     "autoload-dev":{
-        "classmap": ["tests/"]
+        "psr-4": {
+            "Plank\\Metable\\Tests\\" : "tests/"
+        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
