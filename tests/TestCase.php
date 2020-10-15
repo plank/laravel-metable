@@ -1,14 +1,17 @@
 <?php
 
+namespace Plank\Metable\Tests;
+
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Plank\Metable\MetableServiceProvider;
+use ReflectionClass;
 
 class TestCase extends BaseTestCase
 {
     public function setUp(): void
     {
         parent::setUp();
-        $this->withFactories(__DIR__ . '/_data/factories');
+        $this->withFactories(__DIR__ . '/factories');
     }
 
     protected function getPackageProviders($app)
@@ -67,12 +70,14 @@ class TestCase extends BaseTestCase
 
     protected function useDatabase()
     {
-        $artisan = $this->app->make('Illuminate\Contracts\Console\Kernel');
-        $database = $this->app['config']->get('database.default');
         $this->app->useDatabasePath(realpath(__DIR__) . '/..');
-        //Remigrate all database tables
-        $artisan->call('migrate:refresh', [
-            '--database' => $database,
-        ]);
+        $this->loadMigrationsFrom(
+            [
+                '--path' => [
+                    dirname(__DIR__) . '/migrations',
+                    __DIR__ . '/migrations'
+                ]
+            ]
+        );
     }
 }

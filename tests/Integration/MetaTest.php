@@ -1,7 +1,10 @@
 <?php
 
+namespace Plank\Metable\Tests\Integration;
+
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Plank\Metable\Meta;
+use Plank\Metable\Tests\TestCase;
 
 class MetaTest extends TestCase
 {

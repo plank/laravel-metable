@@ -1,5 +1,9 @@
 <?php
 
+namespace Plank\Metable\Tests\Mocks;
+
+use Serializable;
+
 class SampleSerializable implements Serializable
 {
     public $data;

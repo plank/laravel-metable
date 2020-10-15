@@ -1,7 +1,12 @@
 <?php
 
+namespace Plank\Metable\Tests\Integration;
+
 use Illuminate\Database\Eloquent\Collection;
 use Plank\Metable\Meta;
+use Plank\Metable\Tests\Mocks\SampleMetable;
+use Plank\Metable\Tests\TestCase;
+use ReflectionClass;
 
 class MetableTest extends TestCase
 {
