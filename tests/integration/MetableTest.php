@@ -176,7 +176,6 @@ class MetableTest extends TestCase
         $result = SampleMetable::first();
 
         $this->assertEquals($result->getMeta('foo', null), null);
-        $this->assertNotEquals($result->getMeta('foo', null), 'bar');
     }
 
     public function test_it_can_be_queried_by_missing_single_meta_key()
