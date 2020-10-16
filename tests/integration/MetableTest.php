@@ -165,7 +165,6 @@ class MetableTest extends TestCase
         $result = SampleMetable::first();
 
         $this->assertEquals($result->getMeta('foo'), 'baz');
-        $this->assertNotEquals($result->getMeta('foo'), 'bar');
     }
 
     public function test_it_can_get_passed_default_before_model_default_value()
