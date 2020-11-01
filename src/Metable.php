@@ -112,7 +112,36 @@ trait Metable
             return $this->getMetaRecord($key)->getAttribute('value');
         }
 
+        // If we have only one argument provided (i.e. default is not set)
+        // then we check the model for the defaultMetaValues
+        if (func_num_args() == 1 && $this->hasDefaultMetaValue($key)) {
+            return $this->getDefaultMetaValue($key);
+        }
+
         return $default;
+    }
+
+    /**
+     * Check if the default meta array exists and the key is set
+     *
+     * @param string $key
+     * @return boolean
+     */
+    protected function hasDefaultMetaValue($key)
+    {
+        return property_exists($this, 'defaultMetaValues')
+                && array_key_exists($key, $this->defaultMetaValues);
+    }
+
+    /**
+     * Get the default meta value by key
+     *
+     * @param string $key
+     * @return mixed
+     */
+    protected function getDefaultMetaValue($key)
+    {
+        return $this->defaultMetaValues[$key];
     }
 
     /**

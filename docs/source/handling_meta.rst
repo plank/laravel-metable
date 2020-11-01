@@ -66,21 +66,45 @@ You can retrieve the value of the meta at a given key with the ``getMeta()`` met
 
 	//etc.
 
-You may pass a second parameter to the method in order to specify a default value to return if no meta had been set at that key.
-
-::
-
-	<?php
-	$model->getMeta('status', 'draft');
-
-.. note:: If a falsey value (e.g. ``0``, ``false``, ``null``, ``''``) has been manually set for the key, that value will be returned instead of the default value. The default value will only be returned if no meta exists at the key.
-
-
 Once loaded, all meta attached to a model instance are cached in the model's ``meta`` relationship. As such, successive calls to ``getMeta()`` will not hit the database repeatedly.
 
 Similarly, the unserialized value of each meta is cached once accessed. This is particularly relevant for attached :ref:`eloquent_models` and similar database-dependant objects.
 
 Setting a new value for a key automatically updates all caches.
+
+Default Values
+^^^^^^^^^^^^^^
+
+You may pass a second parameter to the ``getMeta()`` method in order to specify a default value to return if no meta has been set at that key.
+
+::
+
+	<?php
+	$model->getMeta('status', 'draft'); // will return 'draft' if not set
+	
+Alternatively, you may set default values as key-value pairs on the model itself, instead of specifying them at each individual call site. If a default has been defined from this property and a value is also passed as to the default parameter, the parameter will take precedence.
+
+::
+
+	<?php
+	class ExampleMetable extends Model {
+		use Metable;
+		
+		protected $defaultMetaValues = [
+			'color' => '#000000'
+		];
+		
+		//...
+	}
+::
+
+	<?php
+	$model->getMeta('color'); // will return '#000000' if not set
+	$model->getMeta('color', null); // will return null if not set
+	$model->getMeta('color', '#ffffff'); // will return '#ffffff' if not set
+	
+
+.. note:: If a falsey value (e.g. ``0``, ``false``, ``null``, ``''``) has been manually set for the key, that value will be returned instead of the default value. The default value will only be returned if no meta exists at the key.
 
 Retrieving All Meta
 -------------------

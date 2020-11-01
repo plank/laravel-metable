@@ -154,6 +154,35 @@ class MetableTest extends TestCase
         $this->assertEquals($metable->getKey(), $result->getKey());
     }
 
+    public function test_it_can_retrieve_model_default_value()
+    {
+        $this->useDatabase();
+        $result = $this->makeMetable();
+
+        $this->assertEquals($result->getMeta('foo'), 'bar');
+    }
+
+    public function test_it_can_get_database_before_default_value()
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
+        $metable->setMeta('foo', 'baz');
+
+        $result = SampleMetable::first();
+
+        $this->assertEquals($result->getMeta('foo'), 'baz');
+    }
+
+    public function test_it_can_get_passed_default_before_model_default_value()
+    {
+        $this->useDatabase();
+        $this->createMetable();
+
+        $result = SampleMetable::first();
+
+        $this->assertEquals($result->getMeta('foo', null), null);
+    }
+
     public function test_it_can_be_queried_by_missing_single_meta_key()
     {
         $this->useDatabase();
