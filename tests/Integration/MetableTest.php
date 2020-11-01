@@ -156,6 +156,7 @@ class MetableTest extends TestCase
 
     public function test_it_can_retrieve_model_default_value()
     {
+        $this->useDatabase();
         $result = $this->makeMetable();
 
         $this->assertEquals($result->getMeta('foo'), 'bar');
