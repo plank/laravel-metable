@@ -129,7 +129,7 @@ trait Metable
      */
     protected function hasDefaultMetaValue($key)
     {
-        return property_exists($this, 'defaultMetaValues') 
+        return property_exists($this, 'defaultMetaValues')
                 && array_key_exists($key, $this->defaultMetaValues);
     }
 
