@@ -1,5 +1,7 @@
 <?php
 
+namespace Plank\Metable\Tests\Integration\DataType;
+
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Plank\Metable\DataType\ArrayHandler;
@@ -14,6 +16,10 @@ use Plank\Metable\DataType\NullHandler;
 use Plank\Metable\DataType\ObjectHandler;
 use Plank\Metable\DataType\SerializableHandler;
 use Plank\Metable\DataType\StringHandler;
+use Plank\Metable\Tests\Mocks\SampleMetable;
+use Plank\Metable\Tests\Mocks\SampleSerializable;
+use Plank\Metable\Tests\TestCase;
+use stdClass;
 
 class HandlerTest extends TestCase
 {

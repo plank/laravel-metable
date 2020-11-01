@@ -1,7 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
+namespace Plank\Metable\Tests\Integration;
+
 use Plank\Metable\Meta;
+use Plank\Metable\Tests\Mocks\SampleMetable;
+use Plank\Metable\Tests\Mocks\SampleMorph;
+use Plank\Metable\Tests\TestCase;
 
 class MorphTest extends TestCase
 {

@@ -1,6 +1,10 @@
 <?php
 
+namespace Plank\Metable\Tests\Integration\DataType;
+
 use Plank\Metable\DataType\ModelHandler;
+use Plank\Metable\Tests\Mocks\SampleMetable;
+use Plank\Metable\Tests\TestCase;
 
 class ModelHandlerTest extends TestCase
 {

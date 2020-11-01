@@ -1,8 +1,12 @@
 # Changelog
 
+# 4.0.0 - 2020-10-12
+- fixed support for Laravel 8.0 migration squashing
+- Migration files are now loaded from the package itself instead of being published to the local /database/migrations directory. This may cause conflicts when upgrading, see [UPGRADING.md](UPGRADING.md) for mitigation steps. 
+
 # 3.0.0 - 2020-09-13
 - Added support for Laravel 8.0 (Thanks @saulens!)
-- moved minimum requirements to PHP 7.3 and Laravel 6.0+
+- Moved minimum requirements to PHP 7.3 and Laravel 6.0+
 
 # 2.1.1 - 2020-06-15
 - Fixed array unpacking issue when queuing Metable models

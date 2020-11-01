@@ -1,5 +1,7 @@
 <?php
 
+namespace Plank\Metable\Tests\Mocks;
+
 use Plank\Metable\Metable;
 
 class SampleMorph extends SampleMetable

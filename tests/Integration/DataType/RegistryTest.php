@@ -1,8 +1,11 @@
 <?php
 
+namespace Plank\Metable\Tests\Integration\DataType;
+
 use Plank\Metable\DataType\HandlerInterface;
 use Plank\Metable\DataType\Registry;
 use Plank\Metable\Exceptions\DataTypeException;
+use Plank\Metable\Tests\TestCase;
 
 class RegistryTest extends TestCase
 {
