@@ -7,19 +7,19 @@ before you can attach meta to an Eloquent model, you must first add the ``Metabl
 
 ::
 
-	<?php
+    <?php
 
-	namespace App;
+    namespace App;
 
-	use Plank\Metable\Metable;
-	use Illuminate\Database\Eloquent\Model;
+    use Plank\Metable\Metable;
+    use Illuminate\Database\Eloquent\Model;
 
-	class Page extends Model
-	{
-		use Metable;
+    class Page extends Model
+    {
+        use Metable;
 
-		// ...
-	}
+        // ...
+    }
 
 .. note::
     The Metable trait adds a ``meta()`` relationship to the model. However, it also keeps meta keys indexed separately to speed up reads. As such, it is recommended to not modify this relationship directly and to instead only use the methods described in this document.
@@ -31,8 +31,8 @@ Attach meta to a model with the ``setMeta()`` method. The method accepts two arg
 
 ::
 
-	<?php
-	$model->setMeta('key', 'value');
+    <?php
+    $model->setMeta('key', 'value');
 
 To set multiple meta key and value pairs at once, you can pass an associative array or collection to ``syncMeta()``.
 
@@ -51,20 +51,20 @@ You can retrieve the value of the meta at a given key with the ``getMeta()`` met
 
 ::
 
-	<?php
+    <?php
 
-	$model->setMeta('age', 18);
-	$model->setMeta('approved', true);
-	$model->setMeta('accessed_at', Carbon::now());
+    $model->setMeta('age', 18);
+    $model->setMeta('approved', true);
+    $model->setMeta('accessed_at', Carbon::now());
 
-	//reload the model from the database
-	$model = $model->fresh();
+    //reload the model from the database
+    $model = $model->fresh();
 
-	$age = $model->getMeta('age'); //returns an integer
-	$approved = $model->getMeta('approved'); //returns a boolean
-	$accessDate = $model->getMeta('accessed_at'); //returns a Carbon instance
+    $age = $model->getMeta('age'); //returns an integer
+    $approved = $model->getMeta('approved'); //returns a boolean
+    $accessDate = $model->getMeta('accessed_at'); //returns a Carbon instance
 
-	//etc.
+    //etc.
 
 Once loaded, all meta attached to a model instance are cached in the model's ``meta`` relationship. As such, successive calls to ``getMeta()`` will not hit the database repeatedly.
 
@@ -79,30 +79,30 @@ You may pass a second parameter to the ``getMeta()`` method in order to specify 
 
 ::
 
-	<?php
-	$model->getMeta('status', 'draft'); // will return 'draft' if not set
-	
+    <?php
+    $model->getMeta('status', 'draft'); // will return 'draft' if not set
+
 Alternatively, you may set default values as key-value pairs on the model itself, instead of specifying them at each individual call site. If a default has been defined from this property and a value is also passed as to the default parameter, the parameter will take precedence.
 
 ::
 
-	<?php
-	class ExampleMetable extends Model {
-		use Metable;
-		
-		protected $defaultMetaValues = [
-			'color' => '#000000'
-		];
-		
-		//...
-	}
+    <?php
+    class ExampleMetable extends Model {
+        use Metable;
+
+        protected $defaultMetaValues = [
+            'color' => '#000000'
+        ];
+
+        //...
+    }
 ::
 
-	<?php
-	$model->getMeta('color'); // will return '#000000' if not set
-	$model->getMeta('color', null); // will return null if not set
-	$model->getMeta('color', '#ffffff'); // will return '#ffffff' if not set
-	
+    <?php
+    $model->getMeta('color'); // will return '#000000' if not set
+    $model->getMeta('color', null); // will return null if not set
+    $model->getMeta('color', '#ffffff'); // will return '#ffffff' if not set
+
 
 .. note:: If a falsey value (e.g. ``0``, ``false``, ``null``, ``''``) has been manually set for the key, that value will be returned instead of the default value. The default value will only be returned if no meta exists at the key.
 
@@ -124,10 +124,10 @@ You can check if a value has been assigned to a given key with the ``hasMeta()``
 
 ::
 
-	<?php
-	if ($model->hasMeta('background-color')) {
-		// ...
-	}
+    <?php
+    if ($model->hasMeta('background-color')) {
+        // ...
+    }
 
 .. note:: This method will return ``true`` even if a falsey value (e.g. ``0``, ``false``, ``null``, ``''``) has been manually set for the key.
 
@@ -146,7 +146,7 @@ To Remove all meta from a model, use ``purgeMeta()``.
 
 ::
 
-	<?php
+    <?php
     $model->purgeMeta();
 
 Attached meta is automatically purged from the database when a ``Metable`` model is manually deleted. Meta will `not` be cascaded if the model is deleted by the query builder.
