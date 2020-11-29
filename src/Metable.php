@@ -76,6 +76,20 @@ trait Metable
     }
 
     /**
+     * Add or update many `Meta` values.
+     *
+     * @param array|Traversable $array
+     *
+     * @return void
+     */
+    public function setManyMeta($array): void
+    {
+        foreach ($array as $key => $value) {
+            $this->setMeta($key, $value);
+        }
+    }
+
+    /**
      * Replace all associated `Meta` with the keys and values provided.
      *
      * @param array|Traversable $array
@@ -178,6 +192,20 @@ trait Metable
     public function removeMeta(string $key): void
     {
         $this->getMetaCollection()->pull($key)->delete();
+    }
+
+    /**
+     * Delete many `Meta` keys.
+     *
+     * @param array|string[]|Traversable $keys
+     *
+     * @return void
+     */
+    public function removeManyMeta($keys): void
+    {
+        foreach ($keys as $key) {
+            $this->removeMeta($key);
+        }
     }
 
     /**
