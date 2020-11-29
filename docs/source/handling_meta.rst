@@ -34,15 +34,25 @@ Attach meta to a model with the ``setMeta()`` method. The method accepts two arg
     <?php
     $model->setMeta('key', 'value');
 
-To set multiple meta key and value pairs at once, you can pass an associative array or collection to ``syncMeta()``.
+To set multiple meta key and value pairs at once, you can pass an associative array or collection to ``setManyMeta()``. The meta will be added to the model.
 
 ::
 
-	<?php
-	$model->syncMeta([
-		'name' => 'John Doe',
-		'age' => 18,
-	]);
+    <?php
+    $model->setManyMeta([
+        'name' => 'John Doe',
+        'age' => 18,
+    ]);
+
+To replace existing meta with a new set of meta, you can pass an associative array or collection to ``syncMeta()``. **All existing meta will be removed before the new meta is attached.**
+
+::
+
+    <?php
+    $model->syncMeta([
+        'name' => 'John Doe',
+        'age' => 18,
+    ]);
 
 Retrieving Meta
 ---------------
@@ -139,10 +149,21 @@ To remove the meta stored at a given key, use ``removeMeta()``.
 
 ::
 
-	<?php
-    $model->removeMeta('prefered_language');
+    <?php
+    $model->removeMeta('preferred_language');
 
-To Remove all meta from a model, use ``purgeMeta()``.
+To remove multiple meta at once, you can pass an array of keys to ``removeManyMeta()``.
+
+::
+
+    <?php
+    $model->removeManyMeta([
+        'preferred_language',
+        'store_currency',
+        'user_timezone',
+    ]);
+
+To remove all meta from a model, use ``purgeMeta()``.
 
 ::
 
