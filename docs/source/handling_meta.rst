@@ -44,6 +44,8 @@ To set multiple meta key and value pairs at once, you can pass an associative ar
 		'age' => 18,
 	]);
 
+.. warning:: ``syncMeta()`` first deletes any existing meta on the model and then replaces it with the new meta. If you need to keep any existing meta, use individual ``setMeta()`` calls.
+
 Retrieving Meta
 ---------------
 
