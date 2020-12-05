@@ -22,9 +22,10 @@
     },
     "require-dev": {
         "laravel/legacy-factories": "^1.0.4",
-        "orchestra/testbench": "^4.0|^5.0|^6.0",
-        "phpunit/phpunit": "^8.2.4|^9.0",
-        "php-coveralls/php-coveralls": "^2.1"
+        "orchestra/testbench": "^5.9|^6.6",
+        "phpunit/phpunit": "^9.5",
+        "mockery/mockery": "^1.4.2",
+        "php-coveralls/php-coveralls": "^2.4.2"
     },
     "autoload-dev":{
         "psr-4": {
