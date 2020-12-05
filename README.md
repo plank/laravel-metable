@@ -1,12 +1,10 @@
 # Laravel-Metable
 
-[![Travis](https://img.shields.io/travis/plank/laravel-metable/master.svg?style=flat-square)](https://travis-ci.org/plank/laravel-metable)
 [![Coveralls](https://img.shields.io/coveralls/plank/laravel-metable.svg?style=flat-square)](https://coveralls.io/github/plank/laravel-metable)
 [![StyleCI](https://styleci.io/repos/79148832/shield?branch=master)](https://styleci.io/repos/79148832)
-[![SensioLabsInsight](https://img.shields.io/sensiolabs/i/83f303ee-321e-4860-8638-cc1f513b7fe5.svg?style=flat-square)](https://insight.sensiolabs.com/projects/83f303ee-321e-4860-8638-cc1f513b7fe5)
 [![Packagist](https://img.shields.io/packagist/v/plank/laravel-metable.svg?style=flat-square)](https://packagist.org/packages/plank/laravel-metable)
 
-Laravel-Metable is a package for easily attaching arbitrary data to Eloquent models for Laravel 5.6+.
+Laravel-Metable is a package for easily attaching arbitrary data to Eloquent models.
 
 ## Features
 
