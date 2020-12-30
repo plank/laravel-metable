@@ -13,6 +13,7 @@ use Traversable;
  *
  * @property Collection|Meta[] $meta
  * @method static Builder whereHasMeta($key): void
+ * @method static Builder whereHasMetaType($type, $key = null): void
  * @method static Builder WhereDoesntHaveMeta($key)
  * @method static Builder WhereHasMetaKeys(array $keys)
  * @method static Builder WhereMeta(string $key, $operator, $value = null)
@@ -255,6 +256,30 @@ trait Metable
             '=',
             count($keys)
         );
+    }
+
+    /**
+     * Query scope to restrict the query to records which have `Meta` of a given type, optionally attached to a given key.
+     *
+     * If an array of types is passed instead, will restrict the query to records having one or more `Meta` with any of the types.
+     *
+     * If an array of keys is passed instead, will restrict the query to records having one or more `Meta` with any of the keys.
+     *
+     * @param Builder $q
+     * @param string|array $type
+     * @param string|array $key
+     *
+     * @return void
+     */
+    public function scopeWhereHasMetaType(Builder $q, $type, $key = null): void
+    {
+        $q->whereHas('meta', function (Builder $q) use ($type, $key) {
+            $q->whereIn('type', (array)$type);
+
+            if (isset($key)) {
+              $q->whereIn('key', (array)$key);
+            }
+        });
     }
 
     /**
