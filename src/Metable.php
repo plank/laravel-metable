@@ -277,7 +277,7 @@ trait Metable
             $q->whereIn('type', (array)$type);
 
             if (isset($key)) {
-              $q->whereIn('key', (array)$key);
+                $q->whereIn('key', (array)$key);
             }
         });
     }
