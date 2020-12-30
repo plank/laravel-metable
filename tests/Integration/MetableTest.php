@@ -287,6 +287,26 @@ class MetableTest extends TestCase
         $this->assertNull($result2);
     }
 
+    public function test_it_can_be_queried_by_meta_type()
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
+        $metable->setMeta('foo', 'bar');
+        $metable->setMeta('baz', ['a' => 'b']);
+
+        $result1 = SampleMetable::whereHasMetaType('string')->first();
+        $result2 = SampleMetable::whereHasMetaType('string', 'foo')->first();
+        $result3 = SampleMetable::whereHasMetaType('string', 'baz')->first();
+        $result4 = SampleMetable::whereHasMetaType('array')->first();
+        $result5 = SampleMetable::whereHasMetaType('array', 'baz')->first();
+
+        $this->assertEquals($metable->getKey(), $result1->getKey());
+        $this->assertEquals($metable->getKey(), $result2->getKey());
+        $this->assertNull($result3);
+        $this->assertEquals($metable->getKey(), $result4->getKey());
+        $this->assertEquals($metable->getKey(), $result5->getKey());
+    }
+
     public function test_it_can_order_query_by_meta_value()
     {
         $this->useDatabase();
