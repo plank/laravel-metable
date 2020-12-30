@@ -299,12 +299,14 @@ class MetableTest extends TestCase
         $result3 = SampleMetable::whereHasMetaType('string', 'baz')->first();
         $result4 = SampleMetable::whereHasMetaType('array')->first();
         $result5 = SampleMetable::whereHasMetaType('array', 'baz')->first();
+        $result6 = SampleMetable::whereHasMetaType(['string', 'array'], 'baz')->first();
 
         $this->assertEquals($metable->getKey(), $result1->getKey());
         $this->assertEquals($metable->getKey(), $result2->getKey());
         $this->assertNull($result3);
         $this->assertEquals($metable->getKey(), $result4->getKey());
         $this->assertEquals($metable->getKey(), $result5->getKey());
+        $this->assertEquals($metable->getKey(), $result6->getKey());
     }
 
     public function test_it_can_order_query_by_meta_value()
