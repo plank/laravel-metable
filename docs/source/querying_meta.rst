@@ -31,6 +31,25 @@ You can also query for records that does not contain a meta key using the ``wher
     $models = MyModel::whereDoesntHaveMeta('notes')->get();
     $models = MyModel::whereDoesntHaveMeta(['queued_at', 'sent_at'])->get();
 
+Checking for Presence of a type
+-------------------------------
+
+To only return records that have a value assigned of a particular type, you can use ``whereHasMetaType()``. You can also pass an array to this method, which will cause the query to return any models attached to one or more of the provided types.
+
+::
+
+    <?php
+    $models = MyModel::whereHasMetaType('string')->get();
+    $models = MyModel::whereHasMetaType(['string', 'array'])->get();
+
+You may optionally provide one or more meta keys, which will restrict the query to only models with one or more of the provided keys with values that are one or more of the provided types.
+::
+
+    <?php
+    $models = MyModel::whereHasMetaType('array', 'tags')->get();
+    $models = MyModel::whereHasMetaType('datetime', ['queued_at', 'sent_at'])->get();
+    $models = MyModel::whereHasMetaType(['string', 'array'], 'notes')->get();
+
 Comparing value
 ---------------
 
