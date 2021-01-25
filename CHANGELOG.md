@@ -1,5 +1,8 @@
 # Changelog
 
+# 5.0.0
+- New schema migration: improved database indexing. See [UPGRADING.md](UPGRADING.md) for details.
+
 # 4.0.0 - 2020-10-12
 - fixed support for Laravel 8.0 migration squashing
 - Migration files are now loaded from the package itself instead of being published to the local /database/migrations directory. This may cause conflicts when upgrading, see [UPGRADING.md](UPGRADING.md) for mitigation steps. 
