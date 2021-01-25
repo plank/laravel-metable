@@ -2,6 +2,10 @@
 
 # 5.0.0
 - New schema migration: improved database indexing. See [UPGRADING.md](UPGRADING.md) for details.
+- Added `setManyMeta()` to bulk insert/update multiple keys to a model. Requires Laravel 8.0+ for optimal performance.
+- Added `removeManyMeta()` to bulk delete multiple keys from a model
+- Fixed `removeMeta()` method causing an error if called with a non-existent key 
+- Fixed a minor bug with `setMeta()` creating duplicates in the cached meta relation when updating a key.
 
 # 4.0.0 - 2020-10-12
 - fixed support for Laravel 8.0 migration squashing

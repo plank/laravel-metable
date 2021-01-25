@@ -14,19 +14,27 @@ class MetableTest extends TestCase
     {
         $this->useDatabase();
         $metable = $this->createMetable();
+        $metable->load('meta');
         $this->assertFalse($metable->hasMeta('foo'));
 
         $metable->setMeta('foo', 'bar');
 
         $this->assertTrue($metable->hasMeta('foo'));
         $this->assertEquals('bar', $metable->getMeta('foo'));
+
+        $metable->setMeta('foo', 'baz');
+
+        $this->assertTrue($metable->hasMeta('foo'));
+        $this->assertEquals('baz', $metable->getMeta('foo'));
+        $this->assertCount(1, $metable->meta);
     }
 
     public function test_it_can_set_many_meta_values_at_once()
     {
         $this->useDatabase();
         $metable = $this->createMetable();
-        $this->assertFalse($metable->hasMeta('foo'));
+        $metable->load('meta');
+        $metable->setMeta('foo', 'old');
         $this->assertFalse($metable->hasMeta('bar'));
         $this->assertFalse($metable->hasMeta('baz'));
 
@@ -133,6 +141,17 @@ class MetableTest extends TestCase
         $this->useDatabase();
         $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
+
+        $metable->removeMeta('foo');
+
+        $this->assertFalse($metable->hasMeta('foo'));
+        $this->assertFalse($metable->fresh()->hasMeta('foo'));
+    }
+
+    public function test_it_can_delete_meta_not_set()
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
 
         $metable->removeMeta('foo');
 
