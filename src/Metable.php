@@ -91,7 +91,7 @@ trait Metable
         $builder = DB::table($prototype->getTable());
         $needReload = $this->relationLoaded('meta');
 
-        if(method_exists($builder, 'upsert')) {
+        if (method_exists($builder, 'upsert')) {
             // use upsert if available to store all data in a single query
             // requires Laravel >8.0
             $metaModels = new Collection();

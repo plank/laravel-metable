@@ -52,6 +52,15 @@ class MetableTest extends TestCase
         $this->assertEquals('foo', $metable->getMeta('baz'));
     }
 
+    public function test_it_accepts_empty_array_for_set_many_meta()
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
+        $metable->setMeta('foo', 'old');
+        $metable->setManyMeta([]); // should not error out
+        $this->assertEquals('old', $metable->getMeta('foo'));
+    }
+
     public function test_it_can_set_uppercase_key()
     {
         $this->useDatabase();
