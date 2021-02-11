@@ -2,6 +2,7 @@
 
 # 5.0.0
 - New schema migration: improved database indexing. See [UPGRADING.md](UPGRADING.md) for details.
+- Added config `meta.applyMigrations`. When set to false, migration paths will not be loaded from the package. Use this if you wish to override the default schema migrations provided with the package.
 - Added `setManyMeta()` to bulk insert/update multiple keys to a model. Requires Laravel 8.0+ for optimal performance.
 - Added `removeManyMeta()` to bulk delete multiple keys from a model
 - Fixed `removeMeta()` method causing an error if called with a non-existent key 
