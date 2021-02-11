@@ -2,6 +2,7 @@
 
 # 5.0.0
 - New schema migration: improved database indexing. See [UPGRADING.md](UPGRADING.md) for details.
+- Added config `meta.applyMigrations`. When set to false, migration paths will not be loaded from the package. Use this if you wish to override the default schema migrations provided with the package.
 
 # 4.0.0 - 2020-10-12
 - fixed support for Laravel 8.0 migration squashing
