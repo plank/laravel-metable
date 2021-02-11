@@ -75,9 +75,9 @@ use Plank\Metable\Metable;
 
 class Post extends Model
 {
-	use Metable;
+    use Metable;
 
-	//...
+    //...
 }
 ```
 

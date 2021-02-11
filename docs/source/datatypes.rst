@@ -19,19 +19,19 @@ Arrays of scalar values. Nested arrays are supported.
 
 ::
 
-	<?php
-	$metable->setMeta('information', [
-		'address' => [
-			'street' => '123 Somewhere Ave.',
-			'city' => 'Somewhereville',
-			'country' => 'Somewhereland',
-			'postal' => '123456',
-		],
-		'contact' => [
-			'phone' => '555-555-5555',
-			'email' => 'email@example.com'
-		]
-	]);
+    <?php
+    $metable->setMeta('information', [
+        'address' => [
+            'street' => '123 Somewhere Ave.',
+            'city' => 'Somewhereville',
+            'country' => 'Somewhereland',
+            'postal' => '123456',
+        ],
+        'contact' => [
+            'phone' => '555-555-5555',
+            'email' => 'email@example.com'
+        ]
+    ]);
 
 .. warning:: Laravel-Metable uses ``json_encode()`` and ``json_decode()`` under the hood for array serialization. This will cause any objects nested within the array to be cast to an array.
 
@@ -40,40 +40,40 @@ Boolean
 
 ::
 
-	<?php
-	$metable->setMeta('accepted_promotion', true);
+    <?php
+    $metable->setMeta('accepted_promotion', true);
 
 Integer
 ^^^^^^^^
 
 ::
 
-	<?php
-	$metable->setMeta('likes', 9001);
+    <?php
+    $metable->setMeta('likes', 9001);
 
 Float
 ^^^^^^^^
 
 ::
 
-	<?php
-	$metable->setMeta('precision', 0.755);
+    <?php
+    $metable->setMeta('precision', 0.755);
 
 Null
 ^^^^^^^^
 
 ::
 
-	<?php
-	$metable->setMeta('linked_model', null);
+    <?php
+    $metable->setMeta('linked_model', null);
 
 String
 ^^^^^^^^
 
 ::
 
-	<?php
-	$metable->setMeta('attachment', '/var/www/html/public/attachment.pdf');
+    <?php
+    $metable->setMeta('attachment', '/var/www/html/public/attachment.pdf');
 
 Objects
 ---------------
@@ -89,9 +89,9 @@ It is possible to attach another Eloquent model to a ``Metable`` model.
 
 ::
 
-	<?php
-	$page = App\Page::where(['title' => 'Welcome'])->first();
-	$metable->setMeta('linked_model', $page);
+    <?php
+    $page = App\Page::where(['title' => 'Welcome'])->first();
+    $metable->setMeta('linked_model', $page);
 
 When ``$metable->getMeta()`` is called, the attached model will be reloaded from the database.
 
@@ -99,8 +99,8 @@ It is also possible to attach a ``Model`` instance that has not been saved to th
 
 ::
 
-	<?php
-	$metable->setMeta('related', new App\Page);
+    <?php
+    $metable->setMeta('related', new App\Page);
 
 When ``$metable->getMeta()`` is called, a fresh instance of the class will be created (will not include any attributes).
 
@@ -114,9 +114,9 @@ As with individual models, both existing and unsaved instances can be stored.
 
 ::
 
-	<?php
-	$users = App\User::where(['title' => 'developer'])->get();
-	$metable->setMeta('authorized', $users);
+    <?php
+    $users = App\User::where(['title' => 'developer'])->get();
+    $metable->setMeta('authorized', $users);
 
 DateTime & Carbon
 ^^^^^^^^^^^^^^^^^^
@@ -125,8 +125,8 @@ Any object implementing the ``DateTimeInterface``.  Object will be converted to 
 
 ::
 
-	<?php
-	$metable->setMeta('last_viewed', \Carbon\Carbon::now());
+    <?php
+    $metable->setMeta('last_viewed', \Carbon\Carbon::now());
 
 
 Serializable
@@ -136,15 +136,15 @@ Any object implementing the PHP ``Serializable`` interface.
 
 ::
 
-	<?php
-	class Example implements \Serializable
-	{
-		//...
-	}
+    <?php
+    class Example implements \Serializable
+    {
+        //...
+    }
 
-	$serializable = new Example;
+    $serializable = new Example;
 
-	$metable->setMeta('example', $serializable);
+    $metable->setMeta('example', $serializable);
 
 Plain Objects
 ^^^^^^^^^^^^^^
@@ -153,9 +153,9 @@ Any other objects will be converted to ``stdClass`` plain objects. You can contr
 
 ::
 
-	<?php
-	$metable->setMeta('weight', new Weight(10, 'kg'));
-	$weight = $metable->getMeta('weight') // stdClass($amount = 10; $unit => 'kg');
+    <?php
+    $metable->setMeta('weight', new Weight(10, 'kg'));
+    $weight = $metable->getMeta('weight') // stdClass($amount = 10; $unit => 'kg');
 
 .. note:: The ``Plank\Metable\DataType\ObjectHandler`` class should always be the last entry the ``config/metable.php`` datatypes array, as it will accept any object, causing any handlers below it to be ignored.
 

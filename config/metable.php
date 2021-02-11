@@ -25,4 +25,6 @@ return [
         Plank\Metable\DataType\SerializableHandler::class,
         Plank\Metable\DataType\ObjectHandler::class,
     ],
+
+    'applyMigrations' => true
 ];

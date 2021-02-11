@@ -20,4 +20,5 @@ Laravel-Metable is a package for easily attaching arbitrary data to Eloquent mod
    handling_meta
    querying_meta
    datatypes
+   extending_meta
 

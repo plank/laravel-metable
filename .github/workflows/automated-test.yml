@@ -2,10 +2,10 @@ name: PHPUnit Tests
 on: [push]
 jobs:
   phpunit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        php-versions: ['7.3', '7.4', '8.0']
+        php-versions: ['7.4', '8.0']
         prefer-lowest: ['','--prefer-lowest']
     name: PHP ${{ matrix.php-versions }} ${{ matrix.prefer-lowest }}
     steps:
