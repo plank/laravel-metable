@@ -5,7 +5,10 @@ namespace Plank\Metable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Traversable;
 
 /**
@@ -66,12 +69,53 @@ trait Metable
         } else {
             $meta = $this->makeMeta($key, $value);
             $this->meta()->save($meta);
-        }
-
-        // Update cached relationship, if necessary.
-        if ($this->relationLoaded('meta')) {
             $this->meta[] = $meta;
             $this->indexedMetaCollection[$key] = $meta;
+        }
+    }
+
+    /**
+     * Add or update many `Meta` values.
+     *
+     * @param array<string,mixed> $metaDictionary key-value pairs
+     *
+     * @return void
+     */
+    public function setManyMeta(array $metaDictionary): void
+    {
+        if (empty($metaDictionary)) {
+            return;
+        }
+
+        $prototype = $this->meta()->newModelInstance();
+        $builder = DB::table($prototype->getTable());
+        $needReload = $this->relationLoaded('meta');
+
+        if (method_exists($builder, 'upsert')) {
+            // use upsert if available to store all data in a single query
+            // requires Laravel >8.0
+            $metaModels = new Collection();
+            foreach ($metaDictionary as $key => $value) {
+                $metaModels[$key] = $this->makeMeta($key, $value);
+            }
+
+            $builder->upsert(
+                $metaModels->toArray(),
+                ['metable_type', 'metable_id', 'key'],
+                ['type', 'value']
+            );
+        } else {
+            // otherwise insert manually.
+            // Clear local cache to speed things up since we will reload it afterwards
+            $this->unsetRelation('meta');
+            foreach ($metaDictionary as $key => $value) {
+                $this->setMeta($key, $value);
+            }
+        }
+
+        if ($needReload) {
+            // reload media relation and indexed cache
+            $this->load('meta');
         }
     }
 
@@ -177,7 +221,30 @@ trait Metable
      */
     public function removeMeta(string $key): void
     {
-        $this->getMetaCollection()->pull($key)->delete();
+        if ($this->hasMeta($key)) {
+            $this->getMetaCollection()->pull($key)->delete();
+        }
+    }
+
+    /**
+     * Delete many `Meta` keys.
+     *
+     * @param string[] $keys
+     *
+     * @return void
+     */
+    public function removeManyMeta(array $keys): void
+    {
+        $relation = $this->meta();
+        $relation->newQuery()
+            ->where($relation->getMorphType(), $this->getMorphClass())
+            ->where($relation->getForeignKeyName(), $this->getKey())
+            ->whereIn('key', $keys)
+            ->delete();
+
+        if ($this->relationLoaded('meta')) {
+            $this->load('meta');
+        }
     }
 
     /**
@@ -495,6 +562,8 @@ trait Metable
             'key' => $key,
             'value' => $value,
         ]);
+        $meta->metable_type = $this->getMorphClass();
+        $meta->metable_id = $this->getKey();
 
         return $meta;
     }

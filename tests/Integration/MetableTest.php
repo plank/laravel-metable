@@ -14,12 +14,51 @@ class MetableTest extends TestCase
     {
         $this->useDatabase();
         $metable = $this->createMetable();
+        $metable->load('meta');
         $this->assertFalse($metable->hasMeta('foo'));
 
         $metable->setMeta('foo', 'bar');
 
         $this->assertTrue($metable->hasMeta('foo'));
         $this->assertEquals('bar', $metable->getMeta('foo'));
+
+        $metable->setMeta('foo', 'baz');
+
+        $this->assertTrue($metable->hasMeta('foo'));
+        $this->assertEquals('baz', $metable->getMeta('foo'));
+        $this->assertCount(1, $metable->meta);
+    }
+
+    public function test_it_can_set_many_meta_values_at_once()
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
+        $metable->load('meta');
+        $metable->setMeta('foo', 'old');
+        $this->assertFalse($metable->hasMeta('bar'));
+        $this->assertFalse($metable->hasMeta('baz'));
+
+        $metable->setManyMeta([
+            'foo' => 'bar',
+            'bar' => 'baz',
+            'baz' => 'foo',
+        ]);
+
+        $this->assertTrue($metable->hasMeta('foo'));
+        $this->assertTrue($metable->hasMeta('bar'));
+        $this->assertTrue($metable->hasMeta('baz'));
+        $this->assertEquals('bar', $metable->getMeta('foo'));
+        $this->assertEquals('baz', $metable->getMeta('bar'));
+        $this->assertEquals('foo', $metable->getMeta('baz'));
+    }
+
+    public function test_it_accepts_empty_array_for_set_many_meta()
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
+        $metable->setMeta('foo', 'old');
+        $metable->setManyMeta([]); // should not error out
+        $this->assertEquals('old', $metable->getMeta('foo'));
     }
 
     public function test_it_can_set_uppercase_key()
@@ -116,6 +155,38 @@ class MetableTest extends TestCase
 
         $this->assertFalse($metable->hasMeta('foo'));
         $this->assertFalse($metable->fresh()->hasMeta('foo'));
+    }
+
+    public function test_it_can_delete_meta_not_set()
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
+
+        $metable->removeMeta('foo');
+
+        $this->assertFalse($metable->hasMeta('foo'));
+        $this->assertFalse($metable->fresh()->hasMeta('foo'));
+    }
+
+    public function test_it_can_delete_many_meta_at_once()
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
+        $metable->setMeta('foo', 'bar');
+        $metable->setMeta('bar', 'baz');
+        $metable->setMeta('baz', 'foo');
+
+        $metable->removeManyMeta(['foo', 'bar', 'baz']);
+
+        $this->assertFalse($metable->hasMeta('foo'));
+        $this->assertFalse($metable->hasMeta('bar'));
+        $this->assertFalse($metable->hasMeta('baz'));
+
+        $metable = $metable->fresh();
+
+        $this->assertFalse($metable->hasMeta('foo'));
+        $this->assertFalse($metable->hasMeta('bar'));
+        $this->assertFalse($metable->hasMeta('baz'));
     }
 
     public function test_it_can_delete_all_meta()
