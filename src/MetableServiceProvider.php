@@ -22,7 +22,9 @@ class MetableServiceProvider extends ServiceProvider
             dirname(__DIR__) . '/config/metable.php' => config_path('metable.php'),
         ], 'config');
 
-        $this->loadMigrationsFrom(dirname(__DIR__) . '/migrations');
+        if (config('metable.applyMigrations', true)) {
+            $this->loadMigrationsFrom(dirname(__DIR__) . '/migrations');
+        }
     }
 
     /**

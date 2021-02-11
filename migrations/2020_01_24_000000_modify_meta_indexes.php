@@ -13,7 +13,7 @@ class ModifyMetaIndexes extends Migration
      */
     public function up()
     {
-        Schema::table('meta', function(Blueprint $table) {
+        Schema::table('meta', function (Blueprint $table) {
             $table->dropIndex(['metable_type', 'metable_id']);
             $table->unique(['metable_type', 'metable_id', 'key']);
             $table->index(['key', 'metable_type']);
@@ -27,7 +27,7 @@ class ModifyMetaIndexes extends Migration
      */
     public function down()
     {
-        Schema::table('meta',function(Blueprint $table) {
+        Schema::table('meta', function (Blueprint $table) {
             $table->dropIndex(['key', 'metable_type']);
             $table->dropUnique(['metable_type', 'metable_id', 'key']);
             $table->index(['metable_type', 'metable_id']);
