@@ -41,7 +41,7 @@ class MetableTest extends TestCase
         $metable->setManyMeta([
             'foo' => 'bar',
             'bar' => 'baz',
-            'baz' => 'foo',
+            'baz' => ['foo', 'bar'],
         ]);
 
         $this->assertTrue($metable->hasMeta('foo'));
@@ -49,7 +49,7 @@ class MetableTest extends TestCase
         $this->assertTrue($metable->hasMeta('baz'));
         $this->assertEquals('bar', $metable->getMeta('foo'));
         $this->assertEquals('baz', $metable->getMeta('bar'));
-        $this->assertEquals('foo', $metable->getMeta('baz'));
+        $this->assertEquals(['foo', 'bar'], $metable->getMeta('baz'));
     }
 
     public function test_it_accepts_empty_array_for_set_many_meta()
