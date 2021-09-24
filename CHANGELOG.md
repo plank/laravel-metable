@@ -1,11 +1,14 @@
 # Changelog
 
-# 5.0.0
+# 5.0.1 - 2021-09-19
+- Fixed `setManyMeta()` not properly serializing certain types of data.
+
+# 5.0.0 - 2021-02-11
 - New schema migration: improved database indexing. See [UPGRADING.md](UPGRADING.md) for details.
 - Added config `meta.applyMigrations`. When set to false, migration paths will not be loaded from the package. Use this if you wish to override the default schema migrations provided with the package.
 - Added `setManyMeta()` to bulk insert/update multiple keys to a model. Requires Laravel 8.0+ for optimal performance.
-- Added `removeManyMeta()` to bulk delete multiple keys from a model
-- Fixed `removeMeta()` method causing an error if called with a non-existent key 
+- Added `removeManyMeta()` to bulk delete multiple keys from a model.
+- Fixed `removeMeta()` method causing an error if called with a non-existent key.
 - Fixed a minor bug with `setMeta()` creating duplicates in the cached meta relation when updating a key.
 
 # 4.0.0 - 2020-10-12

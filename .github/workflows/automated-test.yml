@@ -43,8 +43,8 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_PARALLEL: true
-          COVERALLS_FLAG_NAME: PHP ${{ matrix.php-versions }} ${{ matrix.prefer-lowest }}
-        run: vendor/bin/php-coveralls --coverage_clover=build/logs/clover.xml
+          COVERALLS_FLAG_NAME: php-${{ matrix.php-versions }}${{ matrix.prefer-lowest }}
+        run: vendor/bin/php-coveralls --coverage_clover=build/logs/clover.xml -vvv
 
   finish-coverage:
     needs: phpunit

@@ -100,7 +100,9 @@ trait Metable
             }
 
             $builder->upsert(
-                $metaModels->toArray(),
+                $metaModels->map(function (Meta $model) {
+                    return $model->getAttributesForInsert();
+                })->all(),
                 ['metable_type', 'metable_id', 'key'],
                 ['type', 'value']
             );
