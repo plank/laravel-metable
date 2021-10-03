@@ -101,7 +101,9 @@ trait Metable
 
             $builder->upsert(
                 $metaModels->map(function (Meta $model) {
-                    return $model->getAttributesForInsert();
+                    return method_exists($model, 'getAttributesForInsert')
+                        ? $model->getAttributesForInsert() // Laravel >= 8.0
+                        : $model->getAttributes();
                 })->all(),
                 ['metable_type', 'metable_id', 'key'],
                 ['type', 'value']
