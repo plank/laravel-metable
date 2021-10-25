@@ -231,6 +231,7 @@ class MetableTest extends TestCase
         $result = $this->makeMetable();
 
         $this->assertEquals($result->getMeta('foo'), 'bar');
+        $this->assertEquals(['foo' => 'bar'], $result->getAllMeta()->toArray());
     }
 
     public function test_it_can_get_database_before_default_value()
@@ -242,6 +243,7 @@ class MetableTest extends TestCase
         $result = SampleMetable::first();
 
         $this->assertEquals($result->getMeta('foo'), 'baz');
+        $this->assertEquals(['foo' => 'baz'], $result->getAllMeta()->toArray());
     }
 
     public function test_it_can_get_passed_default_before_model_default_value()

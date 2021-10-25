@@ -199,9 +199,11 @@ trait Metable
      */
     public function getAllMeta(): \Illuminate\Support\Collection
     {
-        return $this->getMetaCollection()->toBase()->map(function (Meta $meta) {
-            return $meta->getAttribute('value');
-        });
+        return collect($this->defaultMetaValues)->merge(
+            $this->getMetaCollection()->toBase()->map(function (Meta $meta) {
+                return $meta->getAttribute('value');
+            })
+        );
     }
 
     /**
