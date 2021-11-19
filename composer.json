@@ -1,5 +1,5 @@
 {
-    "name": "emild/laravel-metable",
+    "name": "plank/laravel-metable",
     "description": "A package for attaching arbitrary data to Eloquent models",
     "type": "library",
     "license": "MIT",
