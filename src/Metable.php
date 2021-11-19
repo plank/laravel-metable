@@ -39,7 +39,13 @@ trait Metable
     public static function bootMetable()
     {
         // delete all attached meta on deletion
-        static::deleted(function (self $model) {
+        static::deleted(function(self $model) {
+            if (!in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($model)))
+            {
+                $model->purgeMeta();
+            }
+        });
+        static::forceDeleted(function(self $model) {
             $model->purgeMeta();
         });
     }
