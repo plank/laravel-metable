@@ -17,8 +17,9 @@ use Plank\Metable\DataType\Registry;
  * @property string $value
  * @property Model $metable
  */
-class Meta extends Model
+class Meta extends Model implements \OwenIt\Auditing\Contracts\Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     /**
      * {@inheritdoc}
      */
