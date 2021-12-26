@@ -39,10 +39,10 @@ class MetableTest extends TestCase
         $this->assertFalse($metable->hasMeta('baz'));
 
         $metable->setManyMeta([
-            'foo' => 'bar',
-            'bar' => 'baz',
-            'baz' => ['foo', 'bar'],
-        ]);
+                                  'foo' => 'bar',
+                                  'bar' => 'baz',
+                                  'baz' => ['foo', 'bar'],
+                              ]);
 
         $this->assertTrue($metable->hasMeta('foo'));
         $this->assertTrue($metable->hasMeta('bar'));
@@ -96,10 +96,10 @@ class MetableTest extends TestCase
         $collection = $metable->getAllMeta();
 
         $this->assertEquals([
-            'foo' => 123,
-            'bar' => 'hello',
-            'baz' => ['a', 'b', 'c'],
-        ], $collection->toArray());
+                                'foo' => 123,
+                                'bar' => 'hello',
+                                'baz' => ['a', 'b', 'c'],
+                            ], $collection->toArray());
     }
 
     public function test_it_updates_existing_meta_records()
@@ -434,21 +434,22 @@ class MetableTest extends TestCase
         $meta = $this->makeMeta(['key' => 'foo', 'value' => 'bar']);
         $emptyCollection = new Collection();
         $metaCollection = new Collection([$meta]);
+        $metable->setRelation('meta', $emptyCollection);
 
-        $property = (new ReflectionClass($metable))
-            ->getProperty('indexedMetaCollection');
-        $property->setAccessible(true);
+        $method = (new ReflectionClass($metable))
+            ->getMethod('getMetaCollection');
+        $method->setAccessible(true);
 
-        $this->assertNull($property->getValue($metable));
+        $this->assertEquals($emptyCollection, $method->invoke($metable));
 
         $metable->setRelation('meta', $metaCollection);
-        $this->assertEquals(new Collection(['foo' => $meta]), $property->getValue($metable));
+        $this->assertEquals(new Collection(['foo' => $meta]), $method->invoke($metable));
 
         $metable->setRelation('other', $emptyCollection);
-        $this->assertEquals(new Collection(['foo' => $meta]), $property->getValue($metable));
+        $this->assertEquals(new Collection(['foo' => $meta]), $method->invoke($metable));
 
         $metable->setRelation('meta', $emptyCollection);
-        $this->assertEquals($emptyCollection, $property->getValue($metable));
+        $this->assertEquals($emptyCollection, $method->invoke($metable));
     }
 
     public function test_set_relations_updates_index()
@@ -457,24 +458,34 @@ class MetableTest extends TestCase
         $meta = $this->makeMeta(['key' => 'foo', 'value' => 'bar']);
         $emptyCollection = new Collection();
         $metaCollection = new Collection([$meta]);
+        $indexedCollection = new Collection(['foo' => $meta]);
+        $metable->setRelation('meta', $emptyCollection);
 
-        $property = (new ReflectionClass($metable))
-            ->getProperty('indexedMetaCollection');
-        $property->setAccessible(true);
+        $method = (new ReflectionClass($metable))
+            ->getMethod('getMetaCollection');
+        $method->setAccessible(true);
 
-        $this->assertNull($property->getValue($metable));
+        $this->assertEquals($emptyCollection, $method->invoke($metable));
 
         $metable->setRelations(['meta' => $metaCollection]);
-        $this->assertEquals(new Collection(['foo' => $meta]), $property->getValue($metable));
+        $this->assertEquals($indexedCollection, $method->invoke($metable));
 
         $metable->setRelations(['other' => $emptyCollection, 'meta' => $metaCollection]);
-        $this->assertEquals(new Collection(['foo' => $meta]), $property->getValue($metable));
-
-        $metable->setRelations(['other' => $emptyCollection]);
-        $this->assertEquals($emptyCollection, $property->getValue($metable));
+        $this->assertEquals($indexedCollection, $method->invoke($metable));
 
         $metable->setRelations(['meta' => $emptyCollection]);
-        $this->assertEquals($emptyCollection, $property->getValue($metable));
+        $this->assertEquals($emptyCollection, $method->invoke($metable));
+    }
+
+    public function test_it_can_serialize_properly()
+    {
+        $metable = $this->makeMetable();
+        $meta = $this->makeMeta(['key' => 'foo', 'value' => 'baz']);
+        $metaCollection = new Collection([$meta]);
+        $metable->setRelation('meta', $metaCollection);
+        /** @var SampleMetable $result */
+        $result = unserialize(serialize($metable));
+        $this->assertEquals('baz', $result->getMeta('foo'));
     }
 
     private function makeMeta(array $attributes = []): Meta

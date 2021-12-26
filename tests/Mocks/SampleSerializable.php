@@ -22,4 +22,14 @@ class SampleSerializable implements Serializable
     {
         $this->data = unserialize($serialized);
     }
+
+    public function __serialize(): array
+    {
+        return $this->data;
+    }
+
+    public function __unserialize(array $data)
+    {
+        return $this->data = $data;
+    }
 }
