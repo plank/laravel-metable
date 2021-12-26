@@ -503,8 +503,14 @@ trait Metable
      */
     private function getMetaCollection()
     {
+        // load meta relation if not loaded.
         if (!$this->relationLoaded('meta')) {
             $this->setRelation('meta', $this->meta()->get());
+        }
+
+        // reindex by key for quicker lookups if necessary.
+        if ($this->indexedMetaCollection === null) {
+            $this->indexedMetaCollection = $this->meta->keyBy('key');
         }
 
         return $this->indexedMetaCollection;
@@ -515,12 +521,7 @@ trait Metable
      */
     public function setRelation($relation, $value)
     {
-        if ($relation == 'meta') {
-            // keep the meta relation indexed by key.
-            /** @var Collection $value */
-            $this->indexedMetaCollection = $value->keyBy('key');
-        }
-
+        $this->indexedMetaCollection = null;
         return parent::setRelation($relation, $value);
     }
 
@@ -532,11 +533,9 @@ trait Metable
      */
     public function setRelations(array $relations)
     {
-        // keep the meta relation indexed by key.
         if (isset($relations['meta'])) {
-            $this->indexedMetaCollection = (new Collection($relations['meta']))->keyBy('key');
-        } else {
-            $this->indexedMetaCollection = $this->makeMeta()->newCollection();
+            // clear the indexed cache
+            $this->indexedMetaCollection = null;
         }
 
         return parent::setRelations($relations);

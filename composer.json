@@ -17,13 +17,15 @@
     "require": {
         "php": ">=7.3.0",
         "ext-json": "*",
-        "illuminate/support": "^6.0|^7.0|^8.0",
-        "illuminate/database": "^6.20.12|^7.30.3|^8.22.1"
+        "illuminate/support": "^6.20.42|^8.22.1",
+        "illuminate/database": "^6.20.42|^8.22.1",
+        "phpoption/phpoption": "1.8.1"
     },
     "require-dev": {
+        "symfony/symfony": "^5.4.1|^6.1",
         "laravel/legacy-factories": "^1.0.4",
-        "orchestra/testbench": "^5.9|^6.6",
-        "phpunit/phpunit": "^9.5",
+        "orchestra/testbench": "^5.20|^6.23",
+        "phpunit/phpunit": "^9.5.11",
         "guzzlehttp/guzzle": "^7.2",
         "guzzlehttp/promises": "^1.4",
         "mockery/mockery": "^1.4.2",
