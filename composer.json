@@ -24,7 +24,7 @@
     "require-dev": {
         "symfony/symfony": "^5.4.1|^6.1",
         "laravel/legacy-factories": "^1.0.4",
-        "orchestra/testbench": "^5.20|^6.23",
+        "orchestra/testbench": "^5.20|^6.23|^7.0",
         "phpunit/phpunit": "^9.5.11",
         "guzzlehttp/guzzle": "^7.2",
         "guzzlehttp/promises": "^1.4",
