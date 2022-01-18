@@ -1,5 +1,5 @@
 name: PHPUnit Tests
-on: [push]
+on: [push, pull_request]
 jobs:
   phpunit:
     runs-on: ubuntu-20.04
