@@ -40,6 +40,9 @@ trait Metable
     {
         // delete all attached meta on deletion
         static::deleted(function (self $model) {
+            // Don't delete meta if it's a soft-deleted model
+            if (method_exists($model, 'forceDelete') && !$model->isForceDeleting()) return;
+
             $model->purgeMeta();
         });
     }
