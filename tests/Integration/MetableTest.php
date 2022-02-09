@@ -5,6 +5,7 @@ namespace Plank\Metable\Tests\Integration;
 use Illuminate\Database\Eloquent\Collection;
 use Plank\Metable\Meta;
 use Plank\Metable\Tests\Mocks\SampleMetable;
+use Plank\Metable\Tests\Mocks\SampleMetableSoftDeletes;
 use Plank\Metable\Tests\TestCase;
 use ReflectionClass;
 
@@ -209,6 +210,30 @@ class MetableTest extends TestCase
         $metable->setMeta('foo', 'bar');
 
         $metable->delete();
+        $meta = Meta::all();
+
+        $this->assertEquals(0, $meta->count());
+    }
+
+    public function test_it_does_not_clear_meta_on_soft_deletion()
+    {
+        $this->useDatabase();
+        $metable = $this->createMetableSoftDeletes();
+        $metable->setMeta('foo', 'bar');
+
+        $metable->delete();
+        $meta = Meta::all();
+
+        $this->assertEquals(1, $meta->count());
+    }
+
+    public function test_it_does_clear_meta_on_force_deletion()
+    {
+        $this->useDatabase();
+        $metable = $this->createMetableSoftDeletes();
+        $metable->setMeta('foo', 'bar');
+
+        $metable->forceDelete();
         $meta = Meta::all();
 
         $this->assertEquals(0, $meta->count());
@@ -501,5 +526,10 @@ class MetableTest extends TestCase
     private function createMetable(array $attributes = []): SampleMetable
     {
         return factory(SampleMetable::class)->create($attributes);
+    }
+
+    private function createMetableSoftDeletes(array $attributes = []): SampleMetableSoftDeletes
+    {
+        return factory(SampleMetableSoftDeletes::class)->create($attributes);
     }
 }
