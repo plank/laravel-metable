@@ -15,25 +15,25 @@
         }
     },
     "require": {
-        "php": ">=7.3.0",
+        "php": "^7.3|^8.0",
         "ext-json": "*",
-        "illuminate/support": "^6.20.42|^8.22.1|^9.0",
-        "illuminate/database": "^6.20.42|^8.22.1|^9.0",
+        "illuminate/support": "^8.22|^9.0",
+        "illuminate/database": "^8.22|^9.0",
         "phpoption/phpoption": "1.8.1"
     },
     "require-dev": {
         "symfony/symfony": "^5.4.1|^6.1",
         "laravel/legacy-factories": "^1.0.4",
-        "orchestra/testbench": "^5.20|^6.23|^7.0",
+        "orchestra/testbench": "^6.23|^7.0",
         "phpunit/phpunit": "^9.5.11",
         "guzzlehttp/guzzle": "^7.2",
         "guzzlehttp/promises": "^1.4",
         "mockery/mockery": "^1.4.2",
         "php-coveralls/php-coveralls": "^2.4.2"
     },
-    "autoload-dev":{
+    "autoload-dev": {
         "psr-4": {
-            "Plank\\Metable\\Tests\\" : "tests/"
+            "Plank\\Metable\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",
