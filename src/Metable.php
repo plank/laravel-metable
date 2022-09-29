@@ -5,10 +5,10 @@ namespace Plank\Metable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Plank\Metable\DataType\HandlerInterface;
+use Plank\Metable\Exceptions\DataTypeException;
 use Traversable;
 
 /**
@@ -568,11 +568,37 @@ trait Metable
 
         $meta = new $className([
             'key' => $key,
+            'type' => $this->getMetaType($key),
             'value' => $value,
         ]);
         $meta->metable_type = $this->getMorphClass();
         $meta->metable_id = $this->getKey();
 
         return $meta;
+    }
+
+    protected function getMetaType(string $key): ?string
+    {
+        $handlerClass = $this->getMetaCasts()[$key] ?? null;
+
+        if (! $handlerClass) {
+            return null;
+        }
+
+        if (! is_a($handlerClass, HandlerInterface::class, true)) {
+            throw DataTypeException::handlerInvalid($handlerClass);
+        }
+
+        return (new $handlerClass)->getDataType();
+    }
+
+    /**
+     * Use default casting for given Meta keys
+     *
+     * @return array<array-key, class-string<HandlerInterface>
+     */
+    protected function getMetaCasts(): array
+    {
+        return $this->metaCasts ?? [];
     }
 }

@@ -20,4 +20,9 @@ class DataTypeException extends Exception
 
         return new static("Meta handler not found for value of type '{$type}'");
     }
+
+    public static function handlerInvalid(string $class): self
+    {
+        return new static("Class'{$class}' is not a valid meta handler");
+    }
 }
