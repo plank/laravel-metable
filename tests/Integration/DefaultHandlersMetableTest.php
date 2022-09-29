@@ -8,7 +8,6 @@ use Plank\Metable\Tests\TestCase;
 
 class DefaultHandlersMetableTest extends TestCase
 {
-
     public function test_it_parses_given_variables_according_to_given_metaCasts()
     {
         $this->useDatabase();
@@ -35,13 +34,10 @@ class DefaultHandlersMetableTest extends TestCase
         $this->expectException(DataTypeException::class);
 
         $metable->setMeta('fooWrong', 'oooo');
-
     }
-
 
     private function createMetable(array $attributes = []): SampleMetableTypes
     {
         return factory(SampleMetableTypes::class)->create($attributes);
     }
-
 }
