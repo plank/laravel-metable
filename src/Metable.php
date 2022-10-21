@@ -129,11 +129,11 @@ trait Metable
     /**
      * Replace all associated `Meta` with the keys and values provided.
      *
-     * @param array|Traversable $array
+     * @param iterable $array
      *
      * @return void
      */
-    public function syncMeta($array): void
+    public function syncMeta(iterable $array): void
     {
         $meta = [];
 
@@ -178,7 +178,7 @@ trait Metable
      * @param string $key
      * @return boolean
      */
-    protected function hasDefaultMetaValue($key)
+    protected function hasDefaultMetaValue(string $key): bool
     {
         return property_exists($this, 'defaultMetaValues')
                 && array_key_exists($key, $this->defaultMetaValues);
@@ -190,7 +190,7 @@ trait Metable
      * @param string $key
      * @return mixed
      */
-    protected function getDefaultMetaValue($key)
+    protected function getDefaultMetaValue(string $key)
     {
         return $this->defaultMetaValues[$key];
     }
@@ -198,7 +198,7 @@ trait Metable
     /**
      * Retrieve all meta attached to the model as a key/value map.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, mixed>
      */
     public function getAllMeta(): \Illuminate\Support\Collection
     {
@@ -467,7 +467,7 @@ trait Metable
      *
      * @return string
      */
-    private function joinMetaTable(Builder $q, string $key, $type = 'left'): string
+    private function joinMetaTable(Builder $q, string $key, string $type = 'left'): string
     {
         $relation = $this->meta();
         $metaTable = $relation->getRelated()->getTable();
@@ -547,7 +547,7 @@ trait Metable
     /**
      * Retrieve the FQCN of the class to use for Meta models.
      *
-     * @return string
+     * @return class-string<Meta>
      */
     protected function getMetaClassName(): string
     {
