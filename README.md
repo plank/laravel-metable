@@ -64,7 +64,7 @@ php artisan migrate
 
 5. Add the `Plank\Metable\Metable` trait to any eloquent model class that you want to be able to attach metadata to.
 
-_Note: If need a more generic way to reference different Metable Model classes, you can optionally apply the `Plank\Metable\MetableInterface`_ to your models.
+_Note: If need a more generic way to reference different Metable Model classes, you can optionally apply the `Plank\Metable\MetableInterface` to your models._
 
 ```php
 <?php
