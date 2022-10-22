@@ -49,6 +49,17 @@ class Meta extends Model
      */
     protected $cachedValue;
 
+    public function __construct(array $attributes = [])
+    {
+        if ($attributes['type'] ?? null) {
+            $this->forceFill(['type' => $attributes['type']]);
+
+            unset($attributes['type']);
+        }
+        parent::__construct($attributes);
+    }
+
+
     /**
      * Metable Relation.
      *
@@ -92,7 +103,10 @@ class Meta extends Model
     {
         $registry = $this->getDataTypeRegistry();
 
-        $this->attributes['type'] = $registry->getTypeForValue($value);
+        if ($this->isClean('type')) {
+            $this->attributes['type'] = $registry->getTypeForValue($value);
+        }
+
         $this->attributes['value'] = $registry->getHandlerForType($this->type)
             ->serializeValue($value);
 
