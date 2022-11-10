@@ -17,24 +17,11 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           coverage: pcov
-        env:
-          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-${{ matrix.php-version }}${{ matrix.prefer-lowest }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-${{ matrix.php-version }}${{ matrix.prefer-lowest }}-composer-
 
       - name: Install dependencies
-        run: composer update --prefer-dist ${{ matrix.prefer-lowest }}
-        env:
-          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: "ramsey/composer-install@v2"
+        with:
+          composer-options: "--prefer-dist ${{ matrix.prefer-lowest }}"
 
       - name: Run phpunit
         run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml -v
