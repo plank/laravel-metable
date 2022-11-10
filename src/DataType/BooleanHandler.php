@@ -7,8 +7,5 @@ namespace Plank\Metable\DataType;
  */
 class BooleanHandler extends ScalarHandler
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $type = 'boolean';
+    //
 }

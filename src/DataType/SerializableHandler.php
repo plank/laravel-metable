@@ -7,16 +7,8 @@ use Serializable;
 /**
  * Handle serialization of Serializable objects.
  */
-class SerializableHandler implements HandlerInterface
+class SerializableHandler extends Handler
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getDataType(): string
-    {
-        return 'serializable';
-    }
-
     /**
      * {@inheritdoc}
      */

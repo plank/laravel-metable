@@ -8,7 +8,7 @@ use DateTimeInterface;
 /**
  * Handle serialization of DateTimeInterface objects.
  */
-class DateTimeHandler implements HandlerInterface
+class DateTimeHandler extends Handler
 {
     /**
      * The date format to use for serializing.
@@ -16,14 +16,6 @@ class DateTimeHandler implements HandlerInterface
      * @var string
      */
     protected $format = 'Y-m-d H:i:s.uO';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDataType(): string
-    {
-        return 'datetime';
-    }
 
     /**
      * {@inheritdoc}

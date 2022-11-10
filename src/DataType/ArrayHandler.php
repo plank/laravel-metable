@@ -5,16 +5,8 @@ namespace Plank\Metable\DataType;
 /**
  * Handle serialization of arrays.
  */
-class ArrayHandler implements HandlerInterface
+class ArrayHandler extends Handler
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getDataType(): string
-    {
-        return 'array';
-    }
-
     /**
      * {@inheritdoc}
      */

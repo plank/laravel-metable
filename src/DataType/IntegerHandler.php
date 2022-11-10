@@ -7,8 +7,5 @@ namespace Plank\Metable\DataType;
  */
 class IntegerHandler extends ScalarHandler
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $type = 'integer';
+    //
 }

@@ -5,16 +5,8 @@ namespace Plank\Metable\DataType;
 /**
  * Handle serialization of plain objects.
  */
-class ObjectHandler implements HandlerInterface
+class ObjectHandler extends Handler
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getDataType(): string
-    {
-        return 'object';
-    }
-
     /**
      * {@inheritdoc}
      */

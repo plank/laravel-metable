@@ -10,13 +10,8 @@ class NullHandler extends ScalarHandler
     /**
      * {@inheritdoc}
      */
-    protected $type = 'NULL';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDataType(): string
+    public function getType(): string
     {
-        return 'null';
+        return 'NULL';
     }
 }

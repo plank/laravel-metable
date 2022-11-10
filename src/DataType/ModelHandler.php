@@ -7,16 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Handle serialization of Eloquent Models.
  */
-class ModelHandler implements HandlerInterface
+class ModelHandler extends Handler
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getDataType(): string
-    {
-        return 'model';
-    }
-
     /**
      * {@inheritdoc}
      */

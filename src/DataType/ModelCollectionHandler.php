@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 /**
  * Handle serialization of Eloquent collections.
  */
-class ModelCollectionHandler implements HandlerInterface
+class ModelCollectionHandler extends Handler
 {
     /**
      * {@inheritdoc}
@@ -66,7 +66,7 @@ class ModelCollectionHandler implements HandlerInterface
     /**
      * Load each model instance, grouped by class.
      *
-     * @param array $items
+     * @param  array  $items
      *
      * @return array
      */
@@ -77,7 +77,7 @@ class ModelCollectionHandler implements HandlerInterface
 
         // Retrieve a list of keys to load from each class.
         foreach ($items as $item) {
-            if (!is_null($item['key'])) {
+            if (! is_null($item['key'])) {
                 $classes[$item['class']][] = $item['key'];
             }
         }
