@@ -90,7 +90,7 @@ trait Metable
             return;
         }
 
-        $builder = $this->meta()->newModelInstance();
+        $builder = $this->meta()->getBaseQuery();
         $needReload = $this->relationLoaded('meta');
 
         if (method_exists($builder, 'upsert')) {
