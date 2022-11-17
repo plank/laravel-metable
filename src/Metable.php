@@ -173,6 +173,9 @@ trait Metable
 
     /**
      * Check if the default meta array exists and the key is set
+     *
+     * @param string $key
+     * @return boolean
      */
     protected function hasDefaultMetaValue(string $key): bool
     {
