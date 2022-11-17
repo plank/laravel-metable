@@ -571,8 +571,8 @@ trait Metable
         return $meta;
     }
 
-    public function getAllDefaultMeta(): array
+    protected function getAllDefaultMeta(): array
     {
-        return $this->defaultMetaValues ?? [];
+        return property_exists($this, 'defaultMetaValues') ? $this->defaultMetaValues : [];
     }
 }
