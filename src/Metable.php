@@ -179,8 +179,7 @@ trait Metable
      */
     protected function hasDefaultMetaValue(string $key): bool
     {
-        return property_exists($this, 'defaultMetaValues')
-                && array_key_exists($key, $this->defaultMetaValues);
+        return array_key_exists($key, $this->getAllDefaultMeta());
     }
 
     /**
@@ -191,7 +190,7 @@ trait Metable
      */
     protected function getDefaultMetaValue(string $key)
     {
-        return $this->defaultMetaValues[$key];
+        return $this->getAllDefaultMeta()[$key];
     }
 
     /**
@@ -201,7 +200,7 @@ trait Metable
      */
     public function getAllMeta(): \Illuminate\Support\Collection
     {
-        return collect($this->defaultMetaValues)->merge(
+        return collect($this->getAllDefaultMeta())->merge(
             $this->getMetaCollection()->toBase()->map(function (Meta $meta) {
                 return $meta->getAttribute('value');
             })
@@ -573,5 +572,10 @@ trait Metable
         $meta->metable_id = $this->getKey();
 
         return $meta;
+    }
+
+    protected function getAllDefaultMeta(): array
+    {
+        return property_exists($this, 'defaultMetaValues') ? $this->defaultMetaValues : [];
     }
 }
