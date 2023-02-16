@@ -17,8 +17,8 @@
     "require": {
         "php": ">=7.3.0",
         "ext-json": "*",
-        "illuminate/support": "^6.20.42|^8.22.1|^9.0",
-        "illuminate/database": "^6.20.42|^8.22.1|^9.0",
+        "illuminate/support": "^6.20.42|^8.22.1|^9.0|^10.0",
+        "illuminate/database": "^6.20.42|^8.22.1|^9.0|^10.0",
         "phpoption/phpoption": "^1.8"
     },
     "require-dev": {
