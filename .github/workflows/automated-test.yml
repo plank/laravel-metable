@@ -5,9 +5,13 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        php-versions: ['7.4', '8.0', '8.1']
-        prefer-lowest: ['','--prefer-lowest']
-    name: PHP ${{ matrix.php-versions }} ${{ matrix.prefer-lowest }}
+        php-versions: [7.4, 8.0, 8.1, 8.2]
+        laravel: [10.*, 9.*]
+        stability: [prefer-lowest, prefer-stable]
+        exclude:
+          - laravel: 10.*
+            php: 7.4, 8.0
+    name: PHP ${{ matrix.php-versions }} - L${{ matrix.laravel }} - ${{ matrix.stability}}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -19,9 +23,9 @@ jobs:
           coverage: pcov
 
       - name: Install dependencies
-        uses: "ramsey/composer-install@v2"
+        uses: ramsey/composer-install@v2
         with:
-          composer-options: "--prefer-dist ${{ matrix.prefer-lowest }}"
+          composer-options: "--prefer-dist ${{ matrix.stability }}"
 
       - name: Run phpunit
         run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml -v
@@ -30,7 +34,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_PARALLEL: true
-          COVERALLS_FLAG_NAME: php-${{ matrix.php-versions }}${{ matrix.prefer-lowest }}
+          COVERALLS_FLAG_NAME: php-${{ matrix.php-versions }} - L${{ matrix.laravel }} - ${{ matrix.stability}}
         run: vendor/bin/php-coveralls --coverage_clover=build/logs/clover.xml -vvv
 
   finish-coverage:
