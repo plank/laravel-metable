@@ -10,7 +10,7 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         exclude:
           - laravel: 10.*
-            php: 7.4, 8.0
+            php: [7.4, 8.0]
     name: PHP ${{ matrix.php-versions }} - L${{ matrix.laravel }} - ${{ matrix.stability}}
     steps:
       - name: Checkout
