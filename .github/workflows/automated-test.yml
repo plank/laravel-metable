@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        php-versions: [7.4, 8.0, 8.1, 8.2]
+        php: [7.4, 8.0, 8.1, 8.2]
         laravel: [10.*, 9.*]
         stability: [prefer-lowest, prefer-stable]
         exclude:
@@ -13,7 +13,7 @@ jobs:
             php: 7.4
           - laravel: 10.*
             php: 8.0
-    name: PHP ${{ matrix.php-versions }} - L${{ matrix.laravel }} - ${{ matrix.stability}}
+    name: PHP ${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability}}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           coverage: pcov
 
       - name: Install dependencies
@@ -36,7 +36,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_PARALLEL: true
-          COVERALLS_FLAG_NAME: php-${{ matrix.php-versions }} - L${{ matrix.laravel }} - ${{ matrix.stability}}
+          COVERALLS_FLAG_NAME: php-${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability}}
         run: vendor/bin/php-coveralls --coverage_clover=build/logs/clover.xml -vvv
 
   finish-coverage:
