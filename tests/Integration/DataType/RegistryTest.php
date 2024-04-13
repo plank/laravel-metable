@@ -9,7 +9,7 @@ use Plank\Metable\Tests\TestCase;
 
 class RegistryTest extends TestCase
 {
-    public function test_it_can_set_a_handler()
+    public function test_it_can_set_a_handler(): void
     {
         $registry = new Registry();
         $handler = $this->mockHandlerWithType('foo');
@@ -21,7 +21,7 @@ class RegistryTest extends TestCase
         $this->assertEquals($handler, $registry->getHandlerForType('foo'));
     }
 
-    public function test_it_can_remove_a_handler()
+    public function test_it_can_remove_a_handler(): void
     {
         $registry = new Registry();
         $handler = $this->mockHandlerWithType('foo');
@@ -33,7 +33,7 @@ class RegistryTest extends TestCase
         $this->assertFalse($registry->hasHandlerForType('foo'));
     }
 
-    public function test_it_throws_an_exception_if_no_handler_set()
+    public function test_it_throws_an_exception_if_no_handler_set(): void
     {
         $registry = new Registry();
 
@@ -41,7 +41,7 @@ class RegistryTest extends TestCase
         $registry->getHandlerForType('foo');
     }
 
-    public function test_it_determines_best_handler_for_a_value()
+    public function test_it_determines_best_handler_for_a_value(): void
     {
         $stringHandler = $this->mockHandlerWithType('str');
         $stringHandler->method('canHandleValue')
@@ -64,7 +64,7 @@ class RegistryTest extends TestCase
         $this->assertEquals('str', $type2);
     }
 
-    public function test_it_throws_an_exception_if_no_type_matches_value()
+    public function test_it_throws_an_exception_if_no_type_matches_value(): void
     {
         $registry = new Registry();
 

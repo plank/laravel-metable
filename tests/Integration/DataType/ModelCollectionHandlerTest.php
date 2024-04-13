@@ -9,7 +9,7 @@ use Plank\Metable\Tests\TestCase;
 
 class ModelCollectionHandlerTest extends TestCase
 {
-    public function test_it_reloads_model_instances()
+    public function test_it_reloads_model_instances(): void
     {
         $this->useDatabase();
 

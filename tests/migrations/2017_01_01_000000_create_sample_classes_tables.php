@@ -14,7 +14,7 @@ class CreateSampleClassesTables extends Migration
     public function up()
     {
         Schema::create('sample_metables', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->softDeletes();
             $table->timestamps();
         });

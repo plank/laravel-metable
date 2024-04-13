@@ -23,7 +23,7 @@ use stdClass;
 
 class HandlerTest extends TestCase
 {
-    static public function handlerProvider()
+    static public function handlerProvider(): array
     {
         $timestamp = '2017-01-01 00:00:00.000000+0000';
         $datetime = Carbon::createFromFormat('Y-m-d H:i:s.uO', $timestamp);
@@ -105,28 +105,19 @@ class HandlerTest extends TestCase
     /**
      * @dataProvider handlerProvider
      */
-    public function test_it_specifies_a_datatype_identifier(HandlerInterface $handler, $type)
-    {
+    public function test_it_can_verify_and_serialize_data(
+        HandlerInterface $handler,
+        string $type,
+        mixed $value,
+        array $incompatible
+    ): void {
         $this->assertEquals($type, $handler->getDataType());
-    }
-
-    /**
-     * @dataProvider handlerProvider
-     */
-    public function test_it_can_verify_compatibility(HandlerInterface $handler, $type, $value, $incompatible)
-    {
         $this->assertTrue($handler->canHandleValue($value));
 
-        foreach ($incompatible as $value) {
-            $this->assertFalse($handler->canHandleValue($value));
+        foreach ($incompatible as $incompatibleValue) {
+            $this->assertFalse($handler->canHandleValue($incompatibleValue));
         }
-    }
 
-    /**
-     * @dataProvider handlerProvider
-     */
-    public function test_it_can_serialize_and_unserialize_values(HandlerInterface $handler, $type, $value)
-    {
         $serialized = $handler->serializeValue($value);
         $unserialized = $handler->unserializeValue($serialized);
 

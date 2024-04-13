@@ -8,7 +8,7 @@ use Plank\Metable\Tests\TestCase;
 
 class MetaTest extends TestCase
 {
-    public function test_it_can_get_and_set_value()
+    public function test_it_can_get_and_set_value(): void
     {
         $meta = $this->makeMeta();
 
@@ -18,7 +18,7 @@ class MetaTest extends TestCase
         $this->assertEquals('string', $meta->type);
     }
 
-    public function test_it_exposes_its_serialized_value()
+    public function test_it_exposes_its_serialized_value(): void
     {
         $meta = $this->makeMeta();
         $meta->value = 123;
@@ -26,7 +26,7 @@ class MetaTest extends TestCase
         $this->assertEquals('123', $meta->getRawValue());
     }
 
-    public function test_it_caches_unserialized_value()
+    public function test_it_caches_unserialized_value(): void
     {
         $meta = $this->makeMeta();
         $meta->value = 'foo';
@@ -38,7 +38,7 @@ class MetaTest extends TestCase
         $this->assertEquals('bar', $meta->getRawValue());
     }
 
-    public function test_it_clears_cache_on_set()
+    public function test_it_clears_cache_on_set(): void
     {
         $meta = $this->makeMeta();
         $meta->value = 'foo';
@@ -49,7 +49,7 @@ class MetaTest extends TestCase
         $this->assertEquals('bar', $meta->value);
     }
 
-    public function test_it_can_get_its_model_relation()
+    public function test_it_can_get_its_model_relation(): void
     {
         $meta = $this->makeMeta();
 

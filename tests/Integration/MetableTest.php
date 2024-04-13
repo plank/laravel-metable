@@ -11,7 +11,7 @@ use ReflectionClass;
 
 class MetableTest extends TestCase
 {
-    public function test_it_can_get_and_set_meta_value_by_key()
+    public function test_it_can_get_and_set_meta_value_by_key(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -30,7 +30,7 @@ class MetableTest extends TestCase
         $this->assertCount(1, $metable->meta);
     }
 
-    public function test_it_can_set_many_meta_values_at_once()
+    public function test_it_can_set_many_meta_values_at_once(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -53,7 +53,7 @@ class MetableTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $metable->getMeta('baz'));
     }
 
-    public function test_it_accepts_empty_array_for_set_many_meta()
+    public function test_it_accepts_empty_array_for_set_many_meta(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -62,7 +62,7 @@ class MetableTest extends TestCase
         $this->assertEquals('old', $metable->getMeta('foo'));
     }
 
-    public function test_it_can_set_uppercase_key()
+    public function test_it_can_set_uppercase_key(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -74,7 +74,7 @@ class MetableTest extends TestCase
         $this->assertEquals('bar', $metable->getMeta('FOO'));
     }
 
-    public function test_it_can_get_meta_record()
+    public function test_it_can_get_meta_record(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -86,7 +86,7 @@ class MetableTest extends TestCase
         $this->assertEquals(123, $record->value);
     }
 
-    public function test_it_can_get_meta_all_values()
+    public function test_it_can_get_meta_all_values(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -103,7 +103,7 @@ class MetableTest extends TestCase
                             ], $collection->toArray());
     }
 
-    public function test_it_updates_existing_meta_records()
+    public function test_it_updates_existing_meta_records(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -117,7 +117,7 @@ class MetableTest extends TestCase
         $this->assertEquals(321, $new_record->value);
     }
 
-    public function test_it_returns_default_value_if_no_meta_set()
+    public function test_it_returns_default_value_if_no_meta_set(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -127,7 +127,7 @@ class MetableTest extends TestCase
         $this->assertEquals('not-found', $result);
     }
 
-    public function test_it_can_replace_all_keys()
+    public function test_it_can_replace_all_keys(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -146,7 +146,7 @@ class MetableTest extends TestCase
         $this->assertEquals('d', $metable->getMeta('c'));
     }
 
-    public function test_it_can_delete_meta()
+    public function test_it_can_delete_meta(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -158,7 +158,7 @@ class MetableTest extends TestCase
         $this->assertFalse($metable->fresh()->hasMeta('foo'));
     }
 
-    public function test_it_can_delete_meta_not_set()
+    public function test_it_can_delete_meta_not_set(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -169,7 +169,7 @@ class MetableTest extends TestCase
         $this->assertFalse($metable->fresh()->hasMeta('foo'));
     }
 
-    public function test_it_can_delete_many_meta_at_once()
+    public function test_it_can_delete_many_meta_at_once(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -190,7 +190,7 @@ class MetableTest extends TestCase
         $this->assertFalse($metable->hasMeta('baz'));
     }
 
-    public function test_it_can_delete_all_meta()
+    public function test_it_can_delete_all_meta(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -203,7 +203,7 @@ class MetableTest extends TestCase
         $this->assertEquals(0, $metable->meta()->count());
     }
 
-    public function test_it_clears_meta_on_deletion()
+    public function test_it_clears_meta_on_deletion(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -215,7 +215,7 @@ class MetableTest extends TestCase
         $this->assertEquals(0, $meta->count());
     }
 
-    public function test_it_does_not_clear_meta_on_soft_deletion()
+    public function test_it_does_not_clear_meta_on_soft_deletion(): void
     {
         $this->useDatabase();
         $metable = $this->createMetableSoftDeletes();
@@ -227,7 +227,7 @@ class MetableTest extends TestCase
         $this->assertEquals(1, $meta->count());
     }
 
-    public function test_it_does_clear_meta_on_force_deletion()
+    public function test_it_does_clear_meta_on_force_deletion(): void
     {
         $this->useDatabase();
         $metable = $this->createMetableSoftDeletes();
@@ -239,7 +239,7 @@ class MetableTest extends TestCase
         $this->assertEquals(0, $meta->count());
     }
 
-    public function test_it_can_be_queried_by_single_meta_key()
+    public function test_it_can_be_queried_by_single_meta_key(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -250,7 +250,7 @@ class MetableTest extends TestCase
         $this->assertEquals($metable->getKey(), $result->getKey());
     }
 
-    public function test_it_can_retrieve_model_default_value()
+    public function test_it_can_retrieve_model_default_value(): void
     {
         $this->useDatabase();
         $result = $this->makeMetable();
@@ -259,7 +259,7 @@ class MetableTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $result->getAllMeta()->toArray());
     }
 
-    public function test_it_can_get_database_before_default_value()
+    public function test_it_can_get_database_before_default_value(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -271,7 +271,7 @@ class MetableTest extends TestCase
         $this->assertEquals(['foo' => 'baz'], $result->getAllMeta()->toArray());
     }
 
-    public function test_it_can_get_passed_default_before_model_default_value()
+    public function test_it_can_get_passed_default_before_model_default_value(): void
     {
         $this->useDatabase();
         $this->createMetable();
@@ -281,7 +281,7 @@ class MetableTest extends TestCase
         $this->assertEquals($result->getMeta('foo', null), null);
     }
 
-    public function test_it_can_be_queried_by_missing_single_meta_key()
+    public function test_it_can_be_queried_by_missing_single_meta_key(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -296,7 +296,7 @@ class MetableTest extends TestCase
         $this->assertNotEquals($metable->getKey(), $result->getKey());
     }
 
-    public function test_it_can_be_queried_by_any_meta_keys()
+    public function test_it_can_be_queried_by_any_meta_keys(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -310,7 +310,7 @@ class MetableTest extends TestCase
         $this->assertEquals($metable->getKey(), $result2->getKey());
     }
 
-    public function test_it_can_be_queried_by_any_missing_meta_keys()
+    public function test_it_can_be_queried_by_any_missing_meta_keys(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -331,7 +331,7 @@ class MetableTest extends TestCase
         $this->assertNotEquals($metable->getKey(), $result2->getKey());
     }
 
-    public function test_it_can_be_queried_by_all_meta_keys()
+    public function test_it_can_be_queried_by_all_meta_keys(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -345,7 +345,7 @@ class MetableTest extends TestCase
         $this->assertNull($result2);
     }
 
-    public function test_it_can_be_queried_by_meta_value()
+    public function test_it_can_be_queried_by_meta_value(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -361,7 +361,7 @@ class MetableTest extends TestCase
         $this->assertEquals($metable->getKey(), $result3->getKey());
     }
 
-    public function test_it_can_be_queried_by_numeric_meta_value()
+    public function test_it_can_be_queried_by_numeric_meta_value(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -372,7 +372,7 @@ class MetableTest extends TestCase
         $this->assertEquals($metable->getKey(), $result->getKey());
     }
 
-    public function test_it_can_be_queried_by_in_array()
+    public function test_it_can_be_queried_by_in_array(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
@@ -385,7 +385,7 @@ class MetableTest extends TestCase
         $this->assertNull($result2);
     }
 
-    public function test_it_can_order_query_by_meta_value()
+    public function test_it_can_order_query_by_meta_value(): void
     {
         $this->useDatabase();
         $metable1 = $this->createMetable(['id' => 1]);
@@ -402,7 +402,7 @@ class MetableTest extends TestCase
         $this->assertEquals([2, 1, 3], $results2->pluck('id')->toArray());
     }
 
-    public function test_it_can_order_query_by_meta_value_strict()
+    public function test_it_can_order_query_by_meta_value_strict(): void
     {
         $this->useDatabase();
         $metable1 = $this->createMetable(['id' => 1]);
@@ -419,7 +419,7 @@ class MetableTest extends TestCase
         $this->assertEquals([1, 3], $results2->pluck('id')->toArray());
     }
 
-    public function test_it_can_order_query_by_numeric_meta_value()
+    public function test_it_can_order_query_by_numeric_meta_value(): void
     {
         $this->useDatabase();
         $metable1 = $this->createMetable(['id' => 1]);
@@ -436,7 +436,7 @@ class MetableTest extends TestCase
         $this->assertEquals([1, 3, 2], $results2->pluck('id')->toArray());
     }
 
-    public function test_it_can_order_query_by_numeric_meta_value_strict()
+    public function test_it_can_order_query_by_numeric_meta_value_strict(): void
     {
         $this->useDatabase();
         $metable1 = $this->createMetable(['id' => 1]);
@@ -453,7 +453,7 @@ class MetableTest extends TestCase
         $this->assertEquals([1, 3], $results2->pluck('id')->toArray());
     }
 
-    public function test_set_relation_updates_index()
+    public function test_set_relation_updates_index(): void
     {
         $metable = $this->makeMetable();
         $meta = $this->makeMeta(['key' => 'foo', 'value' => 'bar']);
@@ -477,7 +477,7 @@ class MetableTest extends TestCase
         $this->assertEquals($emptyCollection, $method->invoke($metable));
     }
 
-    public function test_set_relations_updates_index()
+    public function test_set_relations_updates_index(): void
     {
         $metable = $this->makeMetable();
         $meta = $this->makeMeta(['key' => 'foo', 'value' => 'bar']);
@@ -502,7 +502,7 @@ class MetableTest extends TestCase
         $this->assertEquals($emptyCollection, $method->invoke($metable));
     }
 
-    public function test_it_can_serialize_properly()
+    public function test_it_can_serialize_properly(): void
     {
         $metable = $this->makeMetable();
         $meta = $this->makeMeta(['key' => 'foo', 'value' => 'baz']);
