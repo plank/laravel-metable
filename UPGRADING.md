@@ -4,7 +4,7 @@
 
 * Minimum PHP version moved to 8.1
 * Minimum Laravel version moved to 10
-* 
+* Some methods have had their signatures adjusted to use PHP 8+ mixed and union types. If extending any class or implementing any interface from this package, method signatures may need to be updated.
 
 ## 4.X -> 5.X
 - New migration new file added which adds a new composite unique index to the meta table on `metable_type`, `metable_id`, and `key`. Make sure that you have no duplicate keys for a given entity (previously possible as a race condition) before applying the new migration.  

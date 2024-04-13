@@ -20,7 +20,7 @@ class ModelHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value): bool
+    public function canHandleValue(mixed $value): bool
     {
         return $value instanceof Model;
     }
@@ -28,7 +28,7 @@ class ModelHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value): string
+    public function serializeValue(mixed $value): string
     {
         if ($value->exists) {
             return get_class($value) . '#' . $value->getKey();
@@ -40,15 +40,15 @@ class ModelHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function unserializeValue(string $value)
+    public function unserializeValue(string $serializedValue): mixed
     {
         // Return blank instances.
-        if (strpos($value, '#') === false) {
-            return new $value();
+        if (strpos($serializedValue, '#') === false) {
+            return new $serializedValue();
         }
 
         // Fetch specific instances.
-        list($class, $id) = explode('#', $value);
+        list($class, $id) = explode('#', $serializedValue);
 
         return with(new $class())->findOrFail($id);
     }

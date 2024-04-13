@@ -5,6 +5,7 @@
 - Droppped support for PHP 8.0 and below
 - Added support for Laravel 10 and 11
 - Dropped support Laravel versions 9 and below
+- adjusted some method signatures with PHP 8+ mixed and union types
 
 # 5.0.1 - 2021-09-19
 - Fixed `setManyMeta()` not properly serializing certain types of data.

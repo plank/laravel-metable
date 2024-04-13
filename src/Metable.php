@@ -5,29 +5,26 @@ namespace Plank\Metable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Traversable;
 
 /**
  * Trait for giving Eloquent models the ability to handle Meta.
  *
- * @property Collection|Meta[] $meta
- * @method static Builder whereHasMeta($key): void
- * @method static Builder WhereDoesntHaveMeta($key)
+ * @property Collection<Meta> $meta
+ * @method static Builder whereHasMeta(string|string[] $key): void
+ * @method static Builder WhereDoesntHaveMeta(string|string[] $key)
  * @method static Builder WhereHasMetaKeys(array $keys)
- * @method static Builder WhereMeta(string $key, $operator, $value = null)
- * @method static Builder WhereMetaNumeric(string $key, string $operator, $value)
+ * @method static Builder WhereMeta(string $key, $operator, mixed $value = null)
+ * @method static Builder WhereMetaNumeric(string $key, string $operator, mixed $value)
  * @method static Builder WhereMetaIn(string $key, array $values)
- * @method static Builder OrderByMeta(string $key, string $direction = 'asc', $strict = false)
- * @method static Builder OrderByMetaNumeric(string $key, string $direction = 'asc', $strict = false)
+ * @method static Builder OrderByMeta(string $key, string $direction = 'asc', bool $strict = false)
+ * @method static Builder OrderByMetaNumeric(string $key, string $direction = 'asc', bool $strict = false)
  */
 trait Metable
 {
     /**
-     * @var Collection|Meta[]
+     * @var Collection<Meta>
      */
     private $indexedMetaCollection;
 
@@ -63,7 +60,7 @@ trait Metable
      * @param string $key
      * @param mixed $value
      */
-    public function setMeta(string $key, $value): void
+    public function setMeta(string $key, mixed $value): void
     {
         if ($this->hasMeta($key)) {
             $meta = $this->getMetaRecord($key);
@@ -157,7 +154,7 @@ trait Metable
      *
      * @return mixed
      */
-    public function getMeta(string $key, $default = null)
+    public function getMeta(string $key, mixed $default = null): mixed
     {
         if ($this->hasMeta($key)) {
             return $this->getMetaRecord($key)->getAttribute('value');
@@ -190,7 +187,7 @@ trait Metable
      * @param string $key
      * @return mixed
      */
-    protected function getDefaultMetaValue(string $key)
+    protected function getDefaultMetaValue(string $key): mixed
     {
         return $this->defaultMetaValues[$key];
     }
@@ -285,11 +282,11 @@ trait Metable
      * If an array of keys is passed instead, will restrict the query to records having one or more Meta with any of the keys.
      *
      * @param Builder $q
-     * @param string|array $key
+     * @param string|string[] $key
      *
      * @return void
      */
-    public function scopeWhereHasMeta(Builder $q, $key): void
+    public function scopeWhereHasMeta(Builder $q, string|array $key): void
     {
         $q->whereHas('meta', function (Builder $q) use ($key) {
             $q->whereIn('key', (array)$key);
@@ -302,11 +299,11 @@ trait Metable
      * If an array of keys is passed instead, will restrict the query to records having one or more Meta with any of the keys.
      *
      * @param Builder $q
-     * @param string|array $key
+     * @param string|string[] $key
      *
      * @return void
      */
-    public function scopeWhereDoesntHaveMeta(Builder $q, $key): void
+    public function scopeWhereDoesntHaveMeta(Builder $q, string|array $key): void
     {
         $q->whereDoesntHave('meta', function (Builder $q) use ($key) {
             $q->whereIn('key', (array)$key);
@@ -347,7 +344,7 @@ trait Metable
      *
      * @return void
      */
-    public function scopeWhereMeta(Builder $q, string $key, $operator, $value = null): void
+    public function scopeWhereMeta(Builder $q, string $key, mixed $operator, mixed $value = null): void
     {
         // Shift arguments if no operator is present.
         if (!isset($value)) {
@@ -378,7 +375,7 @@ trait Metable
      *
      * @return void
      */
-    public function scopeWhereMetaNumeric(Builder $q, string $key, string $operator, $value): void
+    public function scopeWhereMetaNumeric(Builder $q, string $key, string $operator, int|float $value): void
     {
         // Since we are manually interpolating into the query,
         // escape the operator to protect against injection.
@@ -562,7 +559,7 @@ trait Metable
      *
      * @return Meta
      */
-    protected function makeMeta(string $key = '', $value = ''): Meta
+    protected function makeMeta(string $key = '', mixed $value = ''): Meta
     {
         $className = $this->getMetaClassName();
 

@@ -18,7 +18,7 @@ class ObjectHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value): bool
+    public function canHandleValue(mixed $value): bool
     {
         return is_object($value);
     }
@@ -26,7 +26,7 @@ class ObjectHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value): string
+    public function serializeValue(mixed $value): string
     {
         return json_encode($value);
     }
@@ -34,8 +34,8 @@ class ObjectHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function unserializeValue(string $value)
+    public function unserializeValue(string $serializedValue): mixed
     {
-        return json_decode($value, false);
+        return json_decode($serializedValue, false);
     }
 }

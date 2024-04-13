@@ -47,7 +47,7 @@ class Meta extends Model
      *
      * @var mixed
      */
-    protected $cachedValue;
+    protected mixed $cachedValue;
 
     /**
      * Metable Relation.

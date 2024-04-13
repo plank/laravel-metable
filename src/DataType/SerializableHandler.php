@@ -20,7 +20,7 @@ class SerializableHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value): bool
+    public function canHandleValue(mixed $value): bool
     {
         return $value instanceof Serializable;
     }
@@ -28,7 +28,7 @@ class SerializableHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value): string
+    public function serializeValue(mixed $value): string
     {
         return serialize($value);
     }
@@ -36,8 +36,8 @@ class SerializableHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function unserializeValue(string $value)
+    public function unserializeValue(string $serializedValue): mixed
     {
-        return unserialize($value);
+        return unserialize($serializedValue);
     }
 }
