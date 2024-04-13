@@ -1,5 +1,11 @@
 # Changelog
 
+# 6.0.0
+- Added support for PHP 8.3
+- Droppped support for PHP 8.0 and below
+- Added support for Laravel 10 and 11
+- Dropped support Laravel versions 9 and below
+
 # 5.0.1 - 2021-09-19
 - Fixed `setManyMeta()` not properly serializing certain types of data.
 
