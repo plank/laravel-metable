@@ -91,31 +91,18 @@ trait Metable
         $builder = DB::table($prototype->getTable());
         $needReload = $this->relationLoaded('meta');
 
-        if (method_exists($builder, 'upsert')) {
-            // use upsert if available to store all data in a single query
-            // requires Laravel >8.0
-            $metaModels = new Collection();
-            foreach ($metaDictionary as $key => $value) {
-                $metaModels[$key] = $this->makeMeta($key, $value);
-            }
-
-            $builder->upsert(
-                $metaModels->map(function (Meta $model) {
-                    return method_exists($model, 'getAttributesForInsert')
-                        ? $model->getAttributesForInsert() // Laravel >= 8.0
-                        : $model->getAttributes();
-                })->all(),
-                ['metable_type', 'metable_id', 'key'],
-                ['type', 'value']
-            );
-        } else {
-            // otherwise insert manually.
-            // Clear local cache to speed things up since we will reload it afterwards
-            $this->unsetRelation('meta');
-            foreach ($metaDictionary as $key => $value) {
-                $this->setMeta($key, $value);
-            }
+        $metaModels = new Collection();
+        foreach ($metaDictionary as $key => $value) {
+            $metaModels[$key] = $this->makeMeta($key, $value);
         }
+
+        $builder->upsert(
+            $metaModels->map(function (Meta $model) {
+                return $model->getAttributesForInsert();
+            })->all(),
+            ['metable_type', 'metable_id', 'key'],
+            ['type', 'value']
+        );
 
         if ($needReload) {
             // reload media relation and indexed cache
