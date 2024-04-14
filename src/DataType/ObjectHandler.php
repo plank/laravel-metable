@@ -39,4 +39,14 @@ class ObjectHandler implements HandlerInterface
     {
         return json_decode($serializedValue, false);
     }
+
+    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    {
+        return null;
+    }
+
+    public function getStringValue(mixed $value, string $serializedValue): null|string
+    {
+        return null;
+    }
 }

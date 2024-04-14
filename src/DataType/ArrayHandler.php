@@ -29,7 +29,7 @@ class ArrayHandler implements HandlerInterface
      */
     public function serializeValue(mixed $value): string
     {
-        return json_encode($value);
+        return json_encode($value, JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -37,6 +37,21 @@ class ArrayHandler implements HandlerInterface
      */
     public function unserializeValue(string $serializedValue): mixed
     {
-        return json_decode($serializedValue, true);
+        return json_decode(
+            $serializedValue,
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+    }
+
+    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    {
+        return null;
+    }
+
+    public function getStringValue(mixed $value, string $serializedValue): null|string
+    {
+        return null;
     }
 }

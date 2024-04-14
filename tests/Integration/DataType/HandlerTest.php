@@ -27,12 +27,15 @@ class HandlerTest extends TestCase
     private static $resource;
     static public function handlerProvider(): array
     {
-        $timestamp = '2017-01-01 00:00:00.000000+0000';
-        $datetime = Carbon::createFromFormat('Y-m-d H:i:s.uO', $timestamp);
+        $dateString = '2017-01-01 00:00:00.000000+0000';
+        $datetime = Carbon::createFromFormat('Y-m-d H:i:s.uO', $dateString);
+        $timestamp = $datetime->getTimestamp();
 
         $object = new stdClass();
         $object->foo = 'bar';
         $object->baz = 3;
+
+        $model = new SampleMetable();
 
         self::$resource = fopen('php://memory', 'r');
 
@@ -42,72 +45,104 @@ class HandlerTest extends TestCase
                 'array',
                 ['foo' => ['bar'], 'baz'],
                 [new stdClass()],
+                null,
+                null,
             ],
             'boolean' => [
                 new BooleanHandler(),
                 'boolean',
                 true,
                 [1, 0, '', [], null],
+                1,
+                'true'
             ],
             'datetime' => [
                 new DateTimeHandler(),
                 'datetime',
                 $datetime,
                 [2017, '2017-01-01'],
+                $timestamp,
+                $dateString,
             ],
             'float' => [
                 new FloatHandler(),
                 'float',
                 1.1,
                 ['1.1', 1],
+                1.1,
+                '1.1',
             ],
             'integer' => [
                 new IntegerHandler(),
                 'integer',
                 3,
                 [1.1, '1'],
+                3,
+                '3',
             ],
             'model' => [
                 new ModelHandler(),
                 'model',
-                new SampleMetable(),
+                $model,
                 [new stdClass()],
+                null,
+                SampleMetable::class,
             ],
             'model collection' => [
                 new ModelCollectionHandler(),
                 'collection',
                 new Collection([new SampleMetable()]),
                 [collect()],
+                null,
+                null,
             ],
             'null' => [
                 new NullHandler(),
                 'null',
                 null,
                 [0, '', 'null', [], false],
+                null,
+                null,
             ],
             'object' => [
                 new ObjectHandler(),
                 'object',
                 $object,
                 [[]],
+                null,
+                null,
             ],
             'serialize' => [
                 new SerializeHandler(),
                 'serialized',
                 ['foo' => 'bar', 'baz' => [3]],
                 [self::$resource],
+                null,
+                null,
             ],
             'serializable' => [
                 new SerializableHandler(),
                 'serializable',
                 new SampleSerializable(['foo' => 'bar']),
                 [],
+                null,
+                null,
             ],
             'string' => [
                 new StringHandler(),
                 'string',
                 'foo',
                 [1, 1.1],
+                null,
+                'foo',
+            ],
+            'numeric-string' => [
+                new StringHandler(),
+                'string',
+                '1.2345',
+                [1, 1.1],
+                1.2345,
+                '1.2345',
             ],
         ];
     }
@@ -128,7 +163,9 @@ class HandlerTest extends TestCase
         HandlerInterface $handler,
         string $type,
         mixed $value,
-        array $incompatible
+        array $incompatible,
+        null|int|float $numericValue,
+        null|string $stringValue
     ): void {
         $this->assertEquals($type, $handler->getDataType());
         $this->assertTrue($handler->canHandleValue($value));
@@ -141,5 +178,7 @@ class HandlerTest extends TestCase
         $unserialized = $handler->unserializeValue($serialized);
 
         $this->assertEquals($value, $unserialized);
+        $this->assertEquals($numericValue, $handler->getNumericValue($value, $serialized));
+        $this->assertEquals($stringValue, $handler->getStringValue($value, $serialized));
     }
 }

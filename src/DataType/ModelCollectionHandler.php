@@ -116,4 +116,14 @@ class ModelCollectionHandler implements HandlerInterface
 
         return $results;
     }
+
+    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    {
+        return null;
+    }
+
+    public function getStringValue(mixed $value, string $serializedValue): null|string
+    {
+        return null;
+    }
 }

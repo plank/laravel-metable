@@ -19,4 +19,14 @@ class FloatHandler extends ScalarHandler
     {
         return 'float';
     }
+
+    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    {
+        return $value;
+    }
+
+    public function getStringValue(mixed $value, string $serializedValue): null|string
+    {
+        return (string) $value;
+    }
 }

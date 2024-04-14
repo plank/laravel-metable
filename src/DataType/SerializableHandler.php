@@ -42,4 +42,14 @@ class SerializableHandler implements HandlerInterface
         $allowedClasses = config('metable.options.serializable.allowedClasses', false);
         return unserialize($serializedValue, ['allowed_classes' => $allowedClasses]);
     }
+
+    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    {
+        return null;
+    }
+
+    public function getStringValue(mixed $value, string $serializedValue): null|string
+    {
+        return null;
+    }
 }

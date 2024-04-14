@@ -56,4 +56,14 @@ class ModelHandler implements HandlerInterface
 
         return $class::query()->find($id);
     }
+
+    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    {
+        return null;
+    }
+
+    public function getStringValue(mixed $value, string $serializedValue): null|string
+    {
+        return $serializedValue;
+    }
 }

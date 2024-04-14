@@ -14,7 +14,9 @@ use Plank\Metable\DataType\Registry;
  * @property int $metable_id
  * @property string $type
  * @property string $key
- * @property string $value
+ * @property mixed $value
+ * @property null|string $string_value
+ * @property null|int|float $numeric_value
  * @property Model $metable
  */
 class Meta extends Model
@@ -32,7 +34,14 @@ class Meta extends Model
     /**
      * {@inheritdoc}
      */
-    protected $guarded = ['id', 'metable_type', 'metable_id', 'type'];
+    protected $guarded = [
+        'id',
+        'metable_type',
+        'metable_id',
+        'type',
+        'string_value',
+        'numeric_value'
+    ];
 
     /**
      * {@inheritdoc}
@@ -93,8 +102,18 @@ class Meta extends Model
         $registry = $this->getDataTypeRegistry();
 
         $this->attributes['type'] = $registry->getTypeForValue($value);
-        $this->attributes['value'] = $registry->getHandlerForType($this->type)
-            ->serializeValue($value);
+        $handler = $registry->getHandlerForType($this->type);
+        $serializedValue = $handler->serializeValue($value);
+
+        $this->attributes['value'] = $serializedValue;
+        $this->attributes['string_value'] = $handler->getStringValue(
+            $value,
+            $serializedValue
+        );
+        $this->attributes['numeric_value'] = $handler->getNumericValue(
+            $value,
+            $serializedValue
+        );
 
         $this->cachedValue = null;
     }

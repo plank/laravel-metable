@@ -43,10 +43,10 @@ abstract class ScalarHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function unserializeValue(string $value): mixed
+    public function unserializeValue(string $serializedValue): mixed
     {
-        settype($value, $this->type);
+        settype($serializedValue, $this->type);
 
-        return $value;
+        return $serializedValue;
     }
 }

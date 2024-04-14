@@ -105,7 +105,7 @@ Any object implementing the ``DateTimeInterface``.  Object will be converted to 
     <?php
     $metable->setMeta('last_viewed', \Carbon\Carbon::now());
 
-Other
+Objects and Arrays
 ^^^^^
 
 Objects and arrays will be serialized using PHP's `serialize()` function, to allow for the storage and retrieval of complex data structures. The serialized value is encrypted before being stored in the database, and decrypted when retrieved to prevent tampered data from being unserialized.

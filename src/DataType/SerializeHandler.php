@@ -26,4 +26,14 @@ class SerializeHandler implements HandlerInterface
     {
         return app('encrypter')->decrypt($serializedValue, true);
     }
+
+    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    {
+        return null;
+    }
+
+    public function getStringValue(mixed $value, string $serializedValue): null|string
+    {
+        return null;
+    }
 }

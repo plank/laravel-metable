@@ -48,4 +48,16 @@ class DateTimeHandler implements HandlerInterface
     {
         return Carbon::createFromFormat($this->format, $serializedValue);
     }
+
+    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    {
+        return $value instanceof DateTimeInterface
+            ? $value->getTimestamp()
+            : null;
+    }
+
+    public function getStringValue(mixed $value, string $serializedValue): null|string
+    {
+        return $serializedValue;
+    }
 }

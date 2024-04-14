@@ -32,6 +32,10 @@ interface HandlerInterface
      */
     public function serializeValue(mixed $value): string;
 
+    public function getNumericValue(mixed $value, string $serializedValue): null|int|float;
+
+    public function getStringValue(mixed $value, string $serializedValue): null|string;
+
     /**
      * Convert a serialized string back to its original value.
      *
