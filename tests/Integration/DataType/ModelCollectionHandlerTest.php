@@ -31,4 +31,20 @@ class ModelCollectionHandlerTest extends TestCase
         $this->assertFalse($unserialized[1]->exists);
         $this->assertEquals(1, $unserialized['foo']->getKey());
     }
+
+    public function test_it_handles_invalid_model_class(): void
+    {
+        $handler = new ModelCollectionHandler();
+        $serialized = json_encode([
+            'class' => 'stdClass',
+            'items' => [
+                'class' => 'stdClass',
+                'key' => '1'
+            ]
+        ]);
+        $unserialized = $handler->unserializeValue($serialized);
+
+        $this->assertInstanceOf(Collection::class, $unserialized);
+        $this->assertEmpty($unserialized);
+    }
 }

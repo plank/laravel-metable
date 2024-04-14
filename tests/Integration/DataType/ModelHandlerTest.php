@@ -22,4 +22,13 @@ class ModelHandlerTest extends TestCase
         $this->assertEquals(12, $unserialized->getKey());
         $this->assertTrue($unserialized->exists);
     }
+
+    public function test_it_handles_invalid_model_class(): void
+    {
+        $handler = new ModelHandler();
+        $serialized = 'stdClass#1';
+        $unserialized = $handler->unserializeValue($serialized);
+
+        $this->assertNull($unserialized);
+    }
 }

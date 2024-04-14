@@ -2,6 +2,7 @@
 
 namespace Plank\Metable\Tests\Integration;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Plank\Metable\Meta;
 use Plank\Metable\Tests\Mocks\SampleMetable;
@@ -347,14 +348,15 @@ class MetableTest extends TestCase
 
     public function test_it_can_be_queried_by_meta_value(): void
     {
+        $now = Carbon::now();
         $this->useDatabase();
         $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
-        $metable->setMeta('array', ['a' => 'b']);
+        $metable->setMeta('datetime', $now);
 
         $result1 = SampleMetable::whereMeta('foo', 'bar')->first();
         $result2 = SampleMetable::whereMeta('foo', 'baz')->first();
-        $result3 = SampleMetable::whereMeta('array', ['a' => 'b'])->first();
+        $result3 = SampleMetable::whereMeta('datetime', $now)->first();
 
         $this->assertEquals($metable->getKey(), $result1->getKey());
         $this->assertNull($result2);

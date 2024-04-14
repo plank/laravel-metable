@@ -4,6 +4,7 @@ namespace Plank\Metable\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Plank\Metable\MetableServiceProvider;
+use Plank\Metable\Tests\Mocks\SampleSerializable;
 use ReflectionClass;
 
 class TestCase extends BaseTestCase
@@ -29,6 +30,8 @@ class TestCase extends BaseTestCase
     protected function getEnvironmentSetUp($app)
     {
         date_default_timezone_set('GMT');
+        $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+
         //use in-memory database
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',
@@ -48,14 +51,14 @@ class TestCase extends BaseTestCase
             'strict' => false,
         ]);
         $app['config']->set('database.default', 'testing');
+
+        $app['config']->set('metable.options.serializable.allowedClasses', [SampleSerializable::class]);
     }
 
     protected function getPrivateProperty($class, $property_name)
     {
         $reflector = new ReflectionClass($class);
         $property = $reflector->getProperty($property_name);
-        $property->setAccessible(true);
-
         return $property;
     }
 
@@ -63,8 +66,6 @@ class TestCase extends BaseTestCase
     {
         $reflector = new ReflectionClass($class);
         $method = $reflector->getMethod($method_name);
-        $method->setAccessible(true);
-
         return $method;
     }
 

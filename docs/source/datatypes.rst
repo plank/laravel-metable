@@ -12,29 +12,6 @@ Scalar Values
 
 The following scalar values are supported.
 
-Array
-^^^^^^^^
-
-Arrays of scalar values. Nested arrays are supported.
-
-::
-
-    <?php
-    $metable->setMeta('information', [
-        'address' => [
-            'street' => '123 Somewhere Ave.',
-            'city' => 'Somewhereville',
-            'country' => 'Somewhereland',
-            'postal' => '123456',
-        ],
-        'contact' => [
-            'phone' => '555-555-5555',
-            'email' => 'email@example.com'
-        ]
-    ]);
-
-.. warning:: Laravel-Metable uses ``json_encode()`` and ``json_decode()`` under the hood for array serialization. This will cause any objects nested within the array to be cast to an array.
-
 Boolean
 ^^^^^^^^
 
@@ -128,9 +105,53 @@ Any object implementing the ``DateTimeInterface``.  Object will be converted to 
     <?php
     $metable->setMeta('last_viewed', \Carbon\Carbon::now());
 
+Other
+^^^^^
+
+Objects and arrays will be serialized using PHP's `serialize()` function, to allow for the storage and retrieval of complex data structures. The serialized value is encrypted before being stored in the database, and decrypted when retrieved to prevent tampered data from being unserialized.
+
+::
+
+    <?php
+    $metable->setMeta('data', ['key' => 'value']);
+    $metable->setMeta('data', new MyValueObject(123));
+
+.. note:: The ``Plank\Metable\DataType\SerializeHandler`` class should always be the last entry the ``config/metable.php`` datatypes array, as it will accept data of any type, causing any handlers below it to be ignored.
+
+Deprecated
+----------
+
+The following data types are deprecated and should not be used in new code. They are still supported for backwards compatibility, but will be removed in a future release.
+
+Array
+^^^^^^^^
+
+.. warning:: The ``ArrayHandler`` datatype is deprecated. The ``SerializeHandler`` should be used for handling arrays.
+
+Arrays of scalar values. Nested arrays are supported.
+
+::
+
+    <?php
+    $metable->setMeta('information', [
+        'address' => [
+            'street' => '123 Somewhere Ave.',
+            'city' => 'Somewhereville',
+            'country' => 'Somewhereland',
+            'postal' => '123456',
+        ],
+        'contact' => [
+            'phone' => '555-555-5555',
+            'email' => 'email@example.com'
+        ]
+    ]);
+
+.. warning:: the ``ArrayHandler`` class uses ``json_encode()`` and ``json_decode()`` under the hood for array serialization. This will cause any objects nested within the array to be cast to an array. This is not a concern for the ``SerializeHandler``.
 
 Serializable
 ^^^^^^^^^^^^^
+
+.. warning:: The ``SerializableHandler`` datatype is deprecated. The ``SerializeHandler`` should be used for handling all objects.
 
 Any object implementing the PHP ``Serializable`` interface.
 
@@ -146,8 +167,12 @@ Any object implementing the PHP ``Serializable`` interface.
 
     $metable->setMeta('example', $serializable);
 
+For security reasons, it is necessary to list any classes that can be unserialized in the ``metable.options.serializable.allowedClasses`` key in the ``config/metable.php`` file. This is to prevent arbitrary code execution when unserializing untrusted data. This config can be set to true to allow all classes, but this is not recommended.
+
 Plain Objects
 ^^^^^^^^^^^^^^
+
+.. warning:: The ``ObjectHandler`` datatype is deprecated. The ``SerializeHandler`` should be used for handling all objects.
 
 Any other objects will be converted to ``stdClass`` plain objects. You can control what properties are stored by implementing the ``JsonSerializable`` interface on the class of your stored object.
 
@@ -157,9 +182,7 @@ Any other objects will be converted to ``stdClass`` plain objects. You can contr
     $metable->setMeta('weight', new Weight(10, 'kg'));
     $weight = $metable->getMeta('weight') // stdClass($amount = 10; $unit => 'kg');
 
-.. note:: The ``Plank\Metable\DataType\ObjectHandler`` class should always be the last entry the ``config/metable.php`` datatypes array, as it will accept any object, causing any handlers below it to be ignored.
-
-.. warning:: Laravel-Metable uses ``json_encode()`` and ``json_decode()`` under the hood for plain object serialization. This will cause any arrays within the object's properties to be cast to a ``stdClass`` object.
+.. warning:: Laravel-Metable uses ``json_encode()`` and ``json_decode()`` under the hood for plain object serialization. This will cause any arrays within the object's properties to be cast to a ``stdClass`` object. This is not a concern for the ``SerializeHandler``.
 
 
 Adding Custom Data Types

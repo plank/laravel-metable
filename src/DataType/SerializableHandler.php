@@ -6,6 +6,7 @@ use Serializable;
 
 /**
  * Handle serialization of Serializable objects.
+ * @deprecated Use SerializeHandler instead.
  */
 class SerializableHandler implements HandlerInterface
 {
@@ -38,6 +39,7 @@ class SerializableHandler implements HandlerInterface
      */
     public function unserializeValue(string $serializedValue): mixed
     {
-        return unserialize($serializedValue);
+        $allowedClasses = config('metable.options.serializable.allowedClasses', false);
+        return unserialize($serializedValue, ['allowed_classes' => $allowedClasses]);
     }
 }

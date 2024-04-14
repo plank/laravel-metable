@@ -48,8 +48,12 @@ class ModelHandler implements HandlerInterface
         }
 
         // Fetch specific instances.
-        list($class, $id) = explode('#', $serializedValue);
+        /** @var class-string<Model> $class */
+        [$class, $id] = explode('#', $serializedValue);
+        if (!is_a($class, Model::class, true)) {
+            return null;
+        }
 
-        return with(new $class())->findOrFail($id);
+        return $class::query()->find($id);
     }
 }

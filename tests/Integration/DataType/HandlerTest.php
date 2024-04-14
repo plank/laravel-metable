@@ -15,6 +15,7 @@ use Plank\Metable\DataType\ModelHandler;
 use Plank\Metable\DataType\NullHandler;
 use Plank\Metable\DataType\ObjectHandler;
 use Plank\Metable\DataType\SerializableHandler;
+use Plank\Metable\DataType\SerializeHandler;
 use Plank\Metable\DataType\StringHandler;
 use Plank\Metable\Tests\Mocks\SampleMetable;
 use Plank\Metable\Tests\Mocks\SampleSerializable;
@@ -23,6 +24,7 @@ use stdClass;
 
 class HandlerTest extends TestCase
 {
+    private static $resource;
     static public function handlerProvider(): array
     {
         $timestamp = '2017-01-01 00:00:00.000000+0000';
@@ -31,6 +33,8 @@ class HandlerTest extends TestCase
         $object = new stdClass();
         $object->foo = 'bar';
         $object->baz = 3;
+
+        self::$resource = fopen('php://memory', 'r');
 
         return [
             'array' => [
@@ -87,6 +91,12 @@ class HandlerTest extends TestCase
                 $object,
                 [[]],
             ],
+            'serialize' => [
+                new SerializeHandler(),
+                'serialized',
+                ['foo' => 'bar', 'baz' => [3]],
+                [self::$resource],
+            ],
             'serializable' => [
                 new SerializableHandler(),
                 'serializable',
@@ -100,6 +110,15 @@ class HandlerTest extends TestCase
                 [1, 1.1],
             ],
         ];
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (self::$resource) {
+            fclose(self::$resource);
+            self::$resource = null;
+        }
+        parent::tearDownAfterClass();
     }
 
     /**
