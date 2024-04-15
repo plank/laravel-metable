@@ -33,7 +33,7 @@ trait Metable
      *
      * @return void
      */
-    public static function bootMetable()
+    public static function bootMetable(): void
     {
         // delete all attached meta on deletion
         static::deleted(function (self $model) {
