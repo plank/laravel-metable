@@ -36,7 +36,7 @@ jobs:
           COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run phpunit
-        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml -v
+        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml --debug
 
       - name: Upload coverage results to Coveralls
         env:

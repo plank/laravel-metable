@@ -20,7 +20,6 @@ class CreateMetaTable extends Migration
                 $table->string('type')->nullable();
                 $table->string('key')->index();
                 $table->longtext('value');
-                $table->index(['metable_type', 'metable_id']);
             });
         }
     }
