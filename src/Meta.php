@@ -69,7 +69,7 @@ class Meta extends Model
      * @return mixed
      * @throws Exceptions\DataTypeException
      */
-    public function getValueAttribute()
+    public function getValueAttribute(): mixed
     {
         if (!isset($this->cachedValue)) {
             $this->cachedValue = $this->getDataTypeRegistry()
@@ -88,7 +88,7 @@ class Meta extends Model
      * @param mixed $value
      * @throws Exceptions\DataTypeException
      */
-    public function setValueAttribute($value): void
+    public function setValueAttribute(mixed $value): void
     {
         $registry = $this->getDataTypeRegistry();
 
