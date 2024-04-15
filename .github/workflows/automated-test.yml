@@ -31,7 +31,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer update --prefer-dist ${{ matrix.prefer-lowest }}
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
         env:
           COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
