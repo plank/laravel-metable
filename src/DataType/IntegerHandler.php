@@ -12,12 +12,12 @@ class IntegerHandler extends ScalarHandler
      */
     protected $type = 'integer';
 
-    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    public function getNumericValue(mixed $value): null|int|float
     {
         return $value;
     }
 
-    public function getStringValue(mixed $value, string $serializedValue): null|string
+    public function getStringValue(mixed $value): null|string
     {
         return (string) $value;
     }

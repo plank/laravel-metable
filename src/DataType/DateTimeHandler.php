@@ -15,7 +15,7 @@ class DateTimeHandler implements HandlerInterface
      *
      * @var string
      */
-    protected $format = 'Y-m-d H:i:s.uO';
+    const FORMAT = 'Y-m-d H:i:s.uO';
 
     /**
      * {@inheritdoc}
@@ -38,7 +38,7 @@ class DateTimeHandler implements HandlerInterface
      */
     public function serializeValue(mixed $value): string
     {
-        return $value->format($this->format);
+        return $value->format(self::FORMAT);
     }
 
     /**
@@ -46,18 +46,25 @@ class DateTimeHandler implements HandlerInterface
      */
     public function unserializeValue(string $serializedValue): mixed
     {
-        return Carbon::createFromFormat($this->format, $serializedValue);
+        return Carbon::createFromFormat(self::FORMAT, $serializedValue);
     }
 
-    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    public function getNumericValue(mixed $value): null|int|float
     {
         return $value instanceof DateTimeInterface
             ? $value->getTimestamp()
             : null;
     }
 
-    public function getStringValue(mixed $value, string $serializedValue): null|string
+    public function getStringValue(mixed $value): null|string
     {
-        return $serializedValue;
+       return $value instanceof DateTimeInterface
+            ? $value->copy()->setTimezone('UTC')->format(self::FORMAT)
+            : null;
+    }
+
+    public function isIdempotent(): bool
+    {
+        return true;
     }
 }

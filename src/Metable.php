@@ -4,22 +4,34 @@ namespace Plank\Metable;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\DB;
+use Plank\Metable\DataType\HandlerInterface;
+use Plank\Metable\DataType\Registry;
 
 /**
  * Trait for giving Eloquent models the ability to handle Meta.
  *
  * @property Collection<Meta> $meta
  * @method static Builder whereHasMeta(string|string[] $key): void
- * @method static Builder WhereDoesntHaveMeta(string|string[] $key)
- * @method static Builder WhereHasMetaKeys(array $keys)
- * @method static Builder WhereMeta(string $key, $operator, mixed $value = null)
- * @method static Builder WhereMetaNumeric(string $key, string $operator, mixed $value)
- * @method static Builder WhereMetaIn(string $key, array $values)
- * @method static Builder OrderByMeta(string $key, string $direction = 'asc', bool $strict = false)
- * @method static Builder OrderByMetaNumeric(string $key, string $direction = 'asc', bool $strict = false)
+ * @method static Builder whereDoesntHaveMeta(string|string[] $key)
+ * @method static Builder whereHasMetaKeys(array $keys)
+ * @method static Builder whereMeta(string $key, mixed $operator, mixed $value = null)
+ * @method static Builder whereMetaNumeric(string $key, mixed $operator, mixed $value = null)
+ * @method static Builder whereMetaIn(string $key, array $values)
+ * @method static Builder whereMetaInNumeric(string $key, array $values)
+ * @method static Builder whereMetaNotIn(string $key, array $values)
+ * @method static Builder whereMetaNotInNumeric(string $key, array $values)
+ * @method static Builder whereMetaBetween(string $key, mixed $min, mixed $max, bool $not = false)
+ * @method static Builder whereMetaBetweenNumeric(string $key, mixed $min, mixed $max, bool $not = false)
+ * @method static Builder whereMetaNotBetween(string $key, mixed $min, mixed $max)
+ * @method static Builder whereMetaNotBetweenNumeric(string $key, mixed $min, mixed $max)
+ * @method static Builder whereMetaIsNull(string $key)
+ * @method static Builder whereMetaIsModel(string $key, Model|string $classOrInstance, null|int|string $id = null)
+ * @method static Builder orderByMeta(string $key, string $direction = 'asc', bool $strict = false)
+ * @method static Builder orderByMetaNumeric(string $key, string $direction = 'asc', bool $strict = false)
  */
 trait Metable
 {
@@ -33,7 +45,7 @@ trait Metable
      *
      * @return void
      */
-    public static function bootMetable()
+    public static function bootMetable(): void
     {
         // delete all attached meta on deletion
         static::deleted(function (self $model) {
@@ -248,7 +260,7 @@ trait Metable
     public function purgeMeta(): void
     {
         $this->meta()->delete();
-        $this->setRelation('meta', $this->makeMeta()->newCollection([]));
+        $this->setRelation('meta', $this->makeMeta()->newCollection());
     }
 
     /**
@@ -339,15 +351,28 @@ trait Metable
             $operator = '=';
         }
 
-        // Convert value to its serialized version for comparison.
-        if (!is_string($value)) {
-            $value = $this->makeMeta($key, $value)->getRawValue();
-        }
+        $stringValue = $this->valueToString($value);
+        $q->whereHas(
+            'meta',
+            function (Builder $q) use ($key, $operator, $stringValue, $value) {
+                $q->where('key', $key);
+                $q->where('string_value', $operator, $stringValue);
 
-        $q->whereHas('meta', function (Builder $q) use ($key, $operator, $value) {
-            $q->where('key', $key);
-            $q->where('value', $operator, $value);
-        });
+                // If the value is a string and the string value is at the maximum length,
+                // we can optimize the query by looking up using the index first
+                // then compare the serialized value (not indexed) afterward to ensure correctness.
+                if (strlen($stringValue) === config(
+                        'metable.stringValueIndexLength',
+                        255
+                    )
+                ) {
+                    $handler = $this->getHandlerForValue($value);
+                    if ($handler->isIdempotent()) {
+                        $q->where('value', $operator, $handler->serializeValue($value));
+                    }
+                }
+            }
+        );
     }
 
     /**
@@ -357,25 +382,113 @@ trait Metable
      *
      * @param Builder $q
      * @param string $key
-     * @param string $operator
-     * @param int|float $value
+     * @param mixed|string $operator
+     * @param mixed $value
      *
      * @return void
      */
-    public function scopeWhereMetaNumeric(Builder $q, string $key, string $operator, int|float $value): void
+    public function scopeWhereMetaNumeric(Builder $q, string $key, mixed $operator, mixed $value = null): void
     {
-        // Since we are manually interpolating into the query,
-        // escape the operator to protect against injection.
-        $validOperators = ['<', '<=', '>', '>=', '=', '<>', '!='];
-        $operator = in_array($operator, $validOperators) ? $operator : '=';
-        $field = $q->getQuery()
-            ->getGrammar()
-            ->wrap($this->meta()->getRelated()->getTable() . '.value');
+        // Shift arguments if no operator is present.
+        if (!isset($value)) {
+            $value = $operator;
+            $operator = '=';
+        }
 
-        $q->whereHas('meta', function (Builder $q) use ($key, $operator, $value, $field) {
+        $numericValue = $this->valueToNumeric($value);
+        $q->whereHas('meta', function (Builder $q) use ($key, $operator, $numericValue) {
             $q->where('key', $key);
-            $q->whereRaw("cast({$field} as decimal) {$operator} ?", [(float)$value]);
+            $q->where('numeric_value', $operator, $numericValue);
         });
+    }
+
+    public function scopeWhereMetaBetween(
+        Builder $q,
+        string $key,
+        mixed $min,
+        mixed $max,
+        bool $not = false
+    ): void {
+        $min = $this->valueToString($min);
+        $max = $this->valueToString($max);
+
+        $q->whereHas(
+            'meta',
+            function (Builder $q) use ($key, $min, $max, $not) {
+                $q->where('key', $key);
+                $q->whereBetween('string_value', [$min, $max], 'and', $not);
+            }
+        );
+    }
+
+    public function scopeWhereMetaNotBetween(
+        Builder $q,
+        string $key,
+        mixed $min,
+        mixed $max,
+    ): void {
+        $this->scopeWhereMetaBetween($q, $key, $min, $max, true);
+    }
+
+    public function scopeWhereMetaBetweenNumeric(
+        Builder $q,
+        string $key,
+        mixed $min,
+        mixed $max,
+        bool $not = false
+    ): void {
+        $min = $this->valueToNumeric($min);
+        $max = $this->valueToNumeric($max);
+
+        $q->whereHas('meta', function (Builder $q) use ($key, $min, $max, $not) {
+            $q->where('key', $key);
+            $q->whereBetween('numeric_value', [$min, $max], 'and', $not);
+        });
+    }
+
+    public function scopeWhereMetaNotBetweenNumeric(
+        Builder $q,
+        string $key,
+        mixed $min,
+        mixed $max
+    ): void {
+        $this->scopeWhereMetaBetweenNumeric($q, $key, $min, $max, true);
+    }
+
+    /**
+     * Query scope to restrict the query to records which have `Meta` with a specific key and a `null` value.
+     * @param Builder $q
+     * @param string $key
+     * @return void
+     */
+    public function scopeWhereMetaIsNull(Builder $q, string $key): void
+    {
+        $q->whereHas('meta', function (Builder $q) use ($key) {
+            $q->where('key', $key);
+            $q->whereNull('string_value');
+            $q->where('type', 'null');
+        });
+    }
+
+
+    public function scopeWhereMetaIsModel(
+        Builder $q,
+        string $key,
+        Model|string $classOrInstance,
+        null|int|string $id = null
+    ): void {
+        if ($classOrInstance instanceof Model) {
+            $id = $classOrInstance->getKey();
+            $classOrInstance = get_class($classOrInstance);
+        }
+        $value = $classOrInstance;
+        if ($id) {
+            $value .= '#' . $id;
+        } else {
+            $value .= '%';
+        }
+
+        $this->scopeWhereMeta($q, $key, 'like', $value);
     }
 
     /**
@@ -384,19 +497,56 @@ trait Metable
      * @param Builder $q
      * @param string $key
      * @param array $values
+     * @param bool $not
      *
      * @return void
      */
-    public function scopeWhereMetaIn(Builder $q, string $key, array $values): void
-    {
+    public function scopeWhereMetaIn(
+        Builder $q,
+        string $key,
+        array $values,
+        bool $not = false
+    ): void {
         $values = array_map(function ($val) use ($key) {
-            return is_string($val) ? $val : $this->makeMeta($key, $val)->getRawValue();
+            return $this->valueToString($val);
         }, $values);
 
-        $q->whereHas('meta', function (Builder $q) use ($key, $values) {
+        $q->whereHas('meta', function (Builder $q) use ($key, $values, $not) {
             $q->where('key', $key);
-            $q->whereIn('value', $values);
+            $q->whereIn('string_value', $values, 'and', $not);
         });
+    }
+
+    public function scopeWhereMetaNotIn(
+        Builder $q,
+        string $key,
+        array $values
+    ): void {
+        $this->scopeWhereMetaIn($q, $key, $values, true);
+    }
+
+    public function scopeWhereMetaInNumeric(
+        Builder $q,
+        string $key,
+        array $values,
+        bool $not = false
+    ): void {
+        $values = array_map(function ($val) use ($key) {
+            return $this->valueToNumeric($val);
+        }, $values);
+
+        $q->whereHas('meta', function (Builder $q) use ($key, $values, $not) {
+            $q->where('key', $key);
+            $q->whereIn('numeric_value', $values, 'and', $not);
+        });
+    }
+
+    public function scopeWhereMetaNotInNumeric(
+        Builder $q,
+        string $key,
+        array $values
+    ): void {
+        $this->scopeWhereMetaInNumeric($q, $key, $values, true);
     }
 
     /**
@@ -416,7 +566,7 @@ trait Metable
         bool $strict = false
     ): void {
         $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
-        $q->orderBy("{$table}.value", $direction);
+        $q->orderBy("{$table}.string_value", $direction);
     }
 
     /**
@@ -436,10 +586,7 @@ trait Metable
         bool $strict = false
     ): void {
         $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
-        $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
-        $field = $q->getQuery()->getGrammar()->wrap("{$table}.value");
-
-        $q->orderByRaw("cast({$field} as decimal) $direction");
+        $q->orderBy("{$table}.numeric_value", $direction);
     }
 
     /**
@@ -558,5 +705,34 @@ trait Metable
         $meta->metable_id = $this->getKey();
 
         return $meta;
+    }
+
+    private function valueToString(mixed $value): string
+    {
+        $stringValue = $this->getHandlerForValue($value)->getStringValue($value);
+
+        if ($stringValue === null) {
+            throw new \InvalidArgumentException('Cannot convert to a numeric value');
+        }
+
+        return $stringValue;
+    }
+
+    private function valueToNumeric(mixed $value): int|float
+    {
+        $numericValue = $this->getHandlerForValue($value)->getNumericValue($value);
+
+        if ($numericValue === null) {
+            throw new \InvalidArgumentException('Cannot convert to a numeric value');
+        }
+
+        return $numericValue;
+    }
+
+    private function getHandlerForValue(mixed $value): HandlerInterface
+    {
+        /** @var Registry $registry */
+        $registry = app('metable.datatype.registry');
+        return $registry->getHandlerForValue($value);
     }
 }

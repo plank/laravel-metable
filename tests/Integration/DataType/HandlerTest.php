@@ -178,7 +178,7 @@ class HandlerTest extends TestCase
         $unserialized = $handler->unserializeValue($serialized);
 
         $this->assertEquals($value, $unserialized);
-        $this->assertEquals($numericValue, $handler->getNumericValue($value, $serialized));
-        $this->assertEquals($stringValue, $handler->getStringValue($value, $serialized));
+        $this->assertEquals($numericValue, $handler->getNumericValue($value));
+        $this->assertEquals($stringValue, $handler->getStringValue($value));
     }
 }

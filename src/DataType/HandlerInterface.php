@@ -32,9 +32,9 @@ interface HandlerInterface
      */
     public function serializeValue(mixed $value): string;
 
-    public function getNumericValue(mixed $value, string $serializedValue): null|int|float;
+    public function getNumericValue(mixed $value): null|int|float;
 
-    public function getStringValue(mixed $value, string $serializedValue): null|string;
+    public function getStringValue(mixed $value): null|string;
 
     /**
      * Convert a serialized string back to its original value.
@@ -44,4 +44,9 @@ interface HandlerInterface
      * @return mixed
      */
     public function unserializeValue(string $serializedValue): mixed;
+
+    /**
+     * Indicate whether multiple serializations of the same value will produce the same result.
+     */
+    public function isIdempotent(): bool;
 }

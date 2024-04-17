@@ -34,61 +34,88 @@ You can also query for records that does not contain a meta key using the ``wher
 Comparing value
 ---------------
 
-You can restrict your query based on the value stored at a meta key. The ``whereMeta()`` method can be used to compare the value using any of the operators accepted by the Laravel query builder's ``where()`` method.
+You can restrict your query based on the value stored for a particular meta key. Query scopes for selecting records based on the value of attached meta come in two main flavors: string-based and numeric-based, which informs which indexes are used to lookup the data efficiently. Different data types may support filtering and ordering by different query scopes. Refer to the :ref:`Data Types <data-types>` section for more information.
+
+The value passed to to the query scope will be converted to the appropriate data type before being passed to the database. As such any value that you can pass to the ``Metable::setMeta()`` method can be passed to the query scope, as long as the data type is supported by the operation.
+
+String Value Query Scopes
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+All string-based query scopes using lexicographic comparison to look up values. This means that the values are compared alphabetically as strings. This can lead to unexpected results when comparing numbers, e.g. ``'11'`` is greater than ``'100'``.
+
+By default, only the first 255 characters of a string are indexed (can be adjusted with the ``metable.stringValueIndexLength`` config). When querying by longer values, characters exceeding the limit will be ignored when determining if the criteria matches. The ``whereMeta()`` method will attempt to work around this by comparing the entire serialized value after the results have been filtered by the indexed portion (other query scopes will not do this).
+
+
+The ``whereMeta()`` method can be used to compare the value using any of the operators accepted by the Laravel query builder's ``where()`` method.
 
 ::
 
     <?php
     // omit the operator (defaults to '=')
-    $models = MyModel::whereMeta('letters', ['a', 'b', 'c'])->get();
+    $models = MyModel::whereMeta('status', 'success')->get();
 
     // greater than
     $models = MyModel::whereMeta('name', '>', 'M')->get();
 
     // like
-    $models = MyModel::whereMeta('summary', 'like', '%bacon%')->get();
+    $models = MyModel::whereMeta('summary', 'like', 'Once upon a time%')->get();
 
     //etc.
 
-The ``whereMetaIn()`` method is also available to find records where the value is matches one of a predefined set of options.
+The ``whereMetaIn()`` method and its inverse are also available to find records where the value is matches one of a predefined set of options.
 
 ::
 
     <?php
-    $models = MyModel::whereMetaIn('country', ['CAN', 'USA', 'MEX']);
+    $models = MyModel::whereMetaIn('country', ['CA', 'US', 'MX'])->get();
+    $models = MyModel::whereMetaNotIn('currency', ['USD', 'GBP', 'EUR'])->get();
 
-
-The ``whereMeta()`` and ``whereMetaIn()`` methods perform string comparison (lexicographic ordering). Any non-string values passed to these methods will be serialized to a string. This is useful for evaluating equality (``=``) or inequality (``<>``), but may behave unpredictably with some other operators for non-string data types.
-
-::
-
-    <?php
-    // array value will be serialized before it is passed to the database
-    $model->setMeta('letters', ['a', 'b', 'c']);
-
-    // array argument will be serialized using the same mechanism
-    // the original model will be found.
-    $model = MyModel::whereMeta('letters', ['a', 'b', 'c'])->first();
-
-Depending on the format of the original data, it may be possible to compare against subsets of the data using the SQL ``like`` operator and a string argument.
-
+The ``whereMetaBetween()`` and its inverse method can be used to compare records to a range.
 
 ::
 
     <?php
-    $model->setMeta('letters', ['a', 'b', 'c']);
+    $models = MyModel::whereMetaBetween('country_code', 'AD', 'AZ')->get();
+    $models = MyModel::whereMetaNotBetween('name', 'a', 'm')->get();
 
-    // check for the presence of one value within the json encoded array
-    // the original model will be found
-    $model = MyModel::whereMeta('letters', 'like', '%"b"%' )->first();
+Numeric Value Query Scopes
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Numeric values are indexed in a decimal column that supports up to 20 integral digits and 16 fractional digits (enough to support 64-bit integers and floats at full precision). This allows for a wide range of values to be stored and queried efficiently. The numeric query scopes use numeric comparison to look up values.
 
-When comparing integer or float values with the ``<``, ``<=``, ``>=`` or ``>`` operators, use the ``whereMetaNumeric()`` method. This will cast the values to a number before performing the comparison, in order to avoid common pitfalls of lexicographic ordering (e.g. ``'11'`` is greater than ``'100'``).
+Query scopes are available for numeric values as for string values.
 
 ::
 
     <?php
     $models = MyModel::whereMetaNumeric('counter', '>', 42)->get();
+    $models = MyModel::whereMetaInNumeric('http_code', [401, 403])->get();
+    $models = MyModel::whereMetaNotInNumeric('department', [])->get();
+    $models = MyModel::whereMetaBetweenNumeric('completed_at', Carbon::yesterday(), Carbon::today())->get();
+    $models = MyModel::whereMetaNotBetweenNumeric('percentile', 90, 100)->get();
+
+Other Query Scopes
+^^^^^^^^^^^^^^^^^^
+
+You can look up if a meta key contains a reference to a particular model using the ``whereMetaIsModel()`` method.
+
+::
+
+    <?php
+    // find models that reference a particular model ID
+    $models = MyModel::whereMetaIsModel(\App\MyOtherModel::class, $id)->get();
+    $models = MyModel::whereMetaIsModel($otherModelInstance)->get();
+
+    // find models that reference a any instance of a model class
+    $models = MyModel::whereMetaIsModel(\App\MyOtherModel::class)->get();
+
+If you specifically assigned a meta key to `null`, you can query for models that have a `null` value for that key using the ``whereMetaNull()`` method.
+
+::
+
+    <?php
+    $models = MyModel::whereMetaNull('notes')->get();
+
 
 Ordering results
 ----------------
@@ -98,10 +125,10 @@ You can apply an order by clause to the query to sort the results by the value o
 ::
 
     <?php
-    // order by string value
+    // lexicographic order
     $models = MyModel::orderByMeta('nickname', 'asc')->get();
 
-    //order by numeric value
+    // numeric order
     $models = MyModel::orderByMetaNumeric('score', 'desc')->get();
 
 By default, all records matching the rest of the query will be ordered. Any records which have no meta assigned to the key being sorted on will be considered to have a value of ``null``.
@@ -118,11 +145,9 @@ To automatically exclude all records that do not have meta assigned to the sorte
     $models = MyModel::whereHasMeta('score')
         ->orderByMetaNumeric('score', 'desc')->get();
 
-A Note on Optimization
-----------------------
 
-Laravel-Metable is intended a convenient means for handling data of many different shapes and sizes. It was designed for dealing with data that only a subset of all models in a table would have any need for.
+Querying by Complex Data Types
+-------------------------------
 
-For example, you have a Page model with a template field and each template needs some number of additional fields to modify how it displays. If you have X templates which each have up to Y fields, adding all of these as columns to pages table will quickly get out of hand. Instead, appending these template fields to the Page model as meta can make handling this use case trivial.
+By default, meta containing complex data types (e.g. objects and arrays) are not indexed and cannot be filtered or ordered with any of the above methods. If you need to query by these values, you can enable the ``metable.indexComplexDataTypes`` config option. This will cause a truncated version of the serialized value to be indexed. This can be useful for exact matches, but may not work predictably for other operations. Given the database overhead of indexing complex data types, it is recommended to only enable this feature if you need it.
 
-Laravel-Metable makes it very easy to append just about any data to your models. However, for sufficiently large data sets or data that is queried very frequently, it will often be more efficient to use regular database columns instead in order to take advantage of native SQL data types and indexes. The optimal solution will depend on your use case.

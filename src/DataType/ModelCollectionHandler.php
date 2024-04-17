@@ -117,13 +117,18 @@ class ModelCollectionHandler implements HandlerInterface
         return $results;
     }
 
-    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    public function getNumericValue(mixed $value): null|int|float
     {
         return null;
     }
 
-    public function getStringValue(mixed $value, string $serializedValue): null|string
+    public function getStringValue(mixed $value): null|string
     {
         return null;
+    }
+
+    public function isIdempotent(): bool
+    {
+        return true;
     }
 }

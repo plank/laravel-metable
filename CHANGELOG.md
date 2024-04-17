@@ -9,9 +9,11 @@
 - Added support for Laravel 10 and 11
 - Dropped support Laravel versions 9 and below
 - adjusted some method signatures with PHP 8+ mixed and union types
+- New schema migration adding two new columns and improving indexing for searching by meta values. See [UPGRADING.md](UPGRADING.md) for details.
 
 ### Data Types
 
+- `getStringValue(): ?string` and `getNumericValue(): null|int|float` methods added to `HandlerInterface` which should convert the original value into a format that can be indexed, if possible.
 - Added `SerializeHandler` as a catch-all datatype, which will attempt to serialize the data using PHP's `serialize()` function. The payload is encrypted before being stored in the database to prevent unserializing untrusted data.
 - Deprecated `SerializableHandler` in favor of the new `SerializeHandler` datatype. The `SerializableHandler` will be removed in a future release. In the interim, added the `metable.options.serializable.allowedClasses` config to protect against unserializing untrusted data.
 - Deprecated `ArrayHandler` and `ObjectHandler`, due to the ambiguity of nested array/objects switching type. These will be removed in a future release. The `SerializeHandler` should be used instead.
@@ -19,6 +21,23 @@
 - `ModelHandler` will no longer throw a model not found exception if the model no longer exists. Instead, the meta value will return `null`. This is more in line with the existing behavior of the `ModelCollectionHandler`.
 - `ModelCollectionHandler` will now validate that the encoded collection class is a valid Eloquent collection before attempting to instantiate it during unserialization. If the class is invalid,  an instance of `Illuminate\Database\Eloquent\Collection` will be used instead.
 - `ModelCollectionHandler` will now validate that the encoded class of each entry is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, that entry in the collection will be omitted.
+
+### Mediable trait
+
+- `whereMeta()`, `whereMetaIn()`, and `orderByMeta()` query scopes will now scan the indexed `string_value` column instead of the serialized `value` column. This greatly improves performance when searching for meta values against larger datasets.
+- `whereMetaNumeric()` and `orderByMetaNumeric()` query scopes will now scan the indexed `numeric_value` column instead of the serialized `value` column. This greatly improves performance when searching for meta values against larger datasets.
+- `whereMetaNumeric()` query scope will now accept a value of any type. It will be converted to an integer or float by the handler. This is more consistent with the behaviour of the other query scopes.  
+- Added additional query scopes to more easily search meta values based on different criteria:
+  - `whereMetaInNumeric()`
+  - `whereMetaNotIn()`
+  - `whereMetaNotInNumeric()`
+  - `whereMetaBetween()`
+  - `whereMetaBetweenNumeric()`
+  - `whereMetaNotBetween()`
+  - `whereMetaNotBetweenNumeric()`
+  - `whereMetaIsNull()`
+  - `whereMetaIsModel()`
+- If the data type handlers cannot convert the search value provided to a whereMeta* query scope to a string or numeric value (as appropriate for the scope), then an exception will be thrown.
 
 # 5.0.1 - 2021-09-19
 - Fixed `setManyMeta()` not properly serializing certain types of data.

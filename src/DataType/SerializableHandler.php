@@ -43,13 +43,26 @@ class SerializableHandler implements HandlerInterface
         return unserialize($serializedValue, ['allowed_classes' => $allowedClasses]);
     }
 
-    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    public function getNumericValue(mixed $value): null|int|float
     {
         return null;
     }
 
-    public function getStringValue(mixed $value, string $serializedValue): null|string
+    public function getStringValue(mixed $value): null|string
     {
-        return null;
+        if (!config('metable.indexComplexDataTypes', false)) {
+            return null;
+        }
+
+        return substr(
+            serialize($value),
+            0,
+            config('metable.stringValueIndexLength', 255)
+        );
+    }
+
+    public function isIdempotent(): bool
+    {
+        return true;
     }
 }

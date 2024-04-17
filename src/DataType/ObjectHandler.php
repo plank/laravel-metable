@@ -40,13 +40,26 @@ class ObjectHandler implements HandlerInterface
         return json_decode($serializedValue, false);
     }
 
-    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    public function getNumericValue(mixed $value): null|int|float
     {
         return null;
     }
 
-    public function getStringValue(mixed $value, string $serializedValue): null|string
+    public function getStringValue(mixed $value): null|string
     {
-        return null;
+        if (!config('metable.indexComplexDataTypes', false)) {
+            return null;
+        }
+
+        return substr(
+            json_encode($value, JSON_THROW_ON_ERROR),
+            0,
+            config('metable.stringValueIndexLength', 255)
+        );
+    }
+
+    public function isIdempotent(): bool
+    {
+        return true;
     }
 }

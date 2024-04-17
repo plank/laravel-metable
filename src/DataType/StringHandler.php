@@ -12,7 +12,7 @@ class StringHandler extends ScalarHandler
      */
     protected $type = 'string';
 
-    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    public function getNumericValue(mixed $value): null|int|float
     {
         if (is_numeric($value)) {
             return (float)$value;
@@ -20,8 +20,12 @@ class StringHandler extends ScalarHandler
         return null;
     }
 
-    public function getStringValue(mixed $value, string $serializedValue): null|string
+    public function getStringValue(mixed $value): null|string
     {
-        return substr($value, 0, 255);
+        return substr(
+            $value,
+            0,
+            config('metable.stringValueIndexLength', 255)
+        );
     }
 }

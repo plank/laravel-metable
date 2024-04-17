@@ -12,12 +12,12 @@ class BooleanHandler extends ScalarHandler
      */
     protected $type = 'boolean';
 
-    public function getNumericValue(mixed $value, string $serializedValue): null|int|float
+    public function getNumericValue(mixed $value): null|int|float
     {
         return $value ? 1 : 0;
     }
 
-    public function getStringValue(mixed $value, string $serializedValue): null|string
+    public function getStringValue(mixed $value): null|string
     {
         return $value ? 'true' : 'false';
     }

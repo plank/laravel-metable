@@ -7,6 +7,8 @@ Data Types
 
 You can attach a number of different kinds of values to a ``Metable`` model. The data types that are supported by Laravel-Mediable out of the box are the following.
 
+Meta encoded with different data types support different query scopes for filtering by meta value. See :ref:`querying_meta` for more information on available query scopes.
+
 Scalar Values
 ---------------
 
@@ -14,6 +16,12 @@ The following scalar values are supported.
 
 Boolean
 ^^^^^^^^
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\BooleanHandler |
+| String Query Scopes  | Yes |
+| Numeric Query Scopes | Yes |
+| Other Query Scopes   |     |
++----------------------+-----+
 
 ::
 
@@ -22,6 +30,12 @@ Boolean
 
 Integer
 ^^^^^^^^
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\IntegerHandler |
+| String Query Scopes  | Yes |
+| Numeric Query Scopes | Yes |
+| Other Query Scopes   |     |
++----------------------+-----+
 
 ::
 
@@ -30,6 +44,12 @@ Integer
 
 Float
 ^^^^^^^^
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\FloatHandler |
+| String Query Scopes  | Yes |
+| Numeric Query Scopes | Yes |
+| Other Query Scopes   |     |
++----------------------+-----+
 
 ::
 
@@ -38,6 +58,12 @@ Float
 
 Null
 ^^^^^^^^
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\NullHandler |
+| String Query Scopes  | No |
+| Numeric Query Scopes | No |
+| Other Query Scopes   | whereMetaIsNull() |
++----------------------+-----+
 
 ::
 
@@ -46,6 +72,12 @@ Null
 
 String
 ^^^^^^^^
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\StringHandler |
+| String Query Scopes  | Yes, first `metable.stringValueIndexLength` characters indexed |
+| Numeric Query Scopes | if string is numeric |
+| Other Query Scopes   |     |
++----------------------+-----+
 
 ::
 
@@ -61,6 +93,13 @@ The following classes and interfaces are supported.
 
 Eloquent Models
 ^^^^^^^^^^^^^^^^^
+
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\ModelHandler |
+| String Query Scopes  | Yes |
+| Numeric Query Scopes | No  |
+| Other Query Scopes   | whereMetaIsModel() |
++----------------------+-----+
 
 It is possible to attach another Eloquent model to a ``Metable`` model.
 
@@ -85,6 +124,13 @@ When ``$metable->getMeta()`` is called, a fresh instance of the class will be cr
 Eloquent Collections
 ^^^^^^^^^^^^^^^^^^^^
 
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\ModelCollectionHandler |
+| String Query Scopes  | No  |
+| Numeric Query Scopes | No  |
+| Other Query Scopes   |     |
++----------------------+-----+
+
 Similarly, it is possible to attach multiple models to a key by providing an instance of ``Illuminate\Database\Eloquent\Collection`` containing the models. 
 
 As with individual models, both existing and unsaved instances can be stored.
@@ -97,8 +143,14 @@ As with individual models, both existing and unsaved instances can be stored.
 
 DateTime & Carbon
 ^^^^^^^^^^^^^^^^^^
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\DateTimeHandler |
+| String Query Scopes  | Yes (UTC format) |
+| Numeric Query Scopes | Yes (timestamp) |
+| Other Query Scopes   |     |
++----------------------+-----+
 
-Any object implementing the ``DateTimeInterface``.  Object will be converted to a ``Carbon`` instance.
+Any object implementing the ``DateTimeInterface``.  Object will be converted to a ``Carbon`` instance when unserialized.
 
 ::
 
@@ -107,6 +159,13 @@ Any object implementing the ``DateTimeInterface``.  Object will be converted to 
 
 Objects and Arrays
 ^^^^^
+
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\IntegerHandler |
+| String Query Scopes  | if `metable.indexComplexDataTypes` is enabled  |
+| Numeric Query Scopes | No  |
+| Other Query Scopes   |     |
++----------------------+-----+
 
 Objects and arrays will be serialized using PHP's `serialize()` function, to allow for the storage and retrieval of complex data structures. The serialized value is encrypted before being stored in the database, and decrypted when retrieved to prevent tampered data from being unserialized.
 
@@ -125,6 +184,13 @@ The following data types are deprecated and should not be used in new code. They
 
 Array
 ^^^^^^^^
+
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\ArrayHandler |
+| String Query Scopes  | if `metable.indexComplexDataTypes` is enabled  |
+| Numeric Query Scopes | No  |
+| Other Query Scopes   |     |
++----------------------+-----+
 
 .. warning:: The ``ArrayHandler`` datatype is deprecated. The ``SerializeHandler`` should be used for handling arrays.
 
@@ -151,6 +217,13 @@ Arrays of scalar values. Nested arrays are supported.
 Serializable
 ^^^^^^^^^^^^^
 
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\ArrayHandler |
+| String Query Scopes  | if `metable.indexComplexDataTypes` is enabled  |
+| Numeric Query Scopes | No  |
+| Other Query Scopes   |     |
++----------------------+-----+
+
 .. warning:: The ``SerializableHandler`` datatype is deprecated. The ``SerializeHandler`` should be used for handling all objects.
 
 Any object implementing the PHP ``Serializable`` interface.
@@ -167,10 +240,17 @@ Any object implementing the PHP ``Serializable`` interface.
 
     $metable->setMeta('example', $serializable);
 
-For security reasons, it is necessary to list any classes that can be unserialized in the ``metable.options.serializable.allowedClasses`` key in the ``config/metable.php`` file. This is to prevent arbitrary code execution when unserializing untrusted data. This config can be set to true to allow all classes, but this is not recommended.
+For security reasons, it is necessary to list any classes that can be unserialized in the ``metable.options.serializable.allowedClasses`` key in the ``config/metable.php`` file. This is to prevent PHP Object Injection vulnerabilities when unserializing untrusted data. This config can be set to true to allow all classes, but this is not recommended.
 
 Plain Objects
 ^^^^^^^^^^^^^^
+
++----------------------+-----+
+| Handler              | \Plank\Metable\DataType\ArrayHandler |
+| String Query Scopes  | if `metable.indexComplexDataTypes` is enabled  |
+| Numeric Query Scopes | No  |
+| Other Query Scopes   |     |
++----------------------+-----+
 
 .. warning:: The ``ObjectHandler`` datatype is deprecated. The ``SerializeHandler`` should be used for handling all objects.
 

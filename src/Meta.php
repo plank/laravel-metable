@@ -103,17 +103,10 @@ class Meta extends Model
 
         $this->attributes['type'] = $registry->getTypeForValue($value);
         $handler = $registry->getHandlerForType($this->type);
-        $serializedValue = $handler->serializeValue($value);
 
-        $this->attributes['value'] = $serializedValue;
-        $this->attributes['string_value'] = $handler->getStringValue(
-            $value,
-            $serializedValue
-        );
-        $this->attributes['numeric_value'] = $handler->getNumericValue(
-            $value,
-            $serializedValue
-        );
+        $this->attributes['value'] = $handler->serializeValue($value);
+        $this->attributes['string_value'] = $handler->getStringValue($value);
+        $this->attributes['numeric_value'] = $handler->getNumericValue($value);
 
         $this->cachedValue = null;
     }
