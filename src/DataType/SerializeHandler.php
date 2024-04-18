@@ -49,5 +49,4 @@ class SerializeHandler implements HandlerInterface
     {
         return false;
     }
-
 }

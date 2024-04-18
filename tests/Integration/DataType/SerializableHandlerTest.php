@@ -42,5 +42,4 @@ class SerializableHandlerTest extends TestCase
         );
         $this->assertEquals($incomplete, $handler->unserializeValue($serialized));
     }
-    
 }

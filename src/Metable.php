@@ -653,7 +653,7 @@ trait Metable
      *
      * @return mixed
      */
-    private function getMetaCollection()
+    private function getMetaCollection(): mixed
     {
         // load meta relation if not loaded.
         if (!$this->relationLoaded('meta')) {
