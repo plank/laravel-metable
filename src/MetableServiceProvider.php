@@ -2,8 +2,8 @@
 
 namespace Plank\Metable;
 
-use CreateMetaTable;
 use Illuminate\Support\ServiceProvider;
+use Plank\Metable\Commands\RefreshMeta;
 use Plank\Metable\DataType\Registry;
 
 /**
@@ -25,6 +25,10 @@ class MetableServiceProvider extends ServiceProvider
         if (config('metable.applyMigrations', true)) {
             $this->loadMigrationsFrom(dirname(__DIR__) . '/migrations');
         }
+
+        $this->commands([
+            RefreshMeta::class
+        ]);
     }
 
     /**

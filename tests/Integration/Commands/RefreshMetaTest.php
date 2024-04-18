@@ -1,0 +1,83 @@
+<?php
+
+namespace Plank\Metable\Tests\Integration\Commands;
+
+use Illuminate\Support\Facades\DB;
+use Plank\Metable\DataType\ArrayHandler;
+use Plank\Metable\DataType\DateTimeHandler;
+use Plank\Metable\DataType\SerializeHandler;
+use Plank\Metable\DataType\StringHandler;
+use Plank\Metable\Tests\TestCase;
+
+class RefreshMetaTest extends TestCase
+{
+    public function test_it_refreshes_all_meta_values(): void
+    {
+        $this->useDatabase();
+
+        config()->set('metable.datatypes', [
+            StringHandler::class,
+            DateTimeHandler::class,
+            SerializeHandler::class,
+            ArrayHandler::class,
+        ]);
+        config()->set('metable.indexComplexDataTypes', true);
+
+        $complexValue = ['a' => 'b'];
+
+        DB::table('meta')->insert([
+            [
+                'metable_type' => 'foo',
+                'metable_id' => 1,
+                'type' => 'array',
+                'key' => 'foo',
+                'value' => json_encode($complexValue),
+                'string_value' => null,
+                'numeric_value' => null,
+            ],
+            [
+                'metable_type' => 'foo',
+                'metable_id' => 2,
+                'type' => 'string',
+                'key' => 'bar',
+                'value' => 'blah',
+                'string_value' => null,
+                'numeric_value' => null,
+            ],
+            [
+                'metable_type' => 'foo',
+                'metable_id' => 3,
+                'type' => 'datetime',
+                'key' => 'baz',
+                'value' => '2020-01-01 00:00:00.000000+0000',
+                'string_value' => null,
+                'numeric_value' => null,
+            ],
+        ]);
+
+        $this->artisan('metable:refresh')
+            ->expectsOutput('Refreshing meta values...')
+            ->expectsOutput('Refresh complete.')
+            ->assertExitCode(0);
+
+
+        $result = DB::table('meta')->get();
+        $this->assertCount(3, $result);
+
+        $this->assertEquals('serialized', $result[0]->type);
+        $this->assertEquals($complexValue, app('encrypter')->decrypt($result[0]->value));
+        $this->assertEquals(serialize($complexValue), $result[0]->string_value);
+        $this->assertNull($result[0]->numeric_value);
+
+        $this->assertEquals('string', $result[1]->type);
+        $this->assertEquals('blah', $result[1]->value);
+        $this->assertEquals('blah', $result[1]->string_value);
+        $this->assertNull($result[1]->numeric_value);
+
+        $this->assertEquals('datetime', $result[2]->type);
+        $this->assertEquals('2020-01-01 00:00:00.000000+0000', $result[2]->value);
+        $this->assertEquals('2020-01-01 00:00:00.000000+0000', $result[2]->string_value);
+        $this->assertEquals(1577836800, $result[2]->numeric_value);
+    }
+
+}
