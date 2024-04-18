@@ -25,10 +25,11 @@
         "symfony/symfony": "^6.1|^7.0",
         "laravel/legacy-factories": "^1.0.4",
         "orchestra/testbench": "^8.0|^9.0",
-        "phpunit/phpunit": "^10.0",
+        "phpunit/phpunit": "^10.5",
         "guzzlehttp/guzzle": "^7.2",
         "guzzlehttp/promises": "^1.4",
         "mockery/mockery": "^1.4.2",
+        "nesbot/carbon" : "^2.62.1",
         "php-coveralls/php-coveralls": "^2.5.2"
     },
     "autoload-dev":{
