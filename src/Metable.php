@@ -341,8 +341,12 @@ trait Metable
      *
      * @return void
      */
-    public function scopeWhereMeta(Builder $q, string $key, mixed $operator, mixed $value = null): void
-    {
+    public function scopeWhereMeta(
+        Builder $q,
+        string $key,
+        mixed $operator,
+        mixed $value = null
+    ): void {
         // Shift arguments if no operator is present.
         if (!isset($value)) {
             $value = $operator;
@@ -359,11 +363,10 @@ trait Metable
                 // If the value is a string and the string value is at the maximum length,
                 // we can optimize the query by looking up using the index first
                 // then compare the serialized value (not indexed) afterward to ensure correctness.
-                if (strlen($stringValue) === config(
-                        'metable.stringValueIndexLength',
-                        255
-                    )
-                ) {
+                if (strlen($stringValue) >= config(
+                    'metable.stringValueIndexLength',
+                    255
+                )) {
                     $handler = $this->getHandlerForValue($value);
                     if ($handler->isIdempotent()) {
                         $q->where('value', $operator, $handler->serializeValue($value));
@@ -385,8 +388,12 @@ trait Metable
      *
      * @return void
      */
-    public function scopeWhereMetaNumeric(Builder $q, string $key, mixed $operator, mixed $value = null): void
-    {
+    public function scopeWhereMetaNumeric(
+        Builder $q,
+        string $key,
+        mixed $operator,
+        mixed $value = null
+    ): void {
         // Shift arguments if no operator is present.
         if (!isset($value)) {
             $value = $operator;
@@ -467,7 +474,6 @@ trait Metable
             $q->where('type', 'null');
         });
     }
-
 
     public function scopeWhereMetaIsModel(
         Builder $q,
@@ -612,11 +618,25 @@ trait Metable
         }
 
         // Join the meta table to the query
-        $q->join("{$metaTable} as {$alias}", function (JoinClause $q) use ($relation, $key, $alias) {
-            $q->on($relation->getQualifiedParentKeyName(), '=', $alias . '.' . $relation->getForeignKeyName())
-                ->where($alias . '.key', '=', $key)
-                ->where($alias . '.' . $relation->getMorphType(), '=', $this->getMorphClass());
-        }, null, null, $type);
+        $q->join(
+            "{$metaTable} as {$alias}",
+            function (JoinClause $q) use ($relation, $key, $alias) {
+                $q->on(
+                    $relation->getQualifiedParentKeyName(),
+                    '=',
+                    $alias . '.' . $relation->getForeignKeyName()
+                )
+                    ->where($alias . '.key', '=', $key)
+                    ->where(
+                        $alias . '.' . $relation->getMorphType(),
+                        '=',
+                        $this->getMorphClass()
+                    );
+            },
+            null,
+            null,
+            $type
+        );
 
         // Return the alias so that the calling context can
         // reference the table.
@@ -660,7 +680,7 @@ trait Metable
     /**
      * Set the entire relations array on the model.
      *
-     * @param  array  $relations
+     * @param array $relations
      * @return $this
      */
     public function setRelations(array $relations)
@@ -707,7 +727,9 @@ trait Metable
 
     protected function getAllDefaultMeta(): array
     {
-        return property_exists($this, 'defaultMetaValues') ? $this->defaultMetaValues : [];
+        return property_exists($this, 'defaultMetaValues')
+            ? $this->defaultMetaValues
+            : [];
     }
 
     private function valueToString(mixed $value): string

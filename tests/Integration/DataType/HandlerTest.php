@@ -25,7 +25,7 @@ use stdClass;
 class HandlerTest extends TestCase
 {
     private static $resource;
-    static public function handlerProvider(): array
+    public static function handlerProvider(): array
     {
         $dateString = '2017-01-01 00:00:00.000000+0000';
         $datetime = Carbon::createFromFormat('Y-m-d H:i:s.uO', $dateString);

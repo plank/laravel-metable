@@ -111,7 +111,7 @@ class ModelCollectionHandler implements HandlerInterface
             }
 
             $results[$class] = $class::query()->findMany($keys)
-                ->keyBy(fn(Model $model) => $model->getKey());
+                ->keyBy(fn (Model $model) => $model->getKey());
         }
 
         return $results;

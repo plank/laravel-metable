@@ -58,7 +58,7 @@ class DateTimeHandler implements HandlerInterface
 
     public function getStringValue(mixed $value): null|string
     {
-       return $value instanceof DateTimeInterface
+        return $value instanceof DateTimeInterface
             ? $value->copy()->setTimezone('UTC')->format(self::FORMAT)
             : null;
     }
