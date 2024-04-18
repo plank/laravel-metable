@@ -32,11 +32,31 @@ class ModelCollectionHandlerTest extends TestCase
         $this->assertEquals(1, $unserialized['foo']->getKey());
     }
 
+    public function test_it_handles_invalid_collection_class(): void
+    {
+        $this->useDatabase();
+        $metable = SampleMetable::create();
+        $handler = new ModelCollectionHandler();
+        $serialized = json_encode([
+            'class' => 'stdClass',
+            'items' => [
+                [
+                    'class' => SampleMetable::class,
+                    'key' => $metable->getKey()
+                ]
+            ]
+        ]);
+        $unserialized = $handler->unserializeValue($serialized);
+
+        $this->assertInstanceOf(Collection::class, $unserialized);
+        $this->assertEquals([$metable->getKey()], $unserialized->modelKeys());
+    }
+
     public function test_it_handles_invalid_model_class(): void
     {
         $handler = new ModelCollectionHandler();
         $serialized = json_encode([
-            'class' => 'stdClass',
+            'class' => Collection::class,
             'items' => [
                 'class' => 'stdClass',
                 'key' => '1'
@@ -45,6 +65,21 @@ class ModelCollectionHandlerTest extends TestCase
         $unserialized = $handler->unserializeValue($serialized);
 
         $this->assertInstanceOf(Collection::class, $unserialized);
-        $this->assertEmpty($unserialized);
+        $this->assertCount(0, $unserialized);
+    }
+
+    public function test_it_handles_invalid_model_class_no_key(): void
+    {
+        $handler = new ModelCollectionHandler();
+        $serialized = json_encode([
+            'class' => Collection::class,
+            'items' => [
+                'class' => 'stdClass',
+            ]
+        ]);
+        $unserialized = $handler->unserializeValue($serialized);
+
+        $this->assertInstanceOf(Collection::class, $unserialized);
+        $this->assertCount(0, $unserialized);
     }
 }

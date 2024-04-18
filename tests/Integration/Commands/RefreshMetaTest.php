@@ -23,6 +23,8 @@ class RefreshMetaTest extends TestCase
         ]);
         config()->set('metable.indexComplexDataTypes', true);
 
+        config()->set('metable.refreshPageSize', 2);
+
         $complexValue = ['a' => 'b'];
 
         DB::table('meta')->insert([
@@ -79,5 +81,4 @@ class RefreshMetaTest extends TestCase
         $this->assertEquals('2020-01-01 00:00:00.000000+0000', $result[2]->string_value);
         $this->assertEquals(1577836800, $result[2]->numeric_value);
     }
-
 }

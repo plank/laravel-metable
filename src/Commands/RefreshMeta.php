@@ -26,7 +26,7 @@ class RefreshMeta extends Command
         while ($count < $total) {
             $query = Meta::query()
                 ->orderBy('id')
-                ->limit(100);
+                ->limit(config('metable.refreshPageSize', 100));
             if ($lastId) {
                 $query->where('id', '>', $lastId);
             }
@@ -48,5 +48,4 @@ class RefreshMeta extends Command
 
         $this->info('Refresh complete.');
     }
-    
 }

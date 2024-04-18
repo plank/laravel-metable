@@ -353,14 +353,17 @@ class MetableTest extends TestCase
         $metable = $this->createMetable();
         $metable->setMeta('foo', 'bar');
         $metable->setMeta('datetime', $now);
+        $metable->setMeta('long', str_repeat('a', 300));
 
         $result1 = SampleMetable::whereMeta('foo', 'bar')->first();
         $result2 = SampleMetable::whereMeta('foo', 'baz')->first();
         $result3 = SampleMetable::whereMeta('datetime', $now)->first();
+        $result4 = SampleMetable::whereMeta('long', str_repeat('a', 300))->first();
 
         $this->assertEquals($metable->getKey(), $result1->getKey());
         $this->assertNull($result2);
         $this->assertEquals($metable->getKey(), $result3->getKey());
+        $this->assertEquals($metable->getKey(), $result4->getKey());
     }
 
     public function test_it_can_be_queried_by_numeric_meta_value(): void
@@ -371,9 +374,11 @@ class MetableTest extends TestCase
 
         $result = SampleMetable::whereMetaNumeric('foo', '>', 4)->get();
         $result2 = SampleMetable::whereMetaNumeric('foo', '<', 4)->get();
+        $result3 = SampleMetable::whereMetaNumeric('foo', 123)->get();
 
         $this->assertEquals([$metable->getKey()], $result->modelKeys());
         $this->assertEquals([], $result2->modelKeys());
+        $this->assertEquals([$metable->getKey()], $result3->modelKeys());
     }
 
     public function test_it_can_be_queried_by_in_array(): void
@@ -448,6 +453,27 @@ class MetableTest extends TestCase
 
         $this->assertEquals([$metable->getKey()], $result1->modelKeys());
         $this->assertEquals([], $result2->modelKeys());
+    }
+
+    public function test_it_can_be_queried_by_meta_not_between(): void
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
+        $metable->setMeta('foo', 'c');
+
+        $result1 = SampleMetable::whereMetaNotBetween(
+            'foo',
+            'a',
+            'd'
+        )->get();
+        $result2 = SampleMetable::whereMetaNotBetween(
+            'foo',
+            'd',
+            'z'
+        )->get();
+
+        $this->assertEquals([], $result1->modelKeys());
+        $this->assertEquals([$metable->getKey()], $result2->modelKeys());
     }
 
     public function test_it_can_be_queried_by_meta_between_numeric(): void
@@ -663,6 +689,18 @@ class MetableTest extends TestCase
         /** @var SampleMetable $result */
         $result = unserialize(serialize($metable));
         $this->assertEquals('baz', $result->getMeta('foo'));
+    }
+
+    public function test_it_throws_for_param_that_cannot_be_converted_to_string(): void
+    {
+        $this->expectException(\LogicException::class);
+        SampleMetable::whereMeta('foo', null)->get();
+    }
+
+    public function test_it_throws_for_param_that_cannot_be_converted_to_numeric(): void
+    {
+        $this->expectException(\LogicException::class);
+        SampleMetable::whereMetaNumeric('foo', null)->get();
     }
 
     private function makeMeta(array $attributes = []): Meta

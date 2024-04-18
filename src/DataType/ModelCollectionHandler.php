@@ -63,6 +63,7 @@ class ModelCollectionHandler implements HandlerInterface
 
         $models = $this->loadModels($data['items']);
 
+
         // Repopulate collection keys with loaded models.
         foreach ($data['items'] as $key => $item) {
             if (empty($item['key'])) {
