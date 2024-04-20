@@ -12,4 +12,8 @@ class SampleMetable extends Model
     protected $defaultMetaValues = [
         'foo' => 'bar'
     ];
+
+    protected $castsMeta = [
+        'castable' => 'string',
+    ];
 }

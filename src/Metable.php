@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Support\Facades\DB;
 use Plank\Metable\DataType\HandlerInterface;
 use Plank\Metable\DataType\Registry;
 
@@ -39,6 +38,12 @@ trait Metable
      * @var Collection<Meta>
      */
     private $indexedMetaCollection;
+
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+    }
 
     /**
      * Initialize the trait.
@@ -112,7 +117,7 @@ trait Metable
                 return $model->getAttributesForInsert();
             })->all(),
             ['metable_type', 'metable_id', 'key'],
-            ['type', 'value']
+            ['type', 'value', 'string_value', 'numeric_value', 'hmac']
         );
 
         if ($needReload) {
@@ -155,16 +160,17 @@ trait Metable
     public function getMeta(string $key, mixed $default = null): mixed
     {
         if ($this->hasMeta($key)) {
-            return $this->getMetaRecord($key)->getAttribute('value');
+            $value = $this->getMetaRecord($key)->getAttribute('value');
         }
-
         // If we have only one argument provided (i.e. default is not set)
         // then we check the model for the defaultMetaValues
-        if (func_num_args() == 1 && $this->hasDefaultMetaValue($key)) {
-            return $this->getDefaultMetaValue($key);
+        elseif (func_num_args() == 1 && $this->hasDefaultMetaValue($key)) {
+            $value = $this->getDefaultMetaValue($key);
+        } else {
+            $value = $default;
         }
 
-        return $default;
+        return $this->castMetaValue($key, $value);
     }
 
     /**
@@ -197,10 +203,10 @@ trait Metable
     public function getAllMeta(): \Illuminate\Support\Collection
     {
         return collect($this->getAllDefaultMeta())->merge(
-            $this->getMetaCollection()->toBase()->map(function (Meta $meta) {
-                return $meta->getAttribute('value');
-            })
-        );
+            $this->getMetaCollection()->toBase()->map(
+                fn(Meta $meta) => $meta->getAttribute('value')
+            )
+        )->map(fn(mixed $value, string $key) => $this->castMetaValue($key, $value));
     }
 
     /**
@@ -730,6 +736,21 @@ trait Metable
         return property_exists($this, 'defaultMetaValues')
             ? $this->defaultMetaValues
             : [];
+    }
+
+    protected function castMetaValue(string $key, mixed $value): mixed
+    {
+        if (!property_exists($this, 'castsMeta')
+            || !empty($this->castsMeta[$key])
+        ) {
+            return $value;
+        }
+        $castKey = "meta.$key";
+
+        $this->casts[$castKey] = $this->castsMeta[$key];
+        $value = $this->castAttribute($castKey, $value);
+        unset($this->casts[$castKey]);
+        return $value;
     }
 
     private function valueToString(mixed $value): string

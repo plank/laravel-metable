@@ -41,17 +41,21 @@ class MetableTest extends TestCase
         $this->assertFalse($metable->hasMeta('baz'));
 
         $metable->setManyMeta([
-                                  'foo' => 'bar',
-                                  'bar' => 'baz',
-                                  'baz' => ['foo', 'bar'],
-                              ]);
+            'foo' => 'bar',
+            'bar' => 33,
+            'baz' => ['foo', 'bar'],
+        ]);
 
         $this->assertTrue($metable->hasMeta('foo'));
         $this->assertTrue($metable->hasMeta('bar'));
         $this->assertTrue($metable->hasMeta('baz'));
         $this->assertEquals('bar', $metable->getMeta('foo'));
-        $this->assertEquals('baz', $metable->getMeta('bar'));
+        $this->assertEquals(33, $metable->getMeta('bar'));
         $this->assertEquals(['foo', 'bar'], $metable->getMeta('baz'));
+
+        $this->assertEquals('bar', $metable->getMetaRecord('foo')->string_value);
+        $this->assertEquals(33, $metable->getMetaRecord('bar')->numeric_value);
+        $this->assertNotEmpty($metable->getMetaRecord('baz')->hmac);
     }
 
     public function test_it_accepts_empty_array_for_set_many_meta(): void
@@ -98,10 +102,10 @@ class MetableTest extends TestCase
         $collection = $metable->getAllMeta();
 
         $this->assertEquals([
-                                'foo' => 123,
-                                'bar' => 'hello',
-                                'baz' => ['a', 'b', 'c'],
-                            ], $collection->toArray());
+            'foo' => 123,
+            'bar' => 'hello',
+            'baz' => ['a', 'b', 'c'],
+        ], $collection->toArray());
     }
 
     public function test_it_updates_existing_meta_records(): void
@@ -393,7 +397,6 @@ class MetableTest extends TestCase
         $this->assertEquals([$metable->getKey()], $result1->modelKeys());
         $this->assertEquals([], $result2->modelKeys());
     }
-
 
     public function test_it_can_be_queried_by_not_in_array(): void
     {
@@ -701,6 +704,17 @@ class MetableTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         SampleMetable::whereMetaNumeric('foo', null)->get();
+    }
+
+    public function test_it_can_cast_meta_values(): void
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
+        $metable->setMeta('castable', 123);
+
+        $result = SampleMetable::first();
+
+        $this->assertSame('123', $result->getMeta('castable'));
     }
 
     private function makeMeta(array $attributes = []): Meta
