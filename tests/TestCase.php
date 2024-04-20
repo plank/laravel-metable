@@ -52,7 +52,7 @@ class TestCase extends BaseTestCase
         ]);
         $app['config']->set('database.default', 'testing');
 
-        $app['config']->set('metable.options.serializable.allowedClasses', [SampleSerializable::class]);
+        $app['config']->set('metable.serializableHandlerAllowedClasses', [SampleSerializable::class]);
     }
 
     protected function getPrivateProperty($class, $property_name)

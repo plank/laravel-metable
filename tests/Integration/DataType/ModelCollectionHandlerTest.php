@@ -52,6 +52,23 @@ class ModelCollectionHandlerTest extends TestCase
         $this->assertEquals([$metable->getKey()], $unserialized->modelKeys());
     }
 
+    public function test_it_handles_invalid_collection_class_no_key(): void
+    {
+        $handler = new ModelCollectionHandler();
+        $serialized = json_encode([
+            'class' => 'stdClass',
+            'items' => [
+                [
+                    'class' => SampleMetable::class,
+                ]
+            ]
+        ]);
+        $unserialized = $handler->unserializeValue($serialized);
+
+        $this->assertInstanceOf(Collection::class, $unserialized);
+        $this->assertEquals(new Collection([new SampleMetable()]), $unserialized);
+    }
+
     public function test_it_handles_invalid_model_class(): void
     {
         $handler = new ModelCollectionHandler();

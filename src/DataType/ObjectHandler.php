@@ -4,7 +4,7 @@ namespace Plank\Metable\DataType;
 
 /**
  * Handle serialization of plain objects.
- * @deprecated Use SerializeHandler instead.
+ * @deprecated Use SignedSerializeHandler instead.
  */
 class ObjectHandler implements HandlerInterface
 {
@@ -61,5 +61,10 @@ class ObjectHandler implements HandlerInterface
     public function isIdempotent(): bool
     {
         return true;
+    }
+
+    public function useHmacVerification(): bool
+    {
+        return false;
     }
 }

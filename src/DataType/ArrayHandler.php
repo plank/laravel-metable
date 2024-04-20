@@ -4,7 +4,7 @@ namespace Plank\Metable\DataType;
 
 /**
  * Handle serialization of arrays.
- * @deprecated Use SerializeHandler instead.
+ * @deprecated Use SignedSerializeHandler instead.
  */
 class ArrayHandler implements HandlerInterface
 {
@@ -66,5 +66,10 @@ class ArrayHandler implements HandlerInterface
     public function isIdempotent(): bool
     {
         return true;
+    }
+
+    public function useHmacVerification(): bool
+    {
+        return false;
     }
 }

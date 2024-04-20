@@ -161,13 +161,13 @@ Objects and Arrays
 ^^^^^
 
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\IntegerHandler |
+| Handler              | \Plank\Metable\DataType\SignedSerializeHandler |
 | String Query Scopes  | if `metable.indexComplexDataTypes` is enabled  |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
 +----------------------+-----+
 
-Objects and arrays will be serialized using PHP's `serialize()` function, to allow for the storage and retrieval of complex data structures. The serialized value is encrypted before being stored in the database, and decrypted when retrieved to prevent tampered data from being unserialized.
+Objects and arrays will be serialized using PHP's `serialize()` function, to allow for the storage and retrieval of complex data structures. The serialized value is cryptographically signed with an HMAC which is verified before the data is unserialized to prevent PHP object injection attacks. The application's ``APP_KEY`` is used as the HMAC signing key.
 
 ::
 
@@ -175,7 +175,9 @@ Objects and arrays will be serialized using PHP's `serialize()` function, to all
     $metable->setMeta('data', ['key' => 'value']);
     $metable->setMeta('data', new MyValueObject(123));
 
-.. note:: The ``Plank\Metable\DataType\SerializeHandler`` class should always be the last entry the ``config/metable.php`` datatypes array, as it will accept data of any type, causing any handlers below it to be ignored.
+HMAC verification is generally sufficient for preventing PHP object injection attacks, but it possible to further restrict what can be unserialized by specifying an array or class name in the ``metable.serializableHandlerAllowedClasses`` config in the ``config/metable.php`` file.
+
+.. note:: The ``Plank\Metable\DataType\SignedSerializeHandler`` class should generally be the last entry the ``config/metable.php`` datatypes array, as it will accept data of any type, causing any handlers below it to be ignored for serializing new meta values. Any handlers defined below it will still be used for unserializing existing meta values. This can be used to temporarily provide backwards compatibility for deprecated data types.
 
 Deprecated
 ----------
@@ -192,7 +194,7 @@ Array
 | Other Query Scopes   |     |
 +----------------------+-----+
 
-.. warning:: The ``ArrayHandler`` datatype is deprecated. The ``SerializeHandler`` should be used for handling arrays.
+.. warning:: The ``ArrayHandler`` datatype is deprecated. The ``SignedSerializeHandler`` should be used for handling arrays.
 
 Arrays of scalar values. Nested arrays are supported.
 
@@ -212,7 +214,7 @@ Arrays of scalar values. Nested arrays are supported.
         ]
     ]);
 
-.. warning:: the ``ArrayHandler`` class uses ``json_encode()`` and ``json_decode()`` under the hood for array serialization. This will cause any objects nested within the array to be cast to an array. This is not a concern for the ``SerializeHandler``.
+.. warning:: the ``ArrayHandler`` class uses ``json_encode()`` and ``json_decode()`` under the hood for array serialization. This will cause any objects nested within the array to be cast to an array. This is not a concern for the ``SignedSerializeHandler``.
 
 Serializable
 ^^^^^^^^^^^^^
@@ -224,7 +226,7 @@ Serializable
 | Other Query Scopes   |     |
 +----------------------+-----+
 
-.. warning:: The ``SerializableHandler`` datatype is deprecated. The ``SerializeHandler`` should be used for handling all objects.
+.. warning:: The ``SerializableHandler`` datatype is deprecated. The ``SignedSerializeHandler`` should be used for handling all objects.
 
 Any object implementing the PHP ``Serializable`` interface.
 
@@ -240,7 +242,7 @@ Any object implementing the PHP ``Serializable`` interface.
 
     $metable->setMeta('example', $serializable);
 
-For security reasons, it is necessary to list any classes that can be unserialized in the ``metable.options.serializable.allowedClasses`` key in the ``config/metable.php`` file. This is to prevent PHP Object Injection vulnerabilities when unserializing untrusted data. This config can be set to true to allow all classes, but this is not recommended.
+For security reasons, it is necessary to list any classes that can be unserialized in the ``metable.serializableHandlerAllowedClasses`` key in the ``config/metable.php`` file. This is to prevent PHP Object Injection vulnerabilities when unserializing untrusted data. This config can be set to true to allow all classes, but this is not recommended.
 
 Plain Objects
 ^^^^^^^^^^^^^^
@@ -252,7 +254,7 @@ Plain Objects
 | Other Query Scopes   |     |
 +----------------------+-----+
 
-.. warning:: The ``ObjectHandler`` datatype is deprecated. The ``SerializeHandler`` should be used for handling all objects.
+.. warning:: The ``ObjectHandler`` datatype is deprecated. The ``SignedSerializeHandler`` should be used for handling all objects.
 
 Any other objects will be converted to ``stdClass`` plain objects. You can control what properties are stored by implementing the ``JsonSerializable`` interface on the class of your stored object.
 
@@ -262,7 +264,7 @@ Any other objects will be converted to ``stdClass`` plain objects. You can contr
     $metable->setMeta('weight', new Weight(10, 'kg'));
     $weight = $metable->getMeta('weight') // stdClass($amount = 10; $unit => 'kg');
 
-.. warning:: Laravel-Metable uses ``json_encode()`` and ``json_decode()`` under the hood for plain object serialization. This will cause any arrays within the object's properties to be cast to a ``stdClass`` object. This is not a concern for the ``SerializeHandler``.
+.. warning:: ``ObjectHandler`` class uses ``json_encode()`` and ``json_decode()`` under the hood for plain object serialization. This will cause any arrays within the object's properties to be cast to a ``stdClass`` object. This is not a concern for the ``SignedSerializeHandler``.
 
 
 Adding Custom Data Types

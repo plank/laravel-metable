@@ -3,6 +3,7 @@
 namespace Plank\Metable\Tests\Integration;
 
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Plank\Metable\Exceptions\SecurityException;
 use Plank\Metable\Meta;
 use Plank\Metable\Tests\TestCase;
 
@@ -58,6 +59,17 @@ class MetaTest extends TestCase
         $this->assertInstanceOf(MorphTo::class, $relation);
         $this->assertEquals('metable_type', $relation->getMorphType());
         $this->assertEquals('metable_id', $relation->getForeignKeyName());
+    }
+
+    public function test_it_verifies_hmac(): void
+    {
+        $this->expectException(SecurityException::class);
+        $meta = $this->makeMeta();
+        $meta->type = 'serialized';
+        $meta->value = ['foo'];
+        $this->assertEquals('serialized', $meta->type);
+        $meta->hmac = hash_hmac('sha256', 'foo', 'badsecret');
+        $meta->getValueAttribute();
     }
 
     private function makeMeta(array $attributes = []): Meta

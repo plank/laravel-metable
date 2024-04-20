@@ -5,6 +5,7 @@ namespace Plank\Metable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Plank\Metable\DataType\Registry;
+use Plank\Metable\Exceptions\SecurityException;
 
 /**
  * Model for storing meta data.
@@ -15,8 +16,10 @@ use Plank\Metable\DataType\Registry;
  * @property string $type
  * @property string $key
  * @property mixed $value
+ * @property string $raw_value
  * @property null|string $string_value
  * @property null|int|float $numeric_value
+ * @property null|string $hmac
  * @property Model $metable
  */
 class Meta extends Model
@@ -40,7 +43,8 @@ class Meta extends Model
         'metable_id',
         'type',
         'string_value',
-        'numeric_value'
+        'numeric_value',
+        'hmac'
     ];
 
     /**
@@ -81,9 +85,15 @@ class Meta extends Model
     public function getValueAttribute(): mixed
     {
         if (!isset($this->cachedValue)) {
-            $this->cachedValue = $this->getDataTypeRegistry()
-                ->getHandlerForType($this->type)
-                ->unserializeValue($this->attributes['value']);
+            $handler = $this->getDataTypeRegistry()->getHandlerForType($this->type);
+
+            if ($handler->useHmacVerification()) {
+                $this->verifyHmac($this->attributes['value'], $this->attributes['hmac']);
+            }
+
+            $this->cachedValue = $handler->unserializeValue(
+                $this->attributes['value']
+            );
         }
 
         return $this->cachedValue;
@@ -102,13 +112,21 @@ class Meta extends Model
         $registry = $this->getDataTypeRegistry();
 
         $this->attributes['type'] = $registry->getTypeForValue($value);
-        $handler = $registry->getHandlerForType($this->type);
+        $handler = $registry->getHandlerForType($this->attributes['type']);
 
         $this->attributes['value'] = $handler->serializeValue($value);
+        $this->attributes['hmac'] = $handler->useHmacVerification()
+            ? $this->computeHmac($this->attributes['value'])
+            : null;
         $this->attributes['string_value'] = $handler->getStringValue($value);
         $this->attributes['numeric_value'] = $handler->getNumericValue($value);
 
         $this->cachedValue = null;
+    }
+
+    public function getRawValueAttribute(): string
+    {
+        return $this->attributes['value'];
     }
 
     /**
@@ -129,5 +147,18 @@ class Meta extends Model
     protected function getDataTypeRegistry(): Registry
     {
         return app('metable.datatype.registry');
+    }
+
+    protected function verifyHmac(string $serializedValue, string $hmac): void
+    {
+        $expectedHash = $this->computeHmac($serializedValue);
+        if (!hash_equals($expectedHash, $hmac)) {
+            throw SecurityException::hmacVerificationFailed();
+        }
+    }
+
+    protected function computeHmac(string $serializedValue): string
+    {
+        return hash_hmac('sha256', $serializedValue, config('app.key'));
     }
 }

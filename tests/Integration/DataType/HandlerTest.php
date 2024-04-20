@@ -15,7 +15,7 @@ use Plank\Metable\DataType\ModelHandler;
 use Plank\Metable\DataType\NullHandler;
 use Plank\Metable\DataType\ObjectHandler;
 use Plank\Metable\DataType\SerializableHandler;
-use Plank\Metable\DataType\SerializeHandler;
+use Plank\Metable\DataType\SignedSerializeHandler;
 use Plank\Metable\DataType\StringHandler;
 use Plank\Metable\Tests\Mocks\SampleMetable;
 use Plank\Metable\Tests\Mocks\SampleSerializable;
@@ -49,6 +49,7 @@ class HandlerTest extends TestCase
                 'stringValue' => null,
                 'stringValueComplex' => json_encode(['foo' => ['bar'], 'baz']),
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'boolean' => [
                 'handler' => new BooleanHandler(),
@@ -59,6 +60,7 @@ class HandlerTest extends TestCase
                 'stringValue' => 'true',
                 'stringValueComplex' => 'true',
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'datetime' => [
                 'handler' => new DateTimeHandler(),
@@ -69,6 +71,7 @@ class HandlerTest extends TestCase
                 'stringValue' => $dateString,
                 'stringValueComplex' => $dateString,
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'float' => [
                 'handler' => new FloatHandler(),
@@ -79,6 +82,7 @@ class HandlerTest extends TestCase
                 'stringValue' => '1.1',
                 'stringValueComplex' => '1.1',
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'integer' => [
                 'handler' => new IntegerHandler(),
@@ -89,6 +93,7 @@ class HandlerTest extends TestCase
                 'stringValue' => '3',
                 'stringValueComplex' => '3',
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'model' => [
                 'handler' => new ModelHandler(),
@@ -99,6 +104,7 @@ class HandlerTest extends TestCase
                 'stringValue' => SampleMetable::class,
                 'stringValueComplex' => SampleMetable::class,
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'model collection' => [
                 'handler' => new ModelCollectionHandler(),
@@ -109,6 +115,7 @@ class HandlerTest extends TestCase
                 'stringValue' => null,
                 'stringValueComplex' => null,
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'null' => [
                 'handler' => new NullHandler(),
@@ -119,6 +126,7 @@ class HandlerTest extends TestCase
                 'stringValue' => null,
                 'stringValueComplex' => null,
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'object' => [
                 'handler' => new ObjectHandler(),
@@ -129,16 +137,18 @@ class HandlerTest extends TestCase
                 'stringValue' => null,
                 'stringValueComplex' => json_encode($object),
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
-            'serialize' => [
-                'handler' => new SerializeHandler(),
+            'signedSerialize' => [
+                'handler' => new SignedSerializeHandler(),
                 'type' => 'serialized',
                 'value' => ['foo' => 'bar', 'baz' => [3]],
                 'invalid' => [self::$resource],
                 'numericValue' => null,
                 'stringValue' => null,
                 'stringValueComplex' => serialize(['foo' => 'bar', 'baz' => [3]]),
-                'isIdempotent' => false,
+                'isIdempotent' => true,
+                'usesHmac' => true,
             ],
             'serializable' => [
                 'handler' => new SerializableHandler(),
@@ -149,6 +159,7 @@ class HandlerTest extends TestCase
                 'stringValue' => null,
                 'stringValueComplex' => serialize(new SampleSerializable(['foo' => 'bar'])),
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'string' => [
                 'handler' => new StringHandler(),
@@ -159,6 +170,7 @@ class HandlerTest extends TestCase
                 'stringValue' => 'foo',
                 'stringValueComplex' => 'foo',
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'long-string' => [
                 'handler' => new StringHandler(),
@@ -169,6 +181,7 @@ class HandlerTest extends TestCase
                 'stringValue' => str_repeat('a', 255),
                 'stringValueComplex' => str_repeat('a', 255),
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
             'numeric-string' => [
                 'handler' => new StringHandler(),
@@ -179,6 +192,7 @@ class HandlerTest extends TestCase
                 'stringValue' => '1.2345',
                 'stringValueComplex' => '1.2345',
                 'isIdempotent' => true,
+                'usesHmac' => false,
             ],
         ];
     }
@@ -201,9 +215,10 @@ class HandlerTest extends TestCase
         mixed $value,
         array $incompatible,
         null|int|float $numericValue,
-        null|string $stringValue,
-        null|string $stringValueComplex,
-        bool $isIdempotent
+        ?string $stringValue,
+        ?string $stringValueComplex,
+        bool $isIdempotent,
+        bool $usesHmac
     ): void {
         $this->assertEquals($type, $handler->getDataType());
         $this->assertTrue($handler->canHandleValue($value));
@@ -215,13 +230,13 @@ class HandlerTest extends TestCase
         $serialized = $handler->serializeValue($value);
         $unserialized = $handler->unserializeValue($serialized);
 
+        $this->assertEquals($usesHmac, $handler->useHmacVerification());
         $this->assertEquals($value, $unserialized);
         $this->assertEquals($numericValue, $handler->getNumericValue($value));
         config()->set('metable.indexComplexDataTypes', false);
         $this->assertEquals($stringValue, $handler->getStringValue($value));
         config()->set('metable.indexComplexDataTypes', true);
         $this->assertEquals($stringValueComplex, $handler->getStringValue($value));
-
         $this->assertEquals($isIdempotent, $handler->isIdempotent());
     }
 }

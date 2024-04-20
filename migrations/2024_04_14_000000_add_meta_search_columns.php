@@ -20,6 +20,7 @@ class AddMetaSearchColumns extends Migration
                 'string_value',
                 config('metable.stringValueIndexLength', 255)
             )->nullable();
+            $table->string('hmac', 64)->nullable();
             $table->dropIndex(['key', 'metable_type']);
             $table->dropIndex(['key']);
             $table->index(['key', 'metable_type', 'numeric_value']);

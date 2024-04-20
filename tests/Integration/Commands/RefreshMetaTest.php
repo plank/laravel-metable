@@ -5,7 +5,7 @@ namespace Plank\Metable\Tests\Integration\Commands;
 use Illuminate\Support\Facades\DB;
 use Plank\Metable\DataType\ArrayHandler;
 use Plank\Metable\DataType\DateTimeHandler;
-use Plank\Metable\DataType\SerializeHandler;
+use Plank\Metable\DataType\SignedSerializeHandler;
 use Plank\Metable\DataType\StringHandler;
 use Plank\Metable\Tests\TestCase;
 
@@ -18,7 +18,7 @@ class RefreshMetaTest extends TestCase
         config()->set('metable.datatypes', [
             StringHandler::class,
             DateTimeHandler::class,
-            SerializeHandler::class,
+            SignedSerializeHandler::class,
             ArrayHandler::class,
         ]);
         config()->set('metable.indexComplexDataTypes', true);
@@ -67,7 +67,7 @@ class RefreshMetaTest extends TestCase
         $this->assertCount(3, $result);
 
         $this->assertEquals('serialized', $result[0]->type);
-        $this->assertEquals($complexValue, app('encrypter')->decrypt($result[0]->value));
+        $this->assertEquals($complexValue, unserialize($result[0]->value));
         $this->assertEquals(serialize($complexValue), $result[0]->string_value);
         $this->assertNull($result[0]->numeric_value);
 

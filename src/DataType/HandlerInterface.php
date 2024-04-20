@@ -49,4 +49,6 @@ interface HandlerInterface
      * Indicate whether multiple serializations of the same value will produce the same result.
      */
     public function isIdempotent(): bool;
+
+    public function useHmacVerification(): bool;
 }

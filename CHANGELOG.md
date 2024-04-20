@@ -8,15 +8,15 @@
 - Droppped support for PHP 8.0 and below
 - Added support for Laravel 10 and 11
 - Dropped support Laravel versions 9 and below
-- adjusted some method signatures with PHP 8+ mixed and union types
-- New schema migration adding two new columns and improving indexing for searching by meta values. See [UPGRADING.md](UPGRADING.md) for details.
+- Adjusted some method signatures with PHP 8+ mixed and union types
+- New schema migration adding two new columns and improving indexing for searching by meta values. See [UPGRADING.md](UPGRADING.md) for details
 
 ### Data Types
 
 - Added `getStringValue(): ?string` and `getNumericValue(): null|int|float` methods to `HandlerInterface` which should convert the original value into a format that can be indexed, if possible.
-- Added `SerializeHandler` as a catch-all datatype, which will attempt to serialize the data using PHP's `serialize()` function. The payload is encrypted before being stored in the database to prevent unserializing untrusted data.
-- Deprecated `SerializableHandler` in favor of the new `SerializeHandler` datatype. The `SerializableHandler` will be removed in a future release. In the interim, added the `metable.options.serializable.allowedClasses` config to protect against unserializing untrusted data.
-- Deprecated `ArrayHandler` and `ObjectHandler`, due to the ambiguity of nested array/objects switching type. These will be removed in a future release. The `SerializeHandler` should be used instead.
+- Added `SignedSerializeHandler` as a catch-all datatype, which will attempt to serialize the data using PHP's `serialize()` function. The payload is cryptographically signed with an HMAC before being stored in the database to prevent PHP object injection attacks.
+- Deprecated `SerializableHandler` in favor of the new `SignedSerializeHandler` datatype. The `SerializableHandler` will be removed in a future release. In the interim, added the `metable.options.serializable.allowedClasses` config to protect against unserializing untrusted data.
+- Deprecated `ArrayHandler` and `ObjectHandler`, due to the ambiguity of nested array/objects switching type. These will be removed in a future release. The `SignedSerializeHandler` should be used instead.
 - `ModelHandler` will now validate that the encoded class is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, the meta value will return `null`.
 - `ModelHandler` will no longer throw a model not found exception if the model no longer exists. Instead, the meta value will return `null`. This is more in line with the existing behavior of the `ModelCollectionHandler`.
 - `ModelCollectionHandler` will now validate that the encoded collection class is a valid Eloquent collection before attempting to instantiate it during unserialization. If the class is invalid,  an instance of `Illuminate\Database\Eloquent\Collection` will be used instead.

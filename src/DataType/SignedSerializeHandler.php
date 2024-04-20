@@ -5,7 +5,7 @@ namespace Plank\Metable\DataType;
 /**
  * Securely handle any type of value using php serialize with encryption.
  */
-class SerializeHandler implements HandlerInterface
+final class SignedSerializeHandler implements HandlerInterface
 {
     public function getDataType(): string
     {
@@ -19,12 +19,20 @@ class SerializeHandler implements HandlerInterface
 
     public function serializeValue(mixed $value): string
     {
-        return app('encrypter')->encrypt($value, true);
+        return serialize($value);
     }
 
     public function unserializeValue(string $serializedValue): mixed
     {
-        return app('encrypter')->decrypt($serializedValue, true);
+        return unserialize(
+            $serializedValue,
+            [
+                'allowed_classes' => config(
+                    'metable.signedSerializeHandlerAllowedClasses',
+                    true
+                )
+            ]
+        );
     }
 
     public function getNumericValue(mixed $value): null|int|float
@@ -47,6 +55,11 @@ class SerializeHandler implements HandlerInterface
 
     public function isIdempotent(): bool
     {
-        return false;
+        return true;
+    }
+
+    public function useHmacVerification(): bool
+    {
+        return true;
     }
 }

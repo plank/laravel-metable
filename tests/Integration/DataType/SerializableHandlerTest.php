@@ -19,25 +19,25 @@ class SerializableHandlerTest extends TestCase
         $incomplete = unserialize(serialize($original), ['allowed_classes' => false]);
 
         config()->set(
-            'metable.options.serializable.allowedClasses',
+            'metable.serializableHandlerAllowedClasses',
             [SampleSerializable::class]
         );
         $this->assertEquals($original, $handler->unserializeValue($serialized));
 
         config()->set(
-            'metable.options.serializable.allowedClasses',
+            'metable.serializableHandlerAllowedClasses',
             true
         );
         $this->assertEquals($original, $handler->unserializeValue($serialized));
 
         config()->set(
-            'metable.options.serializable.allowedClasses',
+            'metable.serializableHandlerAllowedClasses',
             []
         );
         $this->assertEquals($incomplete, $handler->unserializeValue($serialized));
 
         config()->set(
-            'metable.options.serializable.allowedClasses',
+            'metable.serializableHandlerAllowedClasses',
             false
         );
         $this->assertEquals($incomplete, $handler->unserializeValue($serialized));

@@ -6,7 +6,7 @@ use Serializable;
 
 /**
  * Handle serialization of Serializable objects.
- * @deprecated Use SerializeHandler instead.
+ * @deprecated Use SignedSerializeHandler instead.
  */
 class SerializableHandler implements HandlerInterface
 {
@@ -39,7 +39,7 @@ class SerializableHandler implements HandlerInterface
      */
     public function unserializeValue(string $serializedValue): mixed
     {
-        $allowedClasses = config('metable.options.serializable.allowedClasses', false);
+        $allowedClasses = config('metable.serializableHandlerAllowedClasses', false);
         return unserialize($serializedValue, ['allowed_classes' => $allowedClasses]);
     }
 
@@ -64,5 +64,10 @@ class SerializableHandler implements HandlerInterface
     public function isIdempotent(): bool
     {
         return true;
+    }
+
+    public function useHmacVerification(): bool
+    {
+        return false;
     }
 }

@@ -67,4 +67,9 @@ class DateTimeHandler implements HandlerInterface
     {
         return true;
     }
+
+    public function useHmacVerification(): bool
+    {
+        return false;
+    }
 }
