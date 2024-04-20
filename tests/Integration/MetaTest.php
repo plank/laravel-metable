@@ -16,6 +16,7 @@ class MetaTest extends TestCase
         $meta->value = 'foo';
 
         $this->assertEquals('foo', $meta->value);
+        $this->assertEquals('foo', $meta->raw_value);
         $this->assertEquals('string', $meta->type);
     }
 

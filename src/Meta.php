@@ -126,7 +126,7 @@ class Meta extends Model
 
     public function getRawValueAttribute(): string
     {
-        return $this->attributes['value'];
+        return $this->getRawValue();
     }
 
     /**

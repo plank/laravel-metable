@@ -2,6 +2,8 @@
 
 ## 6.0.0
 
+Version 6 contains a number of changes to improve the security and performance of the package. Refer to the [UPGRADING.md](UPGRADING.md) file for detailed instructions on how to upgrade from version 5. 
+
 ### Compatibility
 
 - Added support for PHP 8.3
@@ -13,18 +15,21 @@
 
 ### Data Types
 
-- Added `getStringValue(): ?string` and `getNumericValue(): null|int|float` methods to `HandlerInterface` which should convert the original value into a format that can be indexed, if possible.
 - Added `SignedSerializeHandler` as a catch-all datatype, which will attempt to serialize the data using PHP's `serialize()` function. The payload is cryptographically signed with an HMAC before being stored in the database to prevent PHP object injection attacks.
+
 - Deprecated `SerializableHandler` in favor of the new `SignedSerializeHandler` datatype. The `SerializableHandler` will be removed in a future release. In the interim, added the `metable.options.serializable.allowedClasses` config to protect against unserializing untrusted data.
 - Deprecated `ArrayHandler` and `ObjectHandler`, due to the ambiguity of nested array/objects switching type. These will be removed in a future release. The `SignedSerializeHandler` should be used instead.
 - `ModelHandler` will now validate that the encoded class is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, the meta value will return `null`.
 - `ModelHandler` will no longer throw a model not found exception if the model no longer exists. Instead, the meta value will return `null`. This is more in line with the existing behavior of the `ModelCollectionHandler`.
 - `ModelCollectionHandler` will now validate that the encoded collection class is a valid Eloquent collection before attempting to instantiate it during unserialization. If the class is invalid,  an instance of `Illuminate\Database\Eloquent\Collection` will be used instead.
 - `ModelCollectionHandler` will now validate that the encoded class of each entry is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, that entry in the collection will be omitted.
+- Added `getStringValue(): ?string` and `getNumericValue(): null|int|float` methods to `HandlerInterface` which should convert the original value into a format that can be indexed, if possible.
+- Added `isIdempotent(): bool` method to `HandlerInterface` which should indicate whether multiple calls to the `serialize()` method with the same value will produce the same serialized output. This is used to determine if the complete serialized value can be used when searching for meta values.
+- Added `useHmacVerification(): bool` method to `HandlerInterface` which should indicate whether the integrity of the serialized data should be verified with an HMAC.
 
 ### Commands
 
-- Added `metable:refresh` artisan command which will descode and re-encode all meta values in the database. This is useful if you have changed the data type handlers and need to update the serialized data and indexes in the database.
+- Added `metable:refresh` artisan command which will decode and re-encode all meta values in the database. This is useful if you have changed the data type handlers and need to update the serialized data and indexes in the database.
 
 ### Mediable trait
 
@@ -42,6 +47,9 @@
   - `whereMetaIsNull()`
   - `whereMetaIsModel()`
 - If the data type handlers cannot convert the search value provided to a whereMeta* query scope to a string or numeric value (as appropriate for the scope), then an exception will be thrown.
+
+### Meta
+- Added `$meta->raw_value` property which exposes the raw serialized value of the meta key. This is useful for debugging purposes.
 
 # 5.0.1 - 2021-09-19
 - Fixed `setManyMeta()` not properly serializing certain types of data.
