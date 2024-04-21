@@ -6,6 +6,7 @@
 * Minimum Laravel version moved to 10
 * Some methods have had their signatures adjusted to use PHP 8+ mixed and union types. If extending any class or implementing any interface from this package, method signatures may need to be updated.
 * A new schema migration has been added which adds three new columns to the meta table and improves indexing for querying by meta values.
+* Add the `PureEnumHandler` and `BackedEnumHandler` classes to the `datatypes` config. These handlers provide support for storing enum values as Meta.
 * Recommended to add the `SignedSerializeHandler` to the end of `datatypes` config (catch-all).
 * The `SerializableHandler`, `ArrayHandler`, and `ObjectHandler` data types have been deprecated in favor of the new `SignedSerializeHandler`. If you have any Meta encoded using any of these data types, you should continue to include them in the `datatypes` config _after_ the `SignedSerializeHandler` to ensure that existing values will continue to be properly decoded, but new values will use the new encoding. Once all old values have been migrated, you may remove the deprecated data types from the `datatypes` config.
 * For security reasons, if you have any existing Meta encoded using `SerializableHandler`, you must configure the `metable.serializableHandlerAllowedClasses` config to list classes that are allowed to be unserialized. Otherwise, all objects will be returned as `__PHP_Incomplete_Class`. This config may be set to `true` to disable this security check and allow any class, but this is not recommended.

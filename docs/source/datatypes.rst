@@ -17,7 +17,7 @@ The following scalar values are supported.
 Boolean
 ^^^^^^^^
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\BooleanHandler |
+| Handler              | ``\Plank\Metable\DataType\BooleanHandler`` |
 | String Query Scopes  | Yes |
 | Numeric Query Scopes | Yes |
 | Other Query Scopes   |     |
@@ -31,7 +31,7 @@ Boolean
 Integer
 ^^^^^^^^
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\IntegerHandler |
+| Handler              | ``\Plank\Metable\DataType\IntegerHandler`` |
 | String Query Scopes  | Yes |
 | Numeric Query Scopes | Yes |
 | Other Query Scopes   |     |
@@ -45,7 +45,7 @@ Integer
 Float
 ^^^^^^^^
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\FloatHandler |
+| Handler              | ``\Plank\Metable\DataType\FloatHandler`` |
 | String Query Scopes  | Yes |
 | Numeric Query Scopes | Yes |
 | Other Query Scopes   |     |
@@ -59,7 +59,7 @@ Float
 Null
 ^^^^^^^^
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\NullHandler |
+| Handler              | ``\Plank\Metable\DataType\NullHandler`` |
 | String Query Scopes  | No |
 | Numeric Query Scopes | No |
 | Other Query Scopes   | whereMetaIsNull() |
@@ -73,8 +73,8 @@ Null
 String
 ^^^^^^^^
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\StringHandler |
-| String Query Scopes  | Yes, first `metable.stringValueIndexLength` characters indexed |
+| Handler              | ``\Plank\Metable\DataType\StringHandler`` |
+| String Query Scopes  | Yes, first ``metable.stringValueIndexLength`` characters indexed |
 | Numeric Query Scopes | if string is numeric |
 | Other Query Scopes   |     |
 +----------------------+-----+
@@ -84,8 +84,8 @@ String
     <?php
     $metable->setMeta('attachment', '/var/www/html/public/attachment.pdf');
 
-Objects
----------------
+Composite Values
+----------------
 
 The following classes and interfaces are supported.
 
@@ -95,7 +95,7 @@ Eloquent Models
 ^^^^^^^^^^^^^^^^^
 
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\ModelHandler |
+| Handler              | ``\Plank\Metable\DataType\ModelHandler`` |
 | String Query Scopes  | Yes |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   | whereMetaIsModel() |
@@ -125,7 +125,7 @@ Eloquent Collections
 ^^^^^^^^^^^^^^^^^^^^
 
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\ModelCollectionHandler |
+| Handler              | ``\Plank\Metable\DataType\ModelCollectionHandler`` |
 | String Query Scopes  | No  |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
@@ -144,7 +144,7 @@ As with individual models, both existing and unsaved instances can be stored.
 DateTime & Carbon
 ^^^^^^^^^^^^^^^^^^
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\DateTimeHandler |
+| Handler              | ``\Plank\Metable\DataType\DateTimeHandler`` |
 | String Query Scopes  | Yes (UTC format) |
 | Numeric Query Scopes | Yes (timestamp) |
 | Other Query Scopes   |     |
@@ -157,17 +157,31 @@ Any object implementing the ``DateTimeInterface``.  Object will be converted to 
     <?php
     $metable->setMeta('last_viewed', \Carbon\Carbon::now());
 
+Enums
+^^^^^^^^
++----------------------+-----+
+| Handler              | ``\Plank\Metable\DataType\PureEnumHandler``<br />``\Plank\Metable\DataType\BackedEnumHandler`` |
+| String Query Scopes  | Yes |
+| Numeric Query Scopes | If backed with integer or numeric-string |
+| Other Query Scopes   |     |
++----------------------+-----+
+
+::
+
+    <?php
+    $metable->setMeta('status', Status::ACTIVE);
+
 Objects and Arrays
 ^^^^^
 
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\SignedSerializeHandler |
-| String Query Scopes  | if `metable.indexComplexDataTypes` is enabled  |
+| Handler              | ``\Plank\Metable\DataType\SignedSerializeHandler`` |
+| String Query Scopes  | if ``metable.indexComplexDataTypes`` is enabled  |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
 +----------------------+-----+
 
-Objects and arrays will be serialized using PHP's `serialize()` function, to allow for the storage and retrieval of complex data structures. The serialized value is cryptographically signed with an HMAC which is verified before the data is unserialized to prevent PHP object injection attacks. The application's ``APP_KEY`` is used as the HMAC signing key.
+Objects and arrays will be serialized using PHP's ``serialize()`` function, to allow for the storage and retrieval of complex data structures. The serialized value is cryptographically signed with an HMAC which is verified before the data is unserialized to prevent PHP object injection attacks. The application's ``APP_KEY`` is used as the HMAC signing key.
 
 ::
 
@@ -188,8 +202,8 @@ Array
 ^^^^^^^^
 
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\ArrayHandler |
-| String Query Scopes  | if `metable.indexComplexDataTypes` is enabled  |
+| Handler              | ``\Plank\Metable\DataType\ArrayHandler`` |
+| String Query Scopes  | if ``metable.indexComplexDataTypes`` is enabled  |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
 +----------------------+-----+
@@ -220,8 +234,8 @@ Serializable
 ^^^^^^^^^^^^^
 
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\ArrayHandler |
-| String Query Scopes  | if `metable.indexComplexDataTypes` is enabled  |
+| Handler              | ``\Plank\Metable\DataType\ArrayHandler`` |
+| String Query Scopes  | if ``metable.indexComplexDataTypes`` is enabled  |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
 +----------------------+-----+
@@ -248,8 +262,8 @@ Plain Objects
 ^^^^^^^^^^^^^^
 
 +----------------------+-----+
-| Handler              | \Plank\Metable\DataType\ArrayHandler |
-| String Query Scopes  | if `metable.indexComplexDataTypes` is enabled  |
+| Handler              | ``\Plank\Metable\DataType\ArrayHandler`` |
+| String Query Scopes  | if ``metable.indexComplexDataTypes`` is enabled  |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
 +----------------------+-----+

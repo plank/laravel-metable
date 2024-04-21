@@ -5,6 +5,7 @@ namespace Plank\Metable\Tests\Integration\DataType;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Plank\Metable\DataType\ArrayHandler;
+use Plank\Metable\DataType\BackedEnumHandler;
 use Plank\Metable\DataType\BooleanHandler;
 use Plank\Metable\DataType\DateTimeHandler;
 use Plank\Metable\DataType\FloatHandler;
@@ -17,8 +18,12 @@ use Plank\Metable\DataType\ObjectHandler;
 use Plank\Metable\DataType\SerializableHandler;
 use Plank\Metable\DataType\SignedSerializeHandler;
 use Plank\Metable\DataType\StringHandler;
+use Plank\Metable\DataType\PureEnumHandler;
+use Plank\Metable\Tests\Mocks\SampleIntBackedEnum;
 use Plank\Metable\Tests\Mocks\SampleMetable;
 use Plank\Metable\Tests\Mocks\SampleSerializable;
+use Plank\Metable\Tests\Mocks\SampleStringBackedEnum;
+use Plank\Metable\Tests\Mocks\SamplePureEnum;
 use Plank\Metable\Tests\TestCase;
 use stdClass;
 
@@ -194,6 +199,68 @@ class HandlerTest extends TestCase
                 'isIdempotent' => true,
                 'usesHmac' => false,
             ],
+            'unitEnum' => [
+                'handler' => new PureEnumHandler(),
+                'type' => 'enum',
+                'value' => SamplePureEnum::Alpha,
+                'invalid' => [
+                    SampleIntBackedEnum::One,
+                    SampleStringBackedEnum::Alpha,
+                    'Alpha',
+                    1,
+                    new stdClass()
+                ],
+                'numericValue' => null,
+                'stringValue' => 'Alpha',
+                'stringValueComplex' => 'Alpha',
+                'isIdempotent' => true,
+                'usesHmac' => false,
+            ],
+            'stringBackedEnum' => [
+                'handler' => new BackedEnumHandler(),
+                'type' => 'backed_enum',
+                'value' => SampleStringBackedEnum::Alpha,
+                'invalid' => [
+                    SamplePureEnum::Alpha,
+                    'Alpha',
+                    new stdClass()
+                ],
+                'numericValue' => null,
+                'stringValue' => 'alpha',
+                'stringValueComplex' => 'alpha',
+                'isIdempotent' => true,
+                'usesHmac' => false,
+            ],
+            'numericStringBackedEnum' => [
+                'handler' => new BackedEnumHandler(),
+                'type' => 'backed_enum',
+                'value' => SampleStringBackedEnum::Numeric,
+                'invalid' => [
+                    SamplePureEnum::Alpha,
+                    'Alpha',
+                    new stdClass()
+                ],
+                'numericValue' => 1,
+                'stringValue' => '1',
+                'stringValueComplex' => '1',
+                'isIdempotent' => true,
+                'usesHmac' => false,
+            ],
+            'intBackedEnum' => [
+                'handler' => new BackedEnumHandler(),
+                'type' => 'backed_enum',
+                'value' => SampleIntBackedEnum::One,
+                'invalid' => [
+                    SamplePureEnum::Alpha,
+                    1,
+                    new stdClass()
+                ],
+                'numericValue' => 1,
+                'stringValue' => '1',
+                'stringValueComplex' => '1',
+                'isIdempotent' => true,
+                'usesHmac' => false,
+            ],
         ];
     }
 
@@ -224,7 +291,7 @@ class HandlerTest extends TestCase
         $this->assertTrue($handler->canHandleValue($value));
 
         foreach ($incompatible as $incompatibleValue) {
-            $this->assertFalse($handler->canHandleValue($incompatibleValue));
+            $this->assertFalse($handler->canHandleValue($incompatibleValue), "Failed for ". get_debug_type($incompatibleValue));
         }
 
         $serialized = $handler->serializeValue($value);

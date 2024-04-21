@@ -28,6 +28,8 @@ return [
         Plank\Metable\DataType\DateTimeHandler::class,
         Plank\Metable\DataType\ModelHandler::class,
         Plank\Metable\DataType\ModelCollectionHandler::class,
+        Plank\Metable\DataType\BackedEnumHandler::class,
+        Plank\Metable\DataType\PureEnumHandler::class,
 
         /*
          * The following handler is a catch-all that will encode anything.
