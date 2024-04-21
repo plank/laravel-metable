@@ -4,8 +4,9 @@ namespace Plank\Metable\Tests\Mocks;
 
 use Illuminate\Database\Eloquent\Model;
 use Plank\Metable\Metable;
+use Plank\Metable\MetableInterface;
 
-class SampleMetable extends Model
+class SampleMetable extends Model implements MetableInterface
 {
     use Metable;
 
