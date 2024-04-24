@@ -4,10 +4,12 @@ namespace Plank\Metable\Tests\Integration\DataType;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Stringable;
 use Plank\Metable\DataType\ArrayHandler;
 use Plank\Metable\DataType\BackedEnumHandler;
 use Plank\Metable\DataType\BooleanHandler;
 use Plank\Metable\DataType\DateTimeHandler;
+use Plank\Metable\DataType\DateTimeImmutableHandler;
 use Plank\Metable\DataType\FloatHandler;
 use Plank\Metable\DataType\HandlerInterface;
 use Plank\Metable\DataType\IntegerHandler;
@@ -17,6 +19,7 @@ use Plank\Metable\DataType\NullHandler;
 use Plank\Metable\DataType\ObjectHandler;
 use Plank\Metable\DataType\SerializableHandler;
 use Plank\Metable\DataType\SignedSerializeHandler;
+use Plank\Metable\DataType\StringableHandler;
 use Plank\Metable\DataType\StringHandler;
 use Plank\Metable\DataType\PureEnumHandler;
 use Plank\Metable\Tests\Mocks\SampleIntBackedEnum;
@@ -71,6 +74,17 @@ class HandlerTest extends TestCase
                 'handler' => new DateTimeHandler(),
                 'type' => 'datetime',
                 'value' => $datetime,
+                'invalid' => [2017, '2017-01-01'],
+                'numericValue' => $timestamp,
+                'stringValue' => $dateString,
+                'stringValueComplex' => $dateString,
+                'isIdempotent' => true,
+                'usesHmac' => false,
+            ],
+            'datetimeImmutable' => [
+                'handler' => new DateTimeImmutableHandler(),
+                'type' => 'datetime_immutable',
+                'value' => $datetime->toImmutable(),
                 'invalid' => [2017, '2017-01-01'],
                 'numericValue' => $timestamp,
                 'stringValue' => $dateString,
@@ -261,6 +275,17 @@ class HandlerTest extends TestCase
                 'isIdempotent' => true,
                 'usesHmac' => false,
             ],
+            'Stringable' => [
+                'handler' => new StringableHandler(),
+                'type' => 'stringable',
+                'value' => new Stringable('foo'),
+                'invalid' => ['foo'],
+                'numericValue' => null,
+                'stringValue' => 'foo',
+                'stringValueComplex' => 'foo',
+                'isIdempotent' => true,
+                'usesHmac' => false,
+            ]
         ];
     }
 

@@ -157,6 +157,39 @@ Any object implementing the ``DateTimeInterface``.  Object will be converted to 
     <?php
     $metable->setMeta('last_viewed', \Carbon\Carbon::now());
 
+DateTimeImmutable & CarbonImmutable
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
++----------------------+-----+
+| Handler              | ``\Plank\Metable\DataType\DateTimeImmutableHandler`` |
+| String Query Scopes  | Yes (UTC format) |
+| Numeric Query Scopes | Yes (timestamp) |
+| Other Query Scopes   |     |
++----------------------+-----+
+
+Any object extending the ``DateTimeImmutable`` class.  Object will be converted to a ``CarbonImmutable`` instance when unserialized.
+
+::
+
+    <?php
+    $metable->setMeta('completed_at', \Carbon\CarbonImmutable::now());
+
+Stringable
+^^^^^^^^^^
++----------------------+-----+
+| Handler              | ``\Plank\Metable\DataType\StringableHandler`` |
+| String Query Scopes  | Yes |
+| Numeric Query Scopes | If numeric string |
+| Other Query Scopes   |     |
++----------------------+-----+
+
+Strings wrapped in Laravel's ``Illuminate\Support\Stringable`` fluent interface.
+
+::
+
+    <?php
+    $metable->setMeta('address', Str::of('123 Somewhere St.'));
+
 Enums
 ^^^^^^^^
 +----------------------+-----+
@@ -181,7 +214,7 @@ Objects and Arrays
 | Other Query Scopes   |     |
 +----------------------+-----+
 
-Objects and arrays will be serialized using PHP's ``serialize()`` function, to allow for the storage and retrieval of complex data structures. The serialized value is cryptographically signed with an HMAC which is verified before the data is unserialized to prevent PHP object injection attacks. The application's ``APP_KEY`` is used as the HMAC signing key.
+Objects and arrays will be serialized using PHP's ``serialize()`` function, to allow for the storage and retrieval of complex data structures.
 
 ::
 
@@ -189,7 +222,7 @@ Objects and arrays will be serialized using PHP's ``serialize()`` function, to a
     $metable->setMeta('data', ['key' => 'value']);
     $metable->setMeta('data', new MyValueObject(123));
 
-HMAC verification is generally sufficient for preventing PHP object injection attacks, but it possible to further restrict what can be unserialized by specifying an array or class name in the ``metable.serializableHandlerAllowedClasses`` config in the ``config/metable.php`` file.
+The serialized value is cryptographically signed with an HMAC which is verified before the data is unserialized to prevent PHP object injection attacks. The application's ``APP_KEY`` is used as the HMAC signing key. HMAC verification is generally sufficient for preventing PHP object injection attacks, but it possible to further restrict what can be unserialized by specifying an array or class name in the ``metable.SignedSerializeHandlerAllowedClasses`` config in the ``config/metable.php`` file.
 
 .. note:: The ``Plank\Metable\DataType\SignedSerializeHandler`` class should generally be the last entry the ``config/metable.php`` datatypes array, as it will accept data of any type, causing any handlers below it to be ignored for serializing new meta values. Any handlers defined below it will still be used for unserializing existing meta values. This can be used to temporarily provide backwards compatibility for deprecated data types.
 

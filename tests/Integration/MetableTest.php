@@ -3,10 +3,14 @@
 namespace Plank\Metable\Tests\Integration;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Stringable;
 use Plank\Metable\Meta;
 use Plank\Metable\Tests\Mocks\SampleMetable;
 use Plank\Metable\Tests\Mocks\SampleMetableSoftDeletes;
+use Plank\Metable\Tests\Mocks\SampleStringBackedEnum;
 use Plank\Metable\Tests\TestCase;
 use ReflectionClass;
 
@@ -29,6 +33,26 @@ class MetableTest extends TestCase
         $this->assertTrue($metable->hasMeta('foo'));
         $this->assertEquals('baz', $metable->getMeta('foo'));
         $this->assertCount(1, $metable->meta);
+    }
+
+    public function test_it_can_set_meta_encrypted(): void
+    {
+        $this->useDatabase();
+        $metable = $this->createMetable();
+        $metable->load('meta');
+        $this->assertFalse($metable->hasMeta('foo'));
+
+        $metable->setMeta('foo', 'bar', true);
+
+        $this->assertTrue($metable->hasMeta('foo'));
+        $this->assertEquals('bar', $metable->getMeta('foo'));
+        $this->assertEquals('encrypted:string', $metable->getMetaRecord('foo')->type);
+
+        $metable->setMetaEncrypted('baz', [1 => 2]);
+
+        $this->assertTrue($metable->hasMeta('baz'));
+        $this->assertEquals([1 => 2], $metable->getMeta('baz'));
+        $this->assertEquals('encrypted:serialized', $metable->getMetaRecord('baz')->type);
     }
 
     public function test_it_can_set_many_meta_values_at_once(): void
@@ -704,6 +728,137 @@ class MetableTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         SampleMetable::whereMetaNumeric('foo', null)->get();
+    }
+
+    public static function castProvider(): array
+    {
+        $date = Carbon::now();
+        $object = new \stdClass();
+        $object->foo = 'bar';
+        $model = new SampleMetable();
+        $model->id = 99;
+        $model->exists = true;
+        $modelCollection = new Collection([$model]);
+        return [
+            'string - string' => ['string', 'foo', 'foo', 'string'],
+            'string - int' => ['string', 123, '123', 'string'],
+            'string - float' => ['string', 123.45, '123.45', 'string'],
+            'string - true' => ['string', true, '1', 'string'],
+            'string - false' => ['string', false, '', 'string'],
+            'string - null' => ['string', null, null, 'null'],
+            'string - dateTime' => ['string', $date, (string)$date, 'string'],
+            'array - array' => ['array', ['foo', 'bar'], ['foo', 'bar'], 'serialized'],
+            'array - json' => ['array', json_encode(['foo' => 'bar']), ['foo' => 'bar'], 'serialized'],
+            'array - object' => ['array', $object, ['foo' => 'bar'], 'serialized'],
+            'array - null' => ['array', null, null, 'null'],
+            'boolean - true' => ['boolean', true, true, 'boolean'],
+            'boolean - false' => ['boolean', false, false, 'boolean'],
+            'boolean - 1' => ['boolean', 1, true, 'boolean'],
+            'boolean - 0' => ['boolean', 0, false, 'boolean'],
+            'boolean - null' => ['boolean', null, null, 'null'],
+            'boolean - string' => ['boolean', 'abc', true, 'boolean'],
+            'boolean - empty string' => ['boolean', '', false, 'boolean'],
+            'boolean - string 1' => ['boolean', '1', true, 'boolean'],
+            'boolean - string 0' => ['boolean', '0', false, 'boolean'],
+            'decimal - int' => ['decimal:2', 123, '123.00', 'string'],
+            'decimal - float' => ['decimal:2', 123.456, '123.46', 'string'],
+            'decimal - string' => ['decimal:2', '123.456', '123.46', 'string'],
+            'decimal - null' => ['decimal:2', null, null, 'null'],
+            'double - int' => ['double', 123, 123.0, 'float'],
+            'double - float' => ['double', 123.456, 123.456, 'float'],
+            'double - string' => ['double', '123.456', 123.456, 'float'],
+            'double - string int' => ['double', '123', 123.0, 'float'],
+            'double - null' => ['double', null, null, 'null'],
+            'float - int' => ['float', 123, 123.0, 'float'],
+            'float - float' => ['float', 123.456, 123.456, 'float'],
+            'float - string' => ['float', '123.456', 123.456, 'float'],
+            'float - string int' => ['float', '123', 123.0, 'float'],
+            'float - null' => ['float', null, null, 'null'],
+            'integer - int' => ['integer', 123, 123, 'integer'],
+            'integer - float' => ['integer', 123.456, 123, 'integer'],
+            'integer - string' => ['integer', '123', 123, 'integer'],
+            'integer - null' => ['integer', null, null, 'null'],
+            'object - object' => ['object', $object, $object, 'serialized', false],
+            'object - array' => ['object', ['foo' => 'bar'], $object, 'serialized', false],
+            'object - json' => ['object', json_encode(['foo' => 'bar']), $object, 'serialized', false],
+            'object - null' => ['object', null, null, 'null'],
+            'real - int' => ['real', 123, 123.0, 'float'],
+            'real - float' => ['real', 123.456, 123.456, 'float'],
+            'real - string' => ['real', '123.456', 123.456, 'float'],
+            'real - string int' => ['real', '123', 123.0, 'float'],
+            'real - null' => ['real', null, null, 'null'],
+            'timestamp - dateTime' => ['timestamp', $date, $date->timestamp, 'integer'],
+            'timestamp - int' => ['timestamp', 123, 123, 'integer'],
+            'timestamp - string' => ['timestamp', '2020-01-01 00:00:00', strtotime('2020-01-01 00:00:00'), 'integer'],
+            'timestamp - null' => ['timestamp', null, null, 'null'],
+            'date - dateTime' => ['date', $date, $date->copy()->startOfDay(), 'datetime', false],
+            'date - string' => ['date', (string)$date, $date->copy()->startOfDay(), 'datetime', false],
+            'date - timestamp' => ['date', $date->timestamp, $date->copy()->startOfDay(), 'datetime', false],
+            'date - string timestamp' => ['date', (string)$date->timestamp, $date->copy()->startOfDay(), 'datetime', false],
+            'date - null' => ['date', null, null, 'null'],
+            'datetime - dateTime' => ['datetime', $date, $date, 'datetime', false],
+            'datetime - string' => ['datetime', $date->format('Y-m-d H:i:s.uO'), $date, 'datetime', false],
+            'datetime - timestamp' => ['datetime', $date->timestamp, $date->copy()->startOfSecond(), 'datetime', false],
+            'datetime - string timestamp' => ['datetime', (string)$date->timestamp, $date->copy()->startOfSecond(), 'datetime', false],
+            'datetime - null' => ['datetime', null, null, 'null'],
+            'immutable_date - dateTime' => ['immutable_date', $date, $date->copy()->startOfDay()->toImmutable(), 'datetime_immutable', false],
+            'immutable_date - string' => ['immutable_date', $date->format('Y-m-d H:i:s.uO'), $date->copy()->startOfDay()->toImmutable(), 'datetime_immutable', false],
+            'immutable_date - timestamp' => ['immutable_date', $date->timestamp, $date->copy()->startOfDay()->toImmutable(), 'datetime_immutable', false],
+            'immutable_date - string timestamp' => ['immutable_date', (string)$date->timestamp, $date->copy()->startOfDay()->toImmutable(), 'datetime_immutable', false],
+            'immutable_date - null' => ['immutable_date', null, null, 'null'],
+            'immutable_datetime - dateTime' => ['immutable_datetime', $date, $date->toImmutable(), 'datetime_immutable', false],
+            'immutable_datetime - string' => ['immutable_datetime', $date->format('Y-m-d H:i:s.uO'), $date->toImmutable(), 'datetime_immutable', false],
+            'immutable_datetime - timestamp' => ['immutable_datetime', $date->timestamp, $date->copy()->startOfSecond()->toImmutable(), 'datetime_immutable', false],
+            'immutable_datetime - string timestamp' => ['immutable_datetime', (string)$date->timestamp, $date->copy()->startOfSecond()->toImmutable(), 'datetime_immutable', false],
+            'immutable_datetime - null' => ['immutable_datetime', null, null, 'null'],
+            'hashed - string' => ['hashed', 'foo', fn ($result) => password_verify('foo', $result), 'string'],
+            'hashed - int' => ['hashed', 123, fn ($result) => password_verify('123', $result), 'string'],
+            'hashed - null' => ['hashed', null, null, 'null'],
+            'collection - array' => ['collection', ['foo', 'bar'], collect(['foo', 'bar']), 'serialized', false],
+            'collection - eloquent' => ['collection', $model, fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(), 'collection', false],
+            'collection - eloquent collection' => ['collection', $modelCollection, fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(), 'collection', false],
+            'collection - null' => ['collection', null, null, 'null'],
+            'stringable - string' => [AsStringable::class, 'foo', new Stringable('foo'), 'stringable', false],
+            'stringable - int' => [AsStringable::class, 123, new Stringable('123'), 'stringable', false],
+            'stringable - null' => [AsStringable::class, null, null, 'null'],
+            'encrypted - string' => ['encrypted', 'foo', 'foo', 'encrypted:string'],
+            'encrypted - array' => ['encrypted', ['foo' => 'bar'], ['foo' => 'bar'], 'encrypted:serialized'],
+            'encrypted - null' => ['encrypted', null, null, 'null'],
+            'encrypted:collection - array' => ['encrypted:collection', ['foo', 'bar'], collect(['foo', 'bar']), 'encrypted:serialized', false],
+            'encrypted:collection - eloquent' => ['encrypted:collection', $model, fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(), 'encrypted:collection', false],
+            'encrypted:collection - eloquent collection' => ['encrypted:collection', $modelCollection, fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(), 'encrypted:collection', false],
+            'encrypted:string - int' => ['encrypted:string', 123, '123', 'encrypted:string'],
+        ];
+    }
+
+    /** @dataProvider castProvider */
+    public function test_it_casts_meta_values(
+        string $cast,
+        mixed $original,
+        mixed $expected,
+        string $expectedHandlerType,
+        bool $strict = true
+    ): void {
+        $this->useDatabase();
+
+        if ($cast === 'collection' || $cast === 'encrypted:collection') {
+            $model = new SampleMetable();
+            $model->id = 99;
+            $model->save();
+        }
+
+        $key = 'castable';
+        $metable = $this->createMetable();
+        $metable->mergeMetaCasts([$key => $cast]);
+        $metable->setMeta($key, $original);
+        if ($expected instanceof \Closure) {
+            $this->assertTrue($expected($metable->getMeta($key)));
+        } elseif ($strict) {
+            $this->assertSame($expected, $metable->getMeta($key));
+        } else {
+            $this->assertEquals($expected, $metable->getMeta($key));
+        }
+        $this->assertSame($expectedHandlerType, $metable->getMetaRecord($key)->type);
     }
 
     public function test_it_can_cast_meta_values(): void

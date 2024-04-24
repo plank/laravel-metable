@@ -20,16 +20,18 @@ return [
      * If you change this list, it may be necessary to refresh the meta table with the `artisan metable:refresh` command.
      */
     'datatypes' => [
-        Plank\Metable\DataType\BooleanHandler::class,
         Plank\Metable\DataType\NullHandler::class,
+        Plank\Metable\DataType\BooleanHandler::class,
         Plank\Metable\DataType\IntegerHandler::class,
         Plank\Metable\DataType\FloatHandler::class,
         Plank\Metable\DataType\StringHandler::class,
+        Plank\Metable\DataType\StringableHandler::class,
+        Plank\Metable\DataType\DateTimeImmutableHandler::class,
         Plank\Metable\DataType\DateTimeHandler::class,
-        Plank\Metable\DataType\ModelHandler::class,
-        Plank\Metable\DataType\ModelCollectionHandler::class,
         Plank\Metable\DataType\BackedEnumHandler::class,
         Plank\Metable\DataType\PureEnumHandler::class,
+        Plank\Metable\DataType\ModelHandler::class,
+        Plank\Metable\DataType\ModelCollectionHandler::class,
 
         /*
          * The following handler is a catch-all that will encode anything.

@@ -38,7 +38,7 @@ class BackedEnumHandler implements HandlerInterface
 
     public function getNumericValue(mixed $value): null|int|float
     {
-        if(is_numeric($value->value)) {
+        if (is_numeric($value->value)) {
             return $value->value;
         }
         return null;

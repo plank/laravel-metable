@@ -2,6 +2,7 @@
 
 namespace Plank\Metable\Tests;
 
+use Illuminate\Hashing\HashServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Plank\Metable\MetableServiceProvider;
 use Plank\Metable\Tests\Mocks\SampleSerializable;

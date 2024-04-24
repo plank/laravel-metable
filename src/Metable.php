@@ -2,6 +2,7 @@
 
 namespace Plank\Metable;
 
+use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Query\JoinClause;
 use Plank\Metable\DataType\HandlerInterface;
 use Plank\Metable\DataType\Registry;
+use Plank\Metable\Exceptions\CastException;
 
 /**
  * Trait for giving Eloquent models the ability to handle Meta.
@@ -38,6 +40,8 @@ trait Metable
      * @var Collection<Meta>
      */
     private $indexedMetaCollection;
+
+    private array $mergedMetaCasts = [];
 
 
     public function __construct(array $attributes = [])
@@ -77,18 +81,26 @@ trait Metable
      * @param string $key
      * @param mixed $value
      */
-    public function setMeta(string $key, mixed $value): void
+    public function setMeta(string $key, mixed $value, bool $encrypt = false): void
     {
         if ($this->hasMeta($key)) {
             $meta = $this->getMetaRecord($key);
-            $meta->setAttribute('value', $value);
+            $meta->setAttribute('value', $this->castMetaValueIfNeeded($key, $value));
+            if ($encrypt || $this->hasEncryptedMetaCast($key)) {
+                $meta->encrypt();
+            }
             $meta->save();
         } else {
-            $meta = $this->makeMeta($key, $value);
+            $meta = $this->makeMeta($key, $value, $encrypt);
             $this->meta()->save($meta);
             $this->meta[] = $meta;
             $this->indexedMetaCollection[$key] = $meta;
         }
+    }
+
+    public function setMetaEncrypted(string $key, mixed $value): void
+    {
+        $this->setMeta($key, $value, true);
     }
 
     /**
@@ -145,7 +157,7 @@ trait Metable
         $this->meta()->saveMany($meta);
 
         // Update cached relationship.
-        $collection = $this->makeMeta()->newCollection($meta);
+        $collection = $this->getMetaInstance()->newCollection($meta);
         $this->setRelation('meta', $collection);
     }
 
@@ -160,17 +172,16 @@ trait Metable
     public function getMeta(string $key, mixed $default = null): mixed
     {
         if ($this->hasMeta($key)) {
-            $value = $this->getMetaRecord($key)->getAttribute('value');
-        }
-        // If we have only one argument provided (i.e. default is not set)
-        // then we check the model for the defaultMetaValues
-        elseif (func_num_args() == 1 && $this->hasDefaultMetaValue($key)) {
-            $value = $this->getDefaultMetaValue($key);
-        } else {
-            $value = $default;
+            return $this->getMetaRecord($key)->getAttribute('value');
         }
 
-        return $this->castMetaValue($key, $value);
+        // If we have only one argument provided (i.e. default is not set)
+        // then we check the model for the defaultMetaValues
+        if (func_num_args() == 1 && $this->hasDefaultMetaValue($key)) {
+            return $this->getDefaultMetaValue($key);
+        }
+
+        return $default;
     }
 
     /**
@@ -204,9 +215,9 @@ trait Metable
     {
         return collect($this->getAllDefaultMeta())->merge(
             $this->getMetaCollection()->toBase()->map(
-                fn(Meta $meta) => $meta->getAttribute('value')
+                fn (Meta $meta) => $meta->getAttribute('value')
             )
-        )->map(fn(mixed $value, string $key) => $this->castMetaValue($key, $value));
+        );
     }
 
     /**
@@ -264,7 +275,7 @@ trait Metable
     public function purgeMeta(): void
     {
         $this->meta()->delete();
-        $this->setRelation('meta', $this->makeMeta()->newCollection());
+        $this->setRelation('meta', $this->getMetaInstance()->newCollection());
     }
 
     /**
@@ -709,6 +720,12 @@ trait Metable
         return config('metable.model', Meta::class);
     }
 
+    protected function getMetaInstance(): Meta
+    {
+        $class = $this->getMetaClassName();
+        return new $class;
+    }
+
     /**
      * Create a new `Meta` record.
      *
@@ -717,16 +734,20 @@ trait Metable
      *
      * @return Meta
      */
-    protected function makeMeta(string $key = '', mixed $value = ''): Meta
-    {
-        $className = $this->getMetaClassName();
-
-        $meta = new $className([
-            'key' => $key,
-            'value' => $value,
-        ]);
+    protected function makeMeta(
+        string $key = null,
+        mixed $value = null,
+        bool $encrypt = false
+    ): Meta {
+        $meta = $this->getMetaInstance();
+        $meta->key = $key;
+        $meta->value = $this->castMetaValueIfNeeded($key, $value);
         $meta->metable_type = $this->getMorphClass();
         $meta->metable_id = $this->getKey();
+
+        if ($encrypt || $this->hasEncryptedMetaCast($key)) {
+            $meta->encrypt();
+        }
 
         return $meta;
     }
@@ -738,19 +759,126 @@ trait Metable
             : [];
     }
 
-    protected function castMetaValue(string $key, mixed $value): mixed
+    protected function hasEncryptedMetaCast(string $key): bool
     {
-        if (!property_exists($this, 'castsMeta')
-            || !empty($this->castsMeta[$key])
-        ) {
+        $cast = $this->getCastForMetaKey($key);
+        return $cast === 'encrypted'
+            || str_starts_with((string)$cast, 'encrypted:');
+    }
+
+    protected function castMetaValueIfNeeded(string $key, mixed $value): mixed
+    {
+        $cast = $this->getCastForMetaKey($key);
+        if ($cast === null || $value === null) {
             return $value;
         }
-        $castKey = "meta.$key";
 
-        $this->casts[$castKey] = $this->castsMeta[$key];
+        if ($cast == 'encrypted') {
+            return $value;
+        }
+
+        if (str_starts_with($cast, 'encrypted:')) {
+            $cast = substr($cast, 10);
+        }
+
+        return $this->castMetaValue($key, $value, $cast);
+    }
+
+    protected function castMetaValue(string $key, mixed $value, string $cast): mixed
+    {
+        if ($cast == 'array' || $cast == 'object') {
+            $assoc = $cast == 'array';
+            if (is_string($value)) {
+                $value = json_decode($value, $assoc, 512, JSON_THROW_ON_ERROR);
+            }
+            return json_decode(
+                json_encode($value, JSON_THROW_ON_ERROR),
+                $assoc,
+                512,
+                JSON_THROW_ON_ERROR
+            );
+        }
+
+        if ($cast == 'hashed') {
+            return $this->castAttributeAsHashedString($key, $value);
+        }
+
+        if ($cast == 'collection' || str_starts_with($cast, 'collection:')) {
+            if ($value instanceof \Illuminate\Support\Collection) {
+                $collection = $value;
+            } elseif ($value instanceof Model) {
+                $collection = $value->newCollection([$value]);
+            } else {
+                $collection = collect($value);
+            }
+
+            if (str_starts_with($cast, 'collection:')) {
+                $class = substr($cast, 11);
+                $collection->each(function ($item) use ($class): void {
+                    if (!$item instanceof $class) {
+                        throw CastException::invalidClassCast($class, $item);
+                    }
+                });
+            }
+
+            return $collection;
+        }
+
+        if (class_exists($cast)
+            && !is_a($cast, Castable::class, true)
+            && $cast != 'datetime'
+        ) {
+            if ($value instanceof $cast) {
+                return $value;
+            }
+
+            if (is_a($cast, Model::class, true)
+                && (is_string($value) || is_int($value))
+            ) {
+                return $cast::find($value);
+            }
+
+            throw CastException::invalidClassCast($cast, $value);
+        }
+
+        // leverage Eloquent built-in casting functionality
+        $castKey = "meta.$key";
+        $this->casts[$castKey] = $cast;
         $value = $this->castAttribute($castKey, $value);
+
+        // cleanup to avoid polluting the model's casts
         unset($this->casts[$castKey]);
+        unset($this->attributeCastCache[$castKey]);
+        unset($this->classCastCache[$castKey]);
+
         return $value;
+    }
+
+    protected function getCastForMetaKey(string $key): ?string
+    {
+        if (isset($this->mergedMetaCasts[$key])) {
+            return $this->mergedMetaCasts[$key];
+        }
+
+        if (method_exists($this, 'metaCasts')) {
+            $casts = $this->metaCasts();
+            if (isset($casts[$key])) {
+                return $casts[$key];
+            }
+        }
+
+        if (property_exists($this, 'metaCasts')
+            && isset($this->metaCasts[$key])
+        ) {
+            return $this->metaCasts[$key];
+        }
+
+        return null;
+    }
+
+    public function mergeMetaCasts(array $casts): void
+    {
+        $this->mergedMetaCasts = array_merge($this->mergedMetaCasts, $casts);
     }
 
     private function valueToString(mixed $value): string
@@ -781,4 +909,18 @@ trait Metable
         $registry = app('metable.datatype.registry');
         return $registry->getHandlerForValue($value);
     }
+
+    abstract public function getKey();
+
+    abstract public function getMorphClass();
+
+    abstract protected function castAttribute($key, $value);
+
+    abstract public function morphMany($related, $name, $type = null, $id = null, $localKey = null);
+
+    abstract public function load($relations);
+
+    abstract public function relationLoaded($key);
+
+    abstract protected function castAttributeAsHashedString($key, $value);
 }

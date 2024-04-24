@@ -16,10 +16,11 @@ Version 6 contains a number of changes to improve the security and performance o
 ### Data Types
 
 - Added `SignedSerializeHandler` as a catch-all datatype, which will attempt to serialize the data using PHP's `serialize()` function. The payload is cryptographically signed with an HMAC before being stored in the database to prevent PHP object injection attacks.
-
 - Deprecated `SerializableHandler` in favor of the new `SignedSerializeHandler` datatype. The `SerializableHandler` will be removed in a future release. In the interim, added the `metable.options.serializable.allowedClasses` config to protect against unserializing untrusted data.
 - Deprecated `ArrayHandler` and `ObjectHandler`, due to the ambiguity of nested array/objects switching type. These will be removed in a future release. The `SignedSerializeHandler` should be used instead.
 - Added `PureEnumHandler` and `BackedEnumHandler` which adds support for storing enum values as Meta.
+- Added `StringableHandler` which adds support for storing `Illuminate\Support\Stringable` objects as Meta.
+- Added `DateTimeImmutableHandler` which adds support for storing `DateTimeImmutable`/`CarbonImmutable` objects as Meta.
 - `ModelHandler` will now validate that the encoded class is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, the meta value will return `null`.
 - `ModelHandler` will no longer throw a model not found exception if the model no longer exists. Instead, the meta value will return `null`. This is more in line with the existing behavior of the `ModelCollectionHandler`.
 - `ModelCollectionHandler` will now validate that the encoded collection class is a valid Eloquent collection before attempting to instantiate it during unserialization. If the class is invalid,  an instance of `Illuminate\Database\Eloquent\Collection` will be used instead.
@@ -28,13 +29,13 @@ Version 6 contains a number of changes to improve the security and performance o
 - Added `isIdempotent(): bool` method to `HandlerInterface` which should indicate whether multiple calls to the `serialize()` method with the same value will produce the same serialized output. This is used to determine if the complete serialized value can be used when searching for meta values.
 - Added `useHmacVerification(): bool` method to `HandlerInterface` which should indicate whether the integrity of the serialized data should be verified with an HMAC.
 
-### Commands
+### New Commands
 
 - Added `metable:refresh` artisan command which will decode and re-encode all meta values in the database. This is useful if you have changed the data type handlers and need to update the serialized data and indexes in the database.
 
-### Mediable trait
+### Searching Metables By Meta Value 
 
-- `whereMeta()`, `whereMetaIn()`, and `orderByMeta()` query scopes will now scan the indexed `string_value` column instead of the serialized `value` column. This greatly improves performance when searching for meta values against larger datasets.
+- the Metable `whereMeta()`, `whereMetaIn()`, and `orderByMeta()` query scopes will now scan the indexed `string_value` column instead of the serialized `value` column. This greatly improves performance when searching for meta values against larger datasets.
 - `whereMetaNumeric()` and `orderByMetaNumeric()` query scopes will now scan the indexed `numeric_value` column instead of the serialized `value` column. This greatly improves performance when searching for meta values against larger datasets.
 - `whereMetaNumeric()` query scope will now accept a value of any type. It will be converted to an integer or float by the handler. This is more consistent with the behaviour of the other query scopes.  
 - Added additional query scopes to more easily search meta values based on different criteria:
@@ -47,10 +48,20 @@ Version 6 contains a number of changes to improve the security and performance o
   - `whereMetaNotBetweenNumeric()`
   - `whereMetaIsNull()`
   - `whereMetaIsModel()`
-- If the data type handlers cannot convert the search value provided to a whereMeta* query scope to a string or numeric value (as appropriate for the scope), then an exception will be thrown.
+- If the data type handlers cannot convert the search value provided to a whereMeta* query scope to a string or numeric value (as appropriate for the method), then an exception will be thrown.
+
+### Metable Casting
+
+- Added support for casting meta values to specific types by defining the `$castMeta` property or `castMeta(): array` method on the model. This is similar to the `casts` property of Eloquent Models used for attributes. All cast types supported by Eloquent Models are also available for Meta values.Values will be cast before values are stored in the database to ensure that they are indexed consistently
+- the `encrypted:` cast prefix can be combined with any other cast type to cast to the desired type before the value is encrypted to be stored it in the database. Encrypted values are not searchable.
+- A value of `null` is ignored by all cast types. 
+- Added `mergeMetaCasts()` method which can be used to override the defined cast on a meta key at runtime.
 
 ### Meta
-- Added `$meta->raw_value` property which exposes the raw serialized value of the meta key. This is useful for debugging purposes.
+- Added `$meta->string_value` and `$meta->numeric_value` attributes, which are used for optimizing queries filtering by meta value
+- Added `$meta->hmac` attribute, which is used by some data type handlers to validate that the payload has not been tampered with.
+- Added `$meta->raw_value` virtual attribute, which exposes the raw serialized value of the meta key. This is useful for debugging purposes.
+- Added `encrypt()` method, used internally by the `Metable::setMetaEncrypted()` method
 
 # 5.0.1 - 2021-09-19
 - Fixed `setManyMeta()` not properly serializing certain types of data.

@@ -14,7 +14,7 @@ class SampleMetable extends Model implements MetableInterface
         'foo' => 'bar'
     ];
 
-    protected $castsMeta = [
+    protected $metaCasts = [
         'castable' => 'string',
     ];
 }

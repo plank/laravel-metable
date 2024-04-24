@@ -73,6 +73,22 @@ class MetaTest extends TestCase
         $meta->getValueAttribute();
     }
 
+    public function test_it_can_encrypt_its_value(): void
+    {
+        $meta = $this->makeMeta();
+        $meta->value = 'foo';
+        $meta->hmac = $hmac = random_bytes(64);
+
+        $meta->encrypt();
+
+        $this->assertEquals('foo', $meta->value);
+        $this->assertNotEquals('foo', $meta->raw_value);
+        $this->assertEquals($hmac, $meta->hmac);
+        $this->assertEquals('encrypted:string', $meta->type);
+        $this->assertNull($meta->string_value);
+        $this->assertNull($meta->numeric_value);
+    }
+
     private function makeMeta(array $attributes = []): Meta
     {
         return factory(Meta::class)->make($attributes);

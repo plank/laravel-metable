@@ -6,5 +6,4 @@ enum SampleStringBackedEnum: string
 {
     case Alpha = 'alpha';
     case Numeric = '1';
-
 }

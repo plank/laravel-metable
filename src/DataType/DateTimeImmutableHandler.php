@@ -3,12 +3,13 @@
 namespace Plank\Metable\DataType;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use DateTimeInterface;
 
 /**
  * Handle serialization of DateTimeInterface objects.
  */
-class DateTimeHandler implements HandlerInterface
+class DateTimeImmutableHandler implements HandlerInterface
 {
     /**
      * The date format to use for serializing.
@@ -22,7 +23,7 @@ class DateTimeHandler implements HandlerInterface
      */
     public function getDataType(): string
     {
-        return 'datetime';
+        return 'datetime_immutable';
     }
 
     /**
@@ -30,7 +31,7 @@ class DateTimeHandler implements HandlerInterface
      */
     public function canHandleValue(mixed $value): bool
     {
-        return $value instanceof DateTimeInterface;
+        return $value instanceof \DateTimeImmutable;
     }
 
     /**
@@ -46,7 +47,7 @@ class DateTimeHandler implements HandlerInterface
      */
     public function unserializeValue(string $serializedValue): mixed
     {
-        return Carbon::createFromFormat(self::FORMAT, $serializedValue);
+        return CarbonImmutable::createFromFormat(self::FORMAT, $serializedValue);
     }
 
     public function getNumericValue(mixed $value): null|int|float

@@ -2,8 +2,10 @@
 
 namespace Plank\Metable;
 
+use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Crypt;
 use Plank\Metable\DataType\Registry;
 use Plank\Metable\Exceptions\SecurityException;
 
@@ -24,6 +26,8 @@ use Plank\Metable\Exceptions\SecurityException;
  */
 class Meta extends Model
 {
+    public const ENCRYPTED_PREFIX = 'encrypted:';
+
     /**
      * {@inheritdoc}
      */
@@ -85,14 +89,23 @@ class Meta extends Model
     public function getValueAttribute(): mixed
     {
         if (!isset($this->cachedValue)) {
-            $handler = $this->getDataTypeRegistry()->getHandlerForType($this->type);
+            $type = $this->type;
+            $value = $this->attributes['value'];
+
+            if (str_starts_with($type, self::ENCRYPTED_PREFIX)) {
+                $value = $this->getEncrypter()->decrypt($value);
+                $type = substr($this->type, strlen(self::ENCRYPTED_PREFIX));
+            }
+
+            $registry = $this->getDataTypeRegistry();
+            $handler = $registry->getHandlerForType($type);
 
             if ($handler->useHmacVerification()) {
-                $this->verifyHmac($this->attributes['value'], $this->attributes['hmac']);
+                $this->verifyHmac($value, $this->attributes['hmac']);
             }
 
             $this->cachedValue = $handler->unserializeValue(
-                $this->attributes['value']
+                $value
             );
         }
 
@@ -122,6 +135,23 @@ class Meta extends Model
         $this->attributes['numeric_value'] = $handler->getNumericValue($value);
 
         $this->cachedValue = null;
+    }
+
+    public function encrypt(): void
+    {
+        if ($this->type === 'null') {
+            return;
+        }
+
+        if (str_starts_with($this->type, self::ENCRYPTED_PREFIX)) {
+            return;
+        }
+
+        $this->attributes['value'] = $this->getEncrypter()
+            ->encrypt($this->attributes['value']);
+        $this->type = self::ENCRYPTED_PREFIX . $this->type;
+        $this->string_value = null;
+        $this->numeric_value = null;
     }
 
     public function getRawValueAttribute(): string
@@ -160,5 +190,10 @@ class Meta extends Model
     protected function computeHmac(string $serializedValue): string
     {
         return hash_hmac('sha256', $serializedValue, config('app.key'));
+    }
+
+    protected function getEncrypter(): Encrypter
+    {
+        return self::$encrypter ?? Crypt::getFacadeRoot();
     }
 }
