@@ -254,3 +254,54 @@ You can also instruct your model class to `always` eager load the meta relations
 
         protected $with = ['meta'];
     }
+
+
+Meta As Attributes
+------------------
+
+If you prefer to access meta as if they were attributes of the model, you can use the ``MetableAttributes`` trait insin addition to the ``Metable`` trait. This will allow you to access meta as if they were attributes of the model by prefixing them with ``meta_``. Meta attributes can be combined with type annotations, casts and/or default values to provide consistent typing. This can be useful for IDE completions and static analysis, as well as for use in Blade templates.
+
+::
+
+    <?php
+
+    namespace App;
+
+    use Plank\Metable\Metable;
+    use Plank\Metable\MetableAttributes;
+    use Illuminate\Database\Eloquent\Model;
+
+    /**
+        * @property bool $meta_approved
+        * @property \Carbon\Carbon $meta_published_at
+        * @property int $meta_likes
+        */
+    class Page extends Model
+    {
+        use Metable, MetableAttributes;
+
+        $metaCasts = [
+            'approved' => 'boolean',
+            'published_at' => 'datetime',
+            'likes' => 'integer',
+        ];
+
+        $defaultMetaValues = [
+            'approved' => false,
+            'published_at' => null,
+            'likes' => 0,
+        ];
+
+        // ...
+    }
+
+    $page = new Page();
+    $page->meta_likes = 5; // equivalent to $page->setMeta('likes', 5);
+    $page->fill(['meta_approved' => true, 'meta_published_at' => now()]); // equivalent to $page->setManyMeta([...]);
+    if ($page->meta_likes > 0) {} // equivalent $page->getMeta('likes');
+    unset($page->meta_likes); // equivalent to $page->removeMeta('likes');
+
+
+Most attribute operations will translate meta attributes to their corresponding meta operations. However, the ``getAttributes()`` method will **not** include meta attributes. The ``getMetaAttributes()`` method can be used to retrieve all meta values keyed by their attribute name.
+
+The ``toArray()`` method will include meta attributes by default. The ``$visible``/``$hidden`` properties of the model will be respected if any meta attributes are listed. The ``makeMetaHidden()`` method can be used to quickly hide all currently assigned meta attributes from the array representation of the model.

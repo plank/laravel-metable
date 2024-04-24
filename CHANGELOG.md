@@ -57,6 +57,10 @@ Version 6 contains a number of changes to improve the security and performance o
 - A value of `null` is ignored by all cast types. 
 - Added `mergeMetaCasts()` method which can be used to override the defined cast on a meta key at runtime.
 
+### Meta Attributes
+
+- Added optional trait `MetableAttributes` which can further extend the `Metable` trait allowing access to meta values as model attributes using a `meta_` prefix. This can be useful for type hinting, IDE autocompletion, static analysis, and usage in Blade templates. 
+
 ### Meta
 - Added `$meta->string_value` and `$meta->numeric_value` attributes, which are used for optimizing queries filtering by meta value
 - Added `$meta->hmac` attribute, which is used by some data type handlers to validate that the payload has not been tampered with.

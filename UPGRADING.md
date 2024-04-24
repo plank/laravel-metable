@@ -35,6 +35,10 @@
 
 * Review the documentation about which data types can be queried with the various `whereMeta*` and `whereMeta*Numeric` query scopes. If you are querying the serialized `value` column directly, be aware that the formatting of array/object data types may have changed.
 
+### Metable Attributes
+
+* Optional: if you intend to access meta with property access, add the new `\Plank\Metable\MetableAttributes` traits to your `Metable`.
+
 ## 4.X -> 5.X
 - New migration file added which adds a new composite unique index to the meta table on `metable_type`, `metable_id`, and `key`. Make sure that you have no duplicate keys for a given entity (previously possible as a race condition) before applying the new migration.  
 

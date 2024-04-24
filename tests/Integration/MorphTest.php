@@ -49,7 +49,7 @@ class MorphTest extends TestCase
         $results1 = SampleMorph::orderByMeta('foo', 'asc')->get();
         $results2 = Meta::select('metable_type')->get();
 
-        $this->assertCount(3, $results1->pluck('id')->toArray());
+        $this->assertEquals([3, 1, 2], $results1->modelKeys());
         $this->assertEquals([$class, $class, $class], $results2->pluck('metable_type')->toArray());
     }
 
