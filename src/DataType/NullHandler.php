@@ -24,9 +24,4 @@ class NullHandler extends ScalarHandler
     {
         return null;
     }
-
-    public function getStringValue(mixed $value): null|string
-    {
-        return null;
-    }
 }

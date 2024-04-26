@@ -123,16 +123,6 @@ class ModelCollectionHandler implements HandlerInterface
         return null;
     }
 
-    public function getStringValue(mixed $value): null|string
-    {
-        return null;
-    }
-
-    public function isIdempotent(): bool
-    {
-        return true;
-    }
-
     public function useHmacVerification(): bool
     {
         return false;

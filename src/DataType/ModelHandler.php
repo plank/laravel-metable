@@ -62,16 +62,6 @@ class ModelHandler implements HandlerInterface
         return null;
     }
 
-    public function getStringValue(mixed $value): null|string
-    {
-        return $this->serializeValue($value);
-    }
-
-    public function isIdempotent(): bool
-    {
-        return true;
-    }
-
     public function useHmacVerification(): bool
     {
         return false;

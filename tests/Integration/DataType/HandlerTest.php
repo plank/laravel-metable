@@ -54,9 +54,6 @@ class HandlerTest extends TestCase
                 'value' => ['foo' => ['bar'], 'baz'],
                 'invalid' => [new stdClass()],
                 'numericValue' => null,
-                'stringValue' => null,
-                'stringValueComplex' => json_encode(['foo' => ['bar'], 'baz']),
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'boolean' => [
@@ -65,9 +62,6 @@ class HandlerTest extends TestCase
                 'value' => true,
                 'invalid' => [1, 0, '', [], null],
                 'numericValue' => 1,
-                'stringValue' => 'true',
-                'stringValueComplex' => 'true',
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'datetime' => [
@@ -76,9 +70,6 @@ class HandlerTest extends TestCase
                 'value' => $datetime,
                 'invalid' => [2017, '2017-01-01'],
                 'numericValue' => $timestamp,
-                'stringValue' => $dateString,
-                'stringValueComplex' => $dateString,
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'datetimeImmutable' => [
@@ -87,9 +78,6 @@ class HandlerTest extends TestCase
                 'value' => $datetime->toImmutable(),
                 'invalid' => [2017, '2017-01-01'],
                 'numericValue' => $timestamp,
-                'stringValue' => $dateString,
-                'stringValueComplex' => $dateString,
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'float' => [
@@ -98,9 +86,6 @@ class HandlerTest extends TestCase
                 'value' => 1.1,
                 'invalid' => ['1.1', 1],
                 'numericValue' => 1.1,
-                'stringValue' => '1.1',
-                'stringValueComplex' => '1.1',
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'integer' => [
@@ -109,9 +94,6 @@ class HandlerTest extends TestCase
                 'value' => 3,
                 'invalid' => [1.1, '1'],
                 'numericValue' => 3,
-                'stringValue' => '3',
-                'stringValueComplex' => '3',
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'model' => [
@@ -120,9 +102,6 @@ class HandlerTest extends TestCase
                 'value' => $model,
                 'invalid' => [new stdClass()],
                 'numericValue' => null,
-                'stringValue' => SampleMetable::class,
-                'stringValueComplex' => SampleMetable::class,
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'model collection' => [
@@ -131,9 +110,6 @@ class HandlerTest extends TestCase
                 'value' => new Collection([new SampleMetable()]),
                 'invalid' => [collect()],
                 'numericValue' => null,
-                'stringValue' => null,
-                'stringValueComplex' => null,
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'null' => [
@@ -142,9 +118,6 @@ class HandlerTest extends TestCase
                 'value' => null,
                 'invalid' => [0, '', 'null', [], false],
                 'numericValue' => null,
-                'stringValue' => null,
-                'stringValueComplex' => null,
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'object' => [
@@ -153,9 +126,6 @@ class HandlerTest extends TestCase
                 'value' => $object,
                 'invalid' => [[]],
                 'numericValue' => null,
-                'stringValue' => null,
-                'stringValueComplex' => json_encode($object),
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'signedSerialize' => [
@@ -164,9 +134,6 @@ class HandlerTest extends TestCase
                 'value' => ['foo' => 'bar', 'baz' => [3]],
                 'invalid' => [self::$resource],
                 'numericValue' => null,
-                'stringValue' => null,
-                'stringValueComplex' => serialize(['foo' => 'bar', 'baz' => [3]]),
-                'isIdempotent' => true,
                 'usesHmac' => true,
             ],
             'serializable' => [
@@ -175,9 +142,6 @@ class HandlerTest extends TestCase
                 'value' => new SampleSerializable(['foo' => 'bar']),
                 'invalid' => [],
                 'numericValue' => null,
-                'stringValue' => null,
-                'stringValueComplex' => serialize(new SampleSerializable(['foo' => 'bar'])),
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'string' => [
@@ -186,9 +150,6 @@ class HandlerTest extends TestCase
                 'value' => 'foo',
                 'invalid' => [1, 1.1],
                 'numericValue' => null,
-                'stringValue' => 'foo',
-                'stringValueComplex' => 'foo',
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'long-string' => [
@@ -197,9 +158,6 @@ class HandlerTest extends TestCase
                 'value' => str_repeat('a', 300),
                 'invalid' => [1, 1.1],
                 'numericValue' => null,
-                'stringValue' => str_repeat('a', 255),
-                'stringValueComplex' => str_repeat('a', 255),
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'numeric-string' => [
@@ -208,9 +166,6 @@ class HandlerTest extends TestCase
                 'value' => '1.2345',
                 'invalid' => [1, 1.1],
                 'numericValue' => 1.2345,
-                'stringValue' => '1.2345',
-                'stringValueComplex' => '1.2345',
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'unitEnum' => [
@@ -225,9 +180,6 @@ class HandlerTest extends TestCase
                     new stdClass()
                 ],
                 'numericValue' => null,
-                'stringValue' => 'Alpha',
-                'stringValueComplex' => 'Alpha',
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'stringBackedEnum' => [
@@ -240,9 +192,6 @@ class HandlerTest extends TestCase
                     new stdClass()
                 ],
                 'numericValue' => null,
-                'stringValue' => 'alpha',
-                'stringValueComplex' => 'alpha',
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'numericStringBackedEnum' => [
@@ -255,9 +204,6 @@ class HandlerTest extends TestCase
                     new stdClass()
                 ],
                 'numericValue' => 1,
-                'stringValue' => '1',
-                'stringValueComplex' => '1',
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'intBackedEnum' => [
@@ -270,9 +216,6 @@ class HandlerTest extends TestCase
                     new stdClass()
                 ],
                 'numericValue' => 1,
-                'stringValue' => '1',
-                'stringValueComplex' => '1',
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ],
             'Stringable' => [
@@ -281,9 +224,6 @@ class HandlerTest extends TestCase
                 'value' => new Stringable('foo'),
                 'invalid' => ['foo'],
                 'numericValue' => null,
-                'stringValue' => 'foo',
-                'stringValueComplex' => 'foo',
-                'isIdempotent' => true,
                 'usesHmac' => false,
             ]
         ];
@@ -307,9 +247,6 @@ class HandlerTest extends TestCase
         mixed $value,
         array $incompatible,
         null|int|float $numericValue,
-        ?string $stringValue,
-        ?string $stringValueComplex,
-        bool $isIdempotent,
         bool $usesHmac
     ): void {
         $this->assertEquals($type, $handler->getDataType());
@@ -325,10 +262,5 @@ class HandlerTest extends TestCase
         $this->assertEquals($usesHmac, $handler->useHmacVerification());
         $this->assertEquals($value, $unserialized);
         $this->assertEquals($numericValue, $handler->getNumericValue($value));
-        config()->set('metable.indexComplexDataTypes', false);
-        $this->assertEquals($stringValue, $handler->getStringValue($value));
-        config()->set('metable.indexComplexDataTypes', true);
-        $this->assertEquals($stringValueComplex, $handler->getStringValue($value));
-        $this->assertEquals($isIdempotent, $handler->isIdempotent());
     }
 }

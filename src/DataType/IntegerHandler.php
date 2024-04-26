@@ -16,9 +16,4 @@ class IntegerHandler extends ScalarHandler
     {
         return $value;
     }
-
-    public function getStringValue(mixed $value): null|string
-    {
-        return (string) $value;
-    }
 }

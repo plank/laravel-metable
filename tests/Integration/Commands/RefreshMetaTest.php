@@ -21,7 +21,6 @@ class RefreshMetaTest extends TestCase
             SignedSerializeHandler::class,
             ArrayHandler::class,
         ]);
-        config()->set('metable.indexComplexDataTypes', true);
 
         config()->set('metable.refreshPageSize', 2);
 
@@ -34,7 +33,6 @@ class RefreshMetaTest extends TestCase
                 'type' => 'array',
                 'key' => 'foo',
                 'value' => json_encode($complexValue),
-                'string_value' => null,
                 'numeric_value' => null,
             ],
             [
@@ -43,7 +41,6 @@ class RefreshMetaTest extends TestCase
                 'type' => 'string',
                 'key' => 'bar',
                 'value' => 'blah',
-                'string_value' => null,
                 'numeric_value' => null,
             ],
             [
@@ -52,7 +49,6 @@ class RefreshMetaTest extends TestCase
                 'type' => 'datetime',
                 'key' => 'baz',
                 'value' => '2020-01-01 00:00:00.000000+0000',
-                'string_value' => null,
                 'numeric_value' => null,
             ],
         ]);
@@ -68,17 +64,14 @@ class RefreshMetaTest extends TestCase
 
         $this->assertEquals('serialized', $result[0]->type);
         $this->assertEquals($complexValue, unserialize($result[0]->value));
-        $this->assertEquals(serialize($complexValue), $result[0]->string_value);
         $this->assertNull($result[0]->numeric_value);
 
         $this->assertEquals('string', $result[1]->type);
         $this->assertEquals('blah', $result[1]->value);
-        $this->assertEquals('blah', $result[1]->string_value);
         $this->assertNull($result[1]->numeric_value);
 
         $this->assertEquals('datetime', $result[2]->type);
         $this->assertEquals('2020-01-01 00:00:00.000000+0000', $result[2]->value);
-        $this->assertEquals('2020-01-01 00:00:00.000000+0000', $result[2]->string_value);
         $this->assertEquals(1577836800, $result[2]->numeric_value);
     }
 }

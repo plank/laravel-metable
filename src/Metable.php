@@ -129,7 +129,7 @@ trait Metable
                 return $model->getAttributesForInsert();
             })->all(),
             ['metable_type', 'metable_id', 'key'],
-            ['type', 'value', 'string_value', 'numeric_value', 'hmac']
+            ['type', 'value', 'numeric_value', 'hmac']
         );
 
         if ($needReload) {
@@ -375,19 +375,14 @@ trait Metable
             'meta',
             function (Builder $q) use ($key, $operator, $stringValue, $value) {
                 $q->where('key', $key);
-                $q->where('string_value', $operator, $stringValue);
+                $q->where('value', $operator, $stringValue);
 
-                // If the value is a string and the string value is at the maximum length,
-                // we can optimize the query by looking up using the index first
-                // then compare the serialized value (not indexed) afterward to ensure correctness.
-                if (strlen($stringValue) >= config(
-                    'metable.stringValueIndexLength',
-                    255
-                )) {
-                    $handler = $this->getHandlerForValue($value);
-                    if ($handler->isIdempotent()) {
-                        $q->where('value', $operator, $handler->serializeValue($value));
-                    }
+                // null and empty string look the same in the database,
+                // use the type column to differentiate.
+                if ($value === null) {
+                    $q->where('type', 'null');
+                } elseif ($value === '') {
+                    $q->where('type', '!=', 'null');
                 }
             }
         );
@@ -438,7 +433,7 @@ trait Metable
             'meta',
             function (Builder $q) use ($key, $min, $max, $not) {
                 $q->where('key', $key);
-                $q->whereBetween('string_value', [$min, $max], 'and', $not);
+                $q->whereBetween('value', [$min, $max], 'and', $not);
             }
         );
     }
@@ -485,11 +480,7 @@ trait Metable
      */
     public function scopeWhereMetaIsNull(Builder $q, string $key): void
     {
-        $q->whereHas('meta', function (Builder $q) use ($key) {
-            $q->where('key', $key);
-            $q->whereNull('string_value');
-            $q->where('type', 'null');
-        });
+        $this->scopeWhereMeta($q, $key, null);
     }
 
     public function scopeWhereMetaIsModel(
@@ -534,7 +525,7 @@ trait Metable
 
         $q->whereHas('meta', function (Builder $q) use ($key, $values, $not) {
             $q->where('key', $key);
-            $q->whereIn('string_value', $values, 'and', $not);
+            $q->whereIn('value', $values, 'and', $not);
         });
     }
 
@@ -587,7 +578,7 @@ trait Metable
         bool $strict = false
     ): void {
         $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
-        $q->orderBy("{$table}.string_value", $direction);
+        $q->orderBy("{$table}.value", $direction);
     }
 
     /**
@@ -883,13 +874,7 @@ trait Metable
 
     private function valueToString(mixed $value): string
     {
-        $stringValue = $this->getHandlerForValue($value)->getStringValue($value);
-
-        if ($stringValue === null) {
-            throw new \InvalidArgumentException('Cannot convert to a numeric value');
-        }
-
-        return $stringValue;
+        return $this->getHandlerForValue($value)->serializeValue($value);
     }
 
     private function valueToNumeric(mixed $value): int|float

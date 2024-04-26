@@ -5,12 +5,10 @@ namespace Plank\Metable\Tests\Integration;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Stringable;
 use Plank\Metable\Meta;
 use Plank\Metable\Tests\Mocks\SampleMetable;
 use Plank\Metable\Tests\Mocks\SampleMetableSoftDeletes;
-use Plank\Metable\Tests\Mocks\SampleStringBackedEnum;
 use Plank\Metable\Tests\TestCase;
 use ReflectionClass;
 
@@ -77,7 +75,6 @@ class MetableTest extends TestCase
         $this->assertEquals(33, $metable->getMeta('bar'));
         $this->assertEquals(['foo', 'bar'], $metable->getMeta('baz'));
 
-        $this->assertEquals('bar', $metable->getMetaRecord('foo')->string_value);
         $this->assertEquals(33, $metable->getMetaRecord('bar')->numeric_value);
         $this->assertNotEmpty($metable->getMetaRecord('baz')->hmac);
     }
@@ -382,16 +379,27 @@ class MetableTest extends TestCase
         $metable->setMeta('foo', 'bar');
         $metable->setMeta('datetime', $now);
         $metable->setMeta('long', str_repeat('a', 300));
+        $metable->setMeta('empty', '');
+        $metable->setMeta('null', null);
 
         $result1 = SampleMetable::whereMeta('foo', 'bar')->first();
         $result2 = SampleMetable::whereMeta('foo', 'baz')->first();
         $result3 = SampleMetable::whereMeta('datetime', $now)->first();
         $result4 = SampleMetable::whereMeta('long', str_repeat('a', 300))->first();
 
+        $result5 = SampleMetable::whereMeta('empty', '')->first();
+        $result6 = SampleMetable::whereMeta('empty', null)->first();
+        $result7 = SampleMetable::whereMeta('null', '')->first();
+        $result8 = SampleMetable::whereMeta('null', null)->first();
+
         $this->assertEquals($metable->getKey(), $result1->getKey());
         $this->assertNull($result2);
         $this->assertEquals($metable->getKey(), $result3->getKey());
         $this->assertEquals($metable->getKey(), $result4->getKey());
+        $this->assertEquals($metable->getKey(), $result5->getKey());
+        $this->assertNull($result6);
+        $this->assertNull($result7);
+        $this->assertEquals($metable->getKey(), $result8->getKey());
     }
 
     public function test_it_can_be_queried_by_numeric_meta_value(): void
@@ -668,7 +676,6 @@ class MetableTest extends TestCase
 
         $method = (new ReflectionClass($metable))
             ->getMethod('getMetaCollection');
-        $method->setAccessible(true);
 
         $this->assertEquals($emptyCollection, $method->invoke($metable));
 
@@ -693,7 +700,6 @@ class MetableTest extends TestCase
 
         $method = (new ReflectionClass($metable))
             ->getMethod('getMetaCollection');
-        $method->setAccessible(true);
 
         $this->assertEquals($emptyCollection, $method->invoke($metable));
 
@@ -718,16 +724,10 @@ class MetableTest extends TestCase
         $this->assertEquals('baz', $result->getMeta('foo'));
     }
 
-    public function test_it_throws_for_param_that_cannot_be_converted_to_string(): void
-    {
-        $this->expectException(\LogicException::class);
-        SampleMetable::whereMeta('foo', null)->get();
-    }
-
     public function test_it_throws_for_param_that_cannot_be_converted_to_numeric(): void
     {
         $this->expectException(\LogicException::class);
-        SampleMetable::whereMetaNumeric('foo', null)->get();
+        SampleMetable::query()->whereMetaNumeric('foo', null)->get();
     }
 
     public static function castProvider(): array

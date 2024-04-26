@@ -85,7 +85,6 @@ class MetaTest extends TestCase
         $this->assertNotEquals('foo', $meta->raw_value);
         $this->assertEquals($hmac, $meta->hmac);
         $this->assertEquals('encrypted:string', $meta->type);
-        $this->assertNull($meta->string_value);
         $this->assertNull($meta->numeric_value);
     }
 

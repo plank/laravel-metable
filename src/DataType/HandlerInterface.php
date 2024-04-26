@@ -34,8 +34,6 @@ interface HandlerInterface
 
     public function getNumericValue(mixed $value): null|int|float;
 
-    public function getStringValue(mixed $value): null|string;
-
     /**
      * Convert a serialized string back to its original value.
      *
@@ -44,11 +42,6 @@ interface HandlerInterface
      * @return mixed
      */
     public function unserializeValue(string $serializedValue): mixed;
-
-    /**
-     * Indicate whether multiple serializations of the same value will produce the same result.
-     */
-    public function isIdempotent(): bool;
 
     public function useHmacVerification(): bool;
 }

@@ -57,18 +57,6 @@ class DateTimeImmutableHandler implements HandlerInterface
             : null;
     }
 
-    public function getStringValue(mixed $value): null|string
-    {
-        return $value instanceof DateTimeInterface
-            ? $value->copy()->setTimezone('UTC')->format(self::FORMAT)
-            : null;
-    }
-
-    public function isIdempotent(): bool
-    {
-        return true;
-    }
-
     public function useHmacVerification(): bool
     {
         return false;

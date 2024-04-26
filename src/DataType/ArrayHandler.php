@@ -50,24 +50,6 @@ class ArrayHandler implements HandlerInterface
         return null;
     }
 
-    public function getStringValue(mixed $value): null|string
-    {
-        if (!config('metable.indexComplexDataTypes', false)) {
-            return null;
-        }
-
-        return substr(
-            json_encode($value, JSON_THROW_ON_ERROR),
-            0,
-            config('metable.stringValueIndexLength', 255)
-        );
-    }
-
-    public function isIdempotent(): bool
-    {
-        return true;
-    }
-
     public function useHmacVerification(): bool
     {
         return false;

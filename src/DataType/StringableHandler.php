@@ -26,23 +26,9 @@ class StringableHandler implements HandlerInterface
         return is_numeric((string)$value) ? (float)(string)$value : null;
     }
 
-    public function getStringValue(mixed $value): null|string
-    {
-        return substr(
-            (string)$value,
-            0,
-            config('metable.stringValueIndexLength', 255)
-        );
-    }
-
     public function unserializeValue(string $serializedValue): mixed
     {
         return new Stringable($serializedValue);
-    }
-
-    public function isIdempotent(): bool
-    {
-        return true;
     }
 
     public function useHmacVerification(): bool

@@ -43,9 +43,6 @@ String Value Query Scopes
 
 All string-based query scopes using lexicographic comparison to look up values. This means that the values are compared alphabetically as strings. This can lead to unexpected results when comparing numbers, e.g. ``'11'`` is greater than ``'100'``.
 
-By default, only the first 255 characters of a string are indexed (can be adjusted with the ``metable.stringValueIndexLength`` config). When querying by longer values, characters exceeding the limit will be ignored when determining if the criteria matches. The ``whereMeta()`` method will attempt to work around this by comparing the entire serialized value after the results have been filtered by the indexed portion (other query scopes will not do this).
-
-
 The ``whereMeta()`` method can be used to compare the value using any of the operators accepted by the Laravel query builder's ``where()`` method.
 
 ::

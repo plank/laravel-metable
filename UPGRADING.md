@@ -22,8 +22,7 @@
 ### Handlers
 
 * If you have any custom data types, you will need to implement the new methods from the `HandlerInterface`:
-  * `getStringValue(): ?string` and `getNumericValue(): null|int|float`: These are used to populate the new indexed search columns. You may return `null` if the value cannot be converted into the specified format or does not need to be searchable.
-  * `isIdempotent(): bool`: This method should indicate whether multiple calls to the `serialize()` method with the same value will produce the same serialized output. This is used to determine if the complete serialized value can be used when searching for meta values.  
+  * `getNumericValue(): null|int|float`: used to populate the new indexed numeric search column. You may return `null` if the value cannot be converted into a meaningful numeric value or does not need to be searchable.
   * `useHmacVerification(): bool`: if the integrity of the serialized data should be verified with a HMAC, return `true`. If unserializing this data type is safe without HMAC verification, you may return `false`. 
 
 ### Update Existing Data

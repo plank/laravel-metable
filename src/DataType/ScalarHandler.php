@@ -50,11 +50,6 @@ abstract class ScalarHandler implements HandlerInterface
         return $serializedValue;
     }
 
-    public function isIdempotent(): bool
-    {
-        return true;
-    }
-
     public function useHmacVerification(): bool
     {
         return false;

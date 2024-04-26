@@ -74,7 +74,7 @@ String
 ^^^^^^^^
 +----------------------+-----+
 | Handler              | ``\Plank\Metable\DataType\StringHandler`` |
-| String Query Scopes  | Yes, first ``metable.stringValueIndexLength`` characters indexed |
+| String Query Scopes  | Yes |
 | Numeric Query Scopes | if string is numeric |
 | Other Query Scopes   |     |
 +----------------------+-----+
@@ -126,7 +126,7 @@ Eloquent Collections
 
 +----------------------+-----+
 | Handler              | ``\Plank\Metable\DataType\ModelCollectionHandler`` |
-| String Query Scopes  | No  |
+| String Query Scopes  | Yes |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
 +----------------------+-----+
@@ -145,7 +145,7 @@ DateTime & Carbon
 ^^^^^^^^^^^^^^^^^^
 +----------------------+-----+
 | Handler              | ``\Plank\Metable\DataType\DateTimeHandler`` |
-| String Query Scopes  | Yes (UTC format) |
+| String Query Scopes  | Yes |
 | Numeric Query Scopes | Yes (timestamp) |
 | Other Query Scopes   |     |
 +----------------------+-----+
@@ -162,7 +162,7 @@ DateTimeImmutable & CarbonImmutable
 
 +----------------------+-----+
 | Handler              | ``\Plank\Metable\DataType\DateTimeImmutableHandler`` |
-| String Query Scopes  | Yes (UTC format) |
+| String Query Scopes  | Yes |
 | Numeric Query Scopes | Yes (timestamp) |
 | Other Query Scopes   |     |
 +----------------------+-----+
@@ -209,7 +209,7 @@ Objects and Arrays
 
 +----------------------+-----+
 | Handler              | ``\Plank\Metable\DataType\SignedSerializeHandler`` |
-| String Query Scopes  | if ``metable.indexComplexDataTypes`` is enabled  |
+| String Query Scopes  | Yes |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
 +----------------------+-----+
@@ -236,7 +236,7 @@ Array
 
 +----------------------+-----+
 | Handler              | ``\Plank\Metable\DataType\ArrayHandler`` |
-| String Query Scopes  | if ``metable.indexComplexDataTypes`` is enabled  |
+| String Query Scopes  | Yes |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
 +----------------------+-----+
@@ -268,7 +268,7 @@ Serializable
 
 +----------------------+-----+
 | Handler              | ``\Plank\Metable\DataType\ArrayHandler`` |
-| String Query Scopes  | if ``metable.indexComplexDataTypes`` is enabled  |
+| String Query Scopes  | Yes |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
 +----------------------+-----+
@@ -296,7 +296,7 @@ Plain Objects
 
 +----------------------+-----+
 | Handler              | ``\Plank\Metable\DataType\ArrayHandler`` |
-| String Query Scopes  | if ``metable.indexComplexDataTypes`` is enabled  |
+| String Query Scopes  | Yes |
 | Numeric Query Scopes | No  |
 | Other Query Scopes   |     |
 +----------------------+-----+

@@ -16,9 +16,4 @@ class BooleanHandler extends ScalarHandler
     {
         return $value ? 1 : 0;
     }
-
-    public function getStringValue(mixed $value): null|string
-    {
-        return $value ? 'true' : 'false';
-    }
 }

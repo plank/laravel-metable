@@ -73,21 +73,13 @@ return [
     ],
 
     /**
-     * Whether to index complex data types (arrays, objects, etc).
-     * If enabled the value will be serialized and the first 255 characters will be indexed.
-     * This allows for using whereMeta*() query scopes on serialized values, but may have
-     * performance and disk usage implications for large data sets.
+     * Number of bytes of the to index for strings
+     * This value is used to determine the length of the prefix index on the value column in the database.
+     * Higher values allow for better precision when querying, but will use more disk space in the database.
      *
-     * If you do not intend to query meta values containing complex data types, you should leave this disabled.
-     * If you change this value, it may be necessary to refresh the meta table with the `artisan metable:refresh` command.
-     */
-    'indexComplexDataTypes' => false,
-
-    /**
-     * Number of bytes to index for strings and complex data types.
-     * This value is used to determine the length of the index column in the database.
-     * Higher values allow for better precision when querying,
-     * but will use more disk space in the database.
+     * Prefix index is only supported on the 'mysql', 'mariadb', 'pgsql', and 'sqlite' database drivers.
+     *
+     * Set to 0 before running the migration to disable the index.
      */
     'stringValueIndexLength' => 255,
 ];

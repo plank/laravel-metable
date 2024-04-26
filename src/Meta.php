@@ -128,11 +128,10 @@ class Meta extends Model
         $handler = $registry->getHandlerForType($this->attributes['type']);
 
         $this->attributes['value'] = $handler->serializeValue($value);
+        $this->attributes['numeric_value'] = $handler->getNumericValue($value);
         $this->attributes['hmac'] = $handler->useHmacVerification()
             ? $this->computeHmac($this->attributes['value'])
             : null;
-        $this->attributes['string_value'] = $handler->getStringValue($value);
-        $this->attributes['numeric_value'] = $handler->getNumericValue($value);
 
         $this->cachedValue = null;
     }
@@ -150,7 +149,6 @@ class Meta extends Model
         $this->attributes['value'] = $this->getEncrypter()
             ->encrypt($this->attributes['value']);
         $this->type = self::ENCRYPTED_PREFIX . $this->type;
-        $this->string_value = null;
         $this->numeric_value = null;
     }
 

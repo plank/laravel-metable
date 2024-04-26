@@ -19,13 +19,4 @@ class StringHandler extends ScalarHandler
         }
         return null;
     }
-
-    public function getStringValue(mixed $value): null|string
-    {
-        return substr(
-            $value,
-            0,
-            config('metable.stringValueIndexLength', 255)
-        );
-    }
 }
