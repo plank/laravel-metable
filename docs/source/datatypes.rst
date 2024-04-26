@@ -60,7 +60,7 @@ Null
 ^^^^^^^^
 +----------------------+-----+
 | Handler              | ``\Plank\Metable\DataType\NullHandler`` |
-| String Query Scopes  | No |
+| String Query Scopes  | Yes |
 | Numeric Query Scopes | No |
 | Other Query Scopes   | whereMetaIsNull() |
 +----------------------+-----+

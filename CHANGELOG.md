@@ -2,7 +2,7 @@
 
 ## 6.0.0
 
-Version 6 contains a number of changes to improve the security and performance of the package. Refer to the [UPGRADING.md](UPGRADING.md) file for detailed instructions on how to upgrade from version 5. 
+Version 6 contains a number of changes to improve the usability, performance and security of the package. Refer to the [UPGRADING.md](UPGRADING.md) file for detailed instructions on how to upgrade from version 5.
 
 ### Compatibility
 
@@ -10,8 +10,7 @@ Version 6 contains a number of changes to improve the security and performance o
 - Droppped support for PHP 8.0 and below
 - Added support for Laravel 10 and 11
 - Dropped support Laravel versions 9 and below
-- Adjusted some method signatures with PHP 8+ mixed and union types
-- New schema migration adding two new columns and improving indexing for searching by meta values. See [UPGRADING.md](UPGRADING.md) for details
+- New schema migration adding new columns and improving indexing for searching by meta values. See [UPGRADING.md](UPGRADING.md) for details
 
 ### Data Types
 
@@ -21,10 +20,10 @@ Version 6 contains a number of changes to improve the security and performance o
 - Added `PureEnumHandler` and `BackedEnumHandler` which adds support for storing enum values as Meta.
 - Added `StringableHandler` which adds support for storing `Illuminate\Support\Stringable` objects as Meta.
 - Added `DateTimeImmutableHandler` which adds support for storing `DateTimeImmutable`/`CarbonImmutable` objects as Meta.
-- `ModelHandler` will now validate that the encoded class is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, the meta value will return `null`.
-- `ModelHandler` will no longer throw a model not found exception if the model no longer exists. Instead, the meta value will return `null`. This is more in line with the existing behavior of the `ModelCollectionHandler`.
-- `ModelCollectionHandler` will now validate that the encoded collection class is a valid Eloquent collection before attempting to instantiate it during unserialization. If the class is invalid,  an instance of `Illuminate\Database\Eloquent\Collection` will be used instead.
-- `ModelCollectionHandler` will now validate that the encoded class of each entry is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, that entry in the collection will be omitted.
+- The `ModelHandler` will now validate that the encoded class is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, the meta value will return `null`.
+- The `ModelHandler` will no longer throw a model not found exception if the model no longer exists. Instead, the meta value will return `null`. This is more in line with the existing behavior of the `ModelCollectionHandler`.
+- The `ModelCollectionHandler` will now validate that the encoded collection class is a valid Eloquent collection before attempting to instantiate it during unserialization. If the class is invalid,  an instance of `Illuminate\Database\Eloquent\Collection` will be used instead.
+- The `ModelCollectionHandler` will now validate that the encoded class of each entry is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, that entry in the collection will be omitted.
 - Added `getNumericValue(): null|int|float` method to `HandlerInterface` which should convert the original value into a numeric format for indexing, if relevant for the data type.
 - Added `useHmacVerification(): bool` method to `HandlerInterface` which should indicate whether the integrity of the serialized data should be verified with an HMAC.
 
@@ -34,8 +33,8 @@ Version 6 contains a number of changes to improve the security and performance o
 
 ### Efficient Value Search 
 
-- The Metable `whereMeta()`, `whereMetaIn()`, and `orderByMeta()` query scopes can now leverage a prefix index on the ``meta.value`` column. This greatly improves performance when searching for meta values against larger datasets when using applicable operators, e.g. `=`, `%`, `>`, `>=`, `<`, `<=`, `<>`, `LIKE` (no leading wildcard).
-- `whereMetaNumeric()` and `orderByMetaNumeric()` query scopes will now scan the indexed `numeric_value` column instead of the serialized `value` column. This greatly improves performance when searching for meta values against larger datasets.
+- The Metable `whereMeta()`, `whereMetaIn()`, and `orderByMeta()` query scopes can now leverage a prefix index on the ``meta.value`` column. This greatly improves performance when searching for meta values against larger datasets when using applicable operators, e.g. `=`, `%`, `>`, `>=`, `<`, `<=`, `<>`, `LIKE` (no leading wildcard). This index is only supported by the `'mysql'`, `'mariadb'`, `'pgsql'`, and `'sqlite'` drivers.
+- The `whereMetaNumeric()` and `orderByMetaNumeric()` query scopes will now scan the indexed `numeric_value` column instead of the serialized `value` column. This greatly improves performance when searching for meta values against larger datasets.
 - `whereMetaNumeric()` query scope will now accept a value of any type. It will be converted to an integer or float by the handler. This is more consistent with the behaviour of the other query scopes.
 - Added additional query scopes to more easily search meta values based on different criteria:
   - `whereMetaInNumeric()`
@@ -57,7 +56,7 @@ Version 6 contains a number of changes to improve the security and performance o
 ### Encrypt Meta
 
 - Added the `setMetaEncrypted()` method which will encrypt data before storing it in the database and decrypt it when retrieving it. This is useful for storing sensitive data in the meta table. 
-- prefixing a meta cast with `encrypted:` will automatically encrypt all values for that meta key.
+- Prefixing a meta cast with `encrypted:` will automatically encrypt all values for that meta key.
 
 ### Metable Attributes
 

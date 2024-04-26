@@ -10,7 +10,8 @@
 
 ### Schema Changes
 
-* A new schema migration has been added which adds three new columns to the meta table and improves indexing for querying by meta values.
+* A new schema migration has been added which adds two new columns to the meta table and improves indexing for querying by meta values. 
+* Before running the migration, you may choose to tune the `metable.stringValueIndexLength` config to adjust the length of the index on the `value` column. The default value of 255 is suitable for most use cases.
 
 ### Configuration Changes
 
@@ -36,7 +37,7 @@
 
 ### Metable Attributes
 
-* Optional: if you intend to access meta with property access, add the new `\Plank\Metable\MetableAttributes` traits to your `Metable`.
+* (Optional) If you intend to access meta with property access, add the new `\Plank\Metable\MetableAttributes` traits to your `Metable`.
 
 ## 4.X -> 5.X
 - New migration file added which adds a new composite unique index to the meta table on `metable_type`, `metable_id`, and `key`. Make sure that you have no duplicate keys for a given entity (previously possible as a race condition) before applying the new migration.  
