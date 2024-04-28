@@ -375,7 +375,23 @@ trait Metable
             'meta',
             function (Builder $q) use ($key, $operator, $stringValue, $value) {
                 $q->where('key', $key);
-                $q->where('value', $operator, $stringValue);
+                [
+                    $needPartialMatch,
+                    $needExactMatch
+                ] = $this->determineQueryValueMatchTypes($q, [$stringValue]);
+
+                if ($needPartialMatch) {
+                    $indexLength = (int)config('metable.stringValueIndexLength', 255);
+                    $q->where(
+                        $q->raw("SUBSTR(value, 1, $indexLength)"),
+                        $operator,
+                        substr($stringValue, 0, $indexLength)
+                    );
+                }
+
+                if ($needExactMatch) {
+                    $q->where('value', $operator, $stringValue);
+                }
 
                 // null and empty string look the same in the database,
                 // use the type column to differentiate.
@@ -433,7 +449,27 @@ trait Metable
             'meta',
             function (Builder $q) use ($key, $min, $max, $not) {
                 $q->where('key', $key);
-                $q->whereBetween('value', [$min, $max], 'and', $not);
+
+                [
+                    $needPartialMatch,
+                    $needExactMatch
+                ] = $this->determineQueryValueMatchTypes($q, [$min, $max]);
+
+                if ($needPartialMatch) {
+                    $indexLength = (int)config('metable.stringValueIndexLength', 255);
+                    $q->whereBetween(
+                        $q->raw("SUBSTR(value, 1, $indexLength)"),
+                        [
+                            substr($min, 0, $indexLength),
+                            substr($max, 0, $indexLength)
+                        ],
+                        'and',
+                        $not
+                    );
+                }
+                if ($needExactMatch) {
+                    $q->whereBetween('value', [$min, $max], 'and', $not);
+                }
             }
         );
     }
@@ -525,7 +561,27 @@ trait Metable
 
         $q->whereHas('meta', function (Builder $q) use ($key, $values, $not) {
             $q->where('key', $key);
-            $q->whereIn('value', $values, 'and', $not);
+
+            [
+                $needPartialMatch,
+                $needExactMatch
+            ] = $this->determineQueryValueMatchTypes($q, $values);
+            if ($needPartialMatch) {
+                $indexLength = (int)config('metable.stringValueIndexLength', 255);
+                $q->whereIn(
+                    $q->raw("SUBSTR(value, 1, $indexLength)"),
+                    array_map(
+                        fn ($val) => substr($val, 0, $indexLength),
+                        $values
+                    ),
+                    'and',
+                    $not
+                );
+            }
+
+            if ($needExactMatch) {
+                $q->whereIn('value', $values, 'and', $not);
+            }
         });
     }
 
@@ -578,6 +634,16 @@ trait Metable
         bool $strict = false
     ): void {
         $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
+
+        [$needPartialMatch] = $this->determineQueryValueMatchTypes($q, []);
+        if ($needPartialMatch) {
+            $indexLength = (int)config('metable.stringValueIndexLength', 255);
+            $q->orderBy(
+                $q->raw("SUBSTR({$table}.value, 1, $indexLength)"),
+                $direction
+            );
+        }
+
         $q->orderBy("{$table}.value", $direction);
     }
 
@@ -893,6 +959,37 @@ trait Metable
         /** @var Registry $registry */
         $registry = app('metable.datatype.registry');
         return $registry->getHandlerForValue($value);
+    }
+
+    /**
+     * @param Builder $q
+     * @param string[] $stringValues
+     * @return array{bool, bool} [needPartialMatch, needExactMatch]
+     */
+    protected function determineQueryValueMatchTypes(
+        Builder $q,
+        array $stringValues
+    ): array {
+        $driver = $q->getConnection()->getDriverName();
+        $indexLength = (int)config('metable.stringValueIndexLength', 255);
+
+        // only sqlite and pgsql support expression indexes, which must be partially matched
+        // mysql and mariadb support prefix indexes, which works with the entire value
+        // sqlserv does not support any substring indexing mechanism
+        if (!in_array($driver, ['sqlite', 'pgsql'])) {
+            return [false, true];
+        }
+        // if any value is longer than the index length, we need to do both a
+        // substring match to leverage the index and an exact match to avoid false positives
+        foreach ($stringValues as $stringValue) {
+            if (strlen($stringValue) > $indexLength) {
+                return [true, true];
+            }
+        }
+
+        // if all values are shorter than the index length,
+        // we only need to do a substring match
+        return [true, false];
     }
 
     abstract public function getKey();

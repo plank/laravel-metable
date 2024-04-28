@@ -666,6 +666,68 @@ class MetableTest extends TestCase
         $this->assertEquals([1, 3], $results2->modelKeys());
     }
 
+    public function test_it_can_query_long_strings(): void
+    {
+        config()->set('metable.stringValueIndexLength', 255);
+        $this->useDatabase();
+        $metable1 = $this->createMetable();
+        $metable1->setMeta('foo', $val1 = str_repeat('a', 255) . 'm');
+        $metable2 = $this->createMetable();
+        $metable2->setMeta('foo', $val2 = str_repeat('a', 255) . 'f');
+
+        $this->assertSame(
+            [$metable1->getKey()],
+            SampleMetable::whereMeta('foo', $val1)->get()->modelKeys()
+        );
+        $this->assertSame(
+            [$metable2->getKey()],
+            SampleMetable::whereMeta('foo', $val2)->get()->modelKeys()
+        );
+
+        $this->assertSame(
+            [$metable1->getKey()],
+            SampleMetable::whereMetaIn('foo', [$val1])->get()->modelKeys()
+        );
+
+        $this->assertSame(
+            [$metable2->getKey()],
+            SampleMetable::whereMetaIn('foo', [$val2])->get()->modelKeys()
+        );
+
+        $this->assertSame(
+            [$metable1->getKey(), $metable2->getKey()],
+            SampleMetable::whereMetaIn('foo', [$val1, $val2])->get()->modelKeys()
+        );
+
+        $this->assertSame(
+            [$metable2->getKey()],
+            SampleMetable::whereMetaBetween(
+                'foo',
+                str_repeat('a', 256),
+                str_repeat('a', 255) . 'l'
+            )->get()->modelKeys()
+        );
+
+        $this->assertSame(
+            [$metable1->getKey()],
+            SampleMetable::whereMetaBetween(
+                'foo',
+                str_repeat('a', 255) . 'm',
+                str_repeat('a', 255) . 'z'
+            )->get()->modelKeys()
+        );
+
+        $this->assertSame(
+            [$metable2->getKey(), $metable1->getKey()],
+            SampleMetable::orderByMeta('foo', 'asc')->get()->modelKeys()
+        );
+
+        $this->assertSame(
+            [$metable1->getKey(), $metable2->getKey()],
+            SampleMetable::orderByMeta('foo', 'desc')->get()->modelKeys()
+        );
+    }
+
     public function test_set_relation_updates_index(): void
     {
         $metable = $this->makeMetable();

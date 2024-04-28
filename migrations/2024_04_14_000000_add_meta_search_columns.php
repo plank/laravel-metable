@@ -31,7 +31,7 @@ return new class extends Migration
                     );
                 } elseif (in_array($driver, ['pgsql', 'sqlite'])) {
                     $table->rawIndex(
-                        "metable_type, key, substr(value, 1, $stringIndexLength)",
+                        "metable_type, key, SUBSTR(value, 1, $stringIndexLength)",
                         'value_string_prefix_index'
                     );
                 }
