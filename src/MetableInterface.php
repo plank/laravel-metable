@@ -30,7 +30,9 @@ interface MetableInterface
 {
     public function meta(): MorphMany;
 
-    public function setMeta(string $key, mixed $value): void;
+    public function setMeta(string $key, mixed $value, bool $encrypted = false): void;
+
+    public function setMetaEncrypted(string $key, mixed $value): void;
 
     public function setManyMeta(array $metaDictionary): void;
 

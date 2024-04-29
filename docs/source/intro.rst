@@ -49,6 +49,8 @@ Installation
 
 5. Add the `Plank\\Metable\\Metable <https://github.com/plank/laravel-metable/blob/master/src/Metable.php>`_ trait to any eloquent model class that you want to be able to attach metadata to.
 
+6. (Optional) Add the `Plank\\Metable\\MetableAttributes <https://github.com/plank/laravel-metable/blob/master/src/MetableAttributes.php>`_ trait to your model to enable applying meta using property accessors by prefixing the name with ``$this->meta_``.
+
 Example Usage
 ----------------
 

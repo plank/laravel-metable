@@ -141,10 +141,3 @@ To automatically exclude all records that do not have meta assigned to the sorte
     //equivalent to, but more efficient than
     $models = MyModel::whereHasMeta('score')
         ->orderByMetaNumeric('score', 'desc')->get();
-
-
-Querying by Complex Data Types
--------------------------------
-
-By default, meta containing complex data types (e.g. objects and arrays) are not indexed and cannot be filtered or ordered with any of the above methods. If you need to query by these values, you can enable the ``metable.indexComplexDataTypes`` config option. This will cause a truncated version of the serialized value to be indexed. This can be useful for exact matches, but may not work predictably for other operations. Given the database overhead of indexing complex data types, it is recommended to only enable this feature if you need it.
-
