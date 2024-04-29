@@ -25,12 +25,12 @@ return new class extends Migration {
             if ($stringIndexLength > 0 && $driver = $this->detectDriverName()) {
                 if (in_array($driver, ['mysql', 'mariadb'])) {
                     $table->rawIndex(
-                        "metable_type, key, value($stringIndexLength)",
+                        "`metable_type`, `key`, `value`($stringIndexLength)",
                         'value_string_prefix_index'
                     );
                 } elseif (in_array($driver, ['pgsql', 'sqlite'])) {
                     $table->rawIndex(
-                        "metable_type, key, SUBSTR(value, 1, $stringIndexLength)",
+                        "`metable_type`, `key`, SUBSTR(`value`, 1, $stringIndexLength)",
                         'value_string_prefix_index'
                     );
                 }
