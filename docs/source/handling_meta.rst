@@ -149,7 +149,18 @@ You can enforce that any meta attached to a particular key is always of a partic
             'children' => 'collection:\App\ExampleMetable',
         ];
 
-        //...
+        // equivalent to:
+        protected function metaCasts(): array
+        {
+            return [
+                'optin' => 'boolean',
+                'age' => 'integer',
+                'secret' => 'encrypted:string',
+                'parent' => ExampleMetable::class,
+                'children' => 'collection:\App\ExampleMetable',
+            ];
+        }
+
     }
 
 All `cast types supported by Eloquent<https://laravel.com/docs/11.x/eloquent-mutators#attribute-casting>`_ are supported, with the following modifications:

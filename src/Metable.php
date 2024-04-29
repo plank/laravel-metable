@@ -844,16 +844,7 @@ trait Metable
     protected function castMetaValue(string $key, mixed $value, string $cast): mixed
     {
         if ($cast == 'array' || $cast == 'object') {
-            $assoc = $cast == 'array';
-            if (is_string($value)) {
-                $value = json_decode($value, $assoc, 512, JSON_THROW_ON_ERROR);
-            }
-            return json_decode(
-                json_encode($value, JSON_THROW_ON_ERROR),
-                $assoc,
-                512,
-                JSON_THROW_ON_ERROR
-            );
+            return $this->castMetaToJson($cast, $value);
         }
 
         if ($cast == 'hashed') {
@@ -861,41 +852,14 @@ trait Metable
         }
 
         if ($cast == 'collection' || str_starts_with($cast, 'collection:')) {
-            if ($value instanceof \Illuminate\Support\Collection) {
-                $collection = $value;
-            } elseif ($value instanceof Model) {
-                $collection = $value->newCollection([$value]);
-            } else {
-                $collection = collect($value);
-            }
-
-            if (str_starts_with($cast, 'collection:')) {
-                $class = substr($cast, 11);
-                $collection->each(function ($item) use ($class): void {
-                    if (!$item instanceof $class) {
-                        throw CastException::invalidClassCast($class, $item);
-                    }
-                });
-            }
-
-            return $collection;
+            return $this->castMetaToCollection($cast, $value);
         }
 
         if (class_exists($cast)
             && !is_a($cast, Castable::class, true)
             && $cast != 'datetime'
         ) {
-            if ($value instanceof $cast) {
-                return $value;
-            }
-
-            if (is_a($cast, Model::class, true)
-                && (is_string($value) || is_int($value))
-            ) {
-                return $cast::find($value);
-            }
-
-            throw CastException::invalidClassCast($cast, $value);
+            return $this->castMetaToClass($value, $cast);
         }
 
         // leverage Eloquent built-in casting functionality
@@ -1005,4 +969,83 @@ trait Metable
     abstract public function relationLoaded($key);
 
     abstract protected function castAttributeAsHashedString($key, $value);
+
+    /**
+     * @param mixed $value
+     * @param string $cast
+     * @return Collection|\Illuminate\Support\Collection
+     */
+    protected function castMetaToCollection(string $cast, mixed $value): \Illuminate\Support\Collection
+    {
+        if ($value instanceof \Illuminate\Support\Collection) {
+            $collection = $value;
+        } elseif ($value instanceof Model) {
+            $collection = $value->newCollection([$value]);
+        } elseif (is_iterable($value)) {
+            $isEloquentModels = true;
+            $notEmpty = false;
+
+            foreach ($value as $item) {
+                $notEmpty = true;
+                if (!$item instanceof Model) {
+                    $isEloquentModels = false;
+                    break;
+                }
+            }
+            $collection = $isEloquentModels && $notEmpty
+                ? $value[0]->newCollection($value)
+                : collect($value);
+        }
+
+        if (str_starts_with($cast, 'collection:')) {
+            $class = substr($cast, 11);
+            $collection->each(function ($item) use ($class): void {
+                if (!$item instanceof $class) {
+                    throw CastException::invalidClassCast($class, $item);
+                }
+            });
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param string $cast
+     * @param mixed $value
+     * @return mixed
+     * @throws \JsonException
+     */
+    protected function castMetaToJson(string $cast, mixed $value): mixed
+    {
+        $assoc = $cast == 'array';
+        if (is_string($value)) {
+            $value = json_decode($value, $assoc, 512, JSON_THROW_ON_ERROR);
+        }
+        return json_decode(
+            json_encode($value, JSON_THROW_ON_ERROR),
+            $assoc,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+    }
+
+    /**
+     * @param mixed $value
+     * @param string $cast
+     * @return mixed
+     */
+    protected function castMetaToClass(mixed $value, string $cast): mixed
+    {
+        if ($value instanceof $cast) {
+            return $value;
+        }
+
+        if (is_a($cast, Model::class, true)
+            && (is_string($value) || is_int($value))
+        ) {
+            return $cast::findOrFail($value);
+        }
+
+        throw CastException::invalidClassCast($cast, $value);
+    }
 }

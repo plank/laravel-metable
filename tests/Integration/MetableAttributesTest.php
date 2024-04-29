@@ -52,6 +52,11 @@ class MetableAttributesTest extends TestCase
 
         $model->setAttribute('meta_attribute', 'baz');
         $this->assertFalse($model->hasMeta('attribute'));
+
+        $model->meta_attribute = 'qux';
+        $this->assertTrue($model->offsetExists('meta_attribute'));
+        $model->offsetUnset('meta_attribute');
+        $this->assertNull($model->meta_attribute);
     }
 
     public function test_it_converts_to_array()
@@ -72,21 +77,26 @@ class MetableAttributesTest extends TestCase
 
         $model->makeHidden('meta_var2', 'created_at', 'updated_at', 'meta');
 
-        $array = $model->toArray();
         $this->assertEquals([
             'meta_attribute' => '',
             'id' => $model->getKey(),
             'meta_foo' => 'bar',
             'meta_var' => 'foo'
-        ], $array);
+        ], $model->toArray());
 
-        $model->makeMetaHidden();
-
-        $array = $model->toArray();
+        $model->includeMetaInArray = false;
         $this->assertEquals([
             'meta_attribute' => '',
             'id' => $model->getKey(),
-        ], $array);
+        ], $model->toArray());
+
+        $model->includeMetaInArray = true;
+        $model->makeMetaHidden();
+
+        $this->assertEquals([
+            'meta_attribute' => '',
+            'id' => $model->getKey(),
+        ], $model->toArray());
     }
 
     private function createMetable(array $attributes = []): SampleMetable

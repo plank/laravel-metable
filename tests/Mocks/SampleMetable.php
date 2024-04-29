@@ -20,7 +20,14 @@ class SampleMetable extends Model implements MetableInterface
         'foo' => 'bar'
     ];
 
-    protected $metaCasts = [
-        'castable' => 'string',
-    ];
+    public $metaCasts = [];
+
+    public $methodMetaCasts = [];
+
+    public $includeMetaInArray = true;
+
+    public function metaCasts(): array
+    {
+        return $this->methodMetaCasts;
+    }
 }

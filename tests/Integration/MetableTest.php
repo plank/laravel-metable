@@ -5,10 +5,13 @@ namespace Plank\Metable\Tests\Integration;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Stringable;
+use Plank\Metable\Exceptions\CastException;
 use Plank\Metable\Meta;
 use Plank\Metable\Tests\Mocks\SampleMetable;
 use Plank\Metable\Tests\Mocks\SampleMetableSoftDeletes;
+use Plank\Metable\Tests\Mocks\SampleSerializable;
 use Plank\Metable\Tests\TestCase;
 use ReflectionClass;
 
@@ -810,7 +813,12 @@ class MetableTest extends TestCase
             'string - null' => ['string', null, null, 'null'],
             'string - dateTime' => ['string', $date, (string)$date, 'string'],
             'array - array' => ['array', ['foo', 'bar'], ['foo', 'bar'], 'serialized'],
-            'array - json' => ['array', json_encode(['foo' => 'bar']), ['foo' => 'bar'], 'serialized'],
+            'array - json' => [
+                'array',
+                json_encode(['foo' => 'bar']),
+                ['foo' => 'bar'],
+                'serialized'
+            ],
             'array - object' => ['array', $object, ['foo' => 'bar'], 'serialized'],
             'array - null' => ['array', null, null, 'null'],
             'boolean - true' => ['boolean', true, true, 'boolean'],
@@ -841,8 +849,20 @@ class MetableTest extends TestCase
             'integer - string' => ['integer', '123', 123, 'integer'],
             'integer - null' => ['integer', null, null, 'null'],
             'object - object' => ['object', $object, $object, 'serialized', false],
-            'object - array' => ['object', ['foo' => 'bar'], $object, 'serialized', false],
-            'object - json' => ['object', json_encode(['foo' => 'bar']), $object, 'serialized', false],
+            'object - array' => [
+                'object',
+                ['foo' => 'bar'],
+                $object,
+                'serialized',
+                false
+            ],
+            'object - json' => [
+                'object',
+                json_encode(['foo' => 'bar']),
+                $object,
+                'serialized',
+                false
+            ],
             'object - null' => ['object', null, null, 'null'],
             'real - int' => ['real', 123, 123.0, 'float'],
             'real - float' => ['real', 123.456, 123.456, 'float'],
@@ -851,45 +871,245 @@ class MetableTest extends TestCase
             'real - null' => ['real', null, null, 'null'],
             'timestamp - dateTime' => ['timestamp', $date, $date->timestamp, 'integer'],
             'timestamp - int' => ['timestamp', 123, 123, 'integer'],
-            'timestamp - string' => ['timestamp', '2020-01-01 00:00:00', strtotime('2020-01-01 00:00:00'), 'integer'],
+            'timestamp - string' => [
+                'timestamp',
+                '2020-01-01 00:00:00',
+                strtotime('2020-01-01 00:00:00'),
+                'integer'
+            ],
             'timestamp - null' => ['timestamp', null, null, 'null'],
-            'date - dateTime' => ['date', $date, $date->copy()->startOfDay(), 'datetime', false],
-            'date - string' => ['date', (string)$date, $date->copy()->startOfDay(), 'datetime', false],
-            'date - timestamp' => ['date', $date->timestamp, $date->copy()->startOfDay(), 'datetime', false],
-            'date - string timestamp' => ['date', (string)$date->timestamp, $date->copy()->startOfDay(), 'datetime', false],
+            'date - dateTime' => [
+                'date',
+                $date,
+                $date->copy()->startOfDay(),
+                'datetime',
+                false
+            ],
+            'date - string' => [
+                'date',
+                (string)$date,
+                $date->copy()->startOfDay(),
+                'datetime',
+                false
+            ],
+            'date - timestamp' => [
+                'date',
+                $date->timestamp,
+                $date->copy()->startOfDay(),
+                'datetime',
+                false
+            ],
+            'date - string timestamp' => [
+                'date',
+                (string)$date->timestamp,
+                $date->copy()->startOfDay(),
+                'datetime',
+                false
+            ],
             'date - null' => ['date', null, null, 'null'],
             'datetime - dateTime' => ['datetime', $date, $date, 'datetime', false],
-            'datetime - string' => ['datetime', $date->format('Y-m-d H:i:s.uO'), $date, 'datetime', false],
-            'datetime - timestamp' => ['datetime', $date->timestamp, $date->copy()->startOfSecond(), 'datetime', false],
-            'datetime - string timestamp' => ['datetime', (string)$date->timestamp, $date->copy()->startOfSecond(), 'datetime', false],
+            'datetime - string' => [
+                'datetime',
+                $date->format('Y-m-d H:i:s.uO'),
+                $date,
+                'datetime',
+                false
+            ],
+            'datetime - timestamp' => [
+                'datetime',
+                $date->timestamp,
+                $date->copy()->startOfSecond(),
+                'datetime',
+                false
+            ],
+            'datetime - string timestamp' => [
+                'datetime',
+                (string)$date->timestamp,
+                $date->copy()->startOfSecond(),
+                'datetime',
+                false
+            ],
             'datetime - null' => ['datetime', null, null, 'null'],
-            'immutable_date - dateTime' => ['immutable_date', $date, $date->copy()->startOfDay()->toImmutable(), 'datetime_immutable', false],
-            'immutable_date - string' => ['immutable_date', $date->format('Y-m-d H:i:s.uO'), $date->copy()->startOfDay()->toImmutable(), 'datetime_immutable', false],
-            'immutable_date - timestamp' => ['immutable_date', $date->timestamp, $date->copy()->startOfDay()->toImmutable(), 'datetime_immutable', false],
-            'immutable_date - string timestamp' => ['immutable_date', (string)$date->timestamp, $date->copy()->startOfDay()->toImmutable(), 'datetime_immutable', false],
+            'immutable_date - dateTime' => [
+                'immutable_date',
+                $date,
+                $date->copy()->startOfDay()->toImmutable(),
+                'datetime_immutable',
+                false
+            ],
+            'immutable_date - string' => [
+                'immutable_date',
+                $date->format('Y-m-d H:i:s.uO'),
+                $date->copy()->startOfDay()->toImmutable(),
+                'datetime_immutable',
+                false
+            ],
+            'immutable_date - timestamp' => [
+                'immutable_date',
+                $date->timestamp,
+                $date->copy()->startOfDay()->toImmutable(),
+                'datetime_immutable',
+                false
+            ],
+            'immutable_date - string timestamp' => [
+                'immutable_date',
+                (string)$date->timestamp,
+                $date->copy()->startOfDay()->toImmutable(),
+                'datetime_immutable',
+                false
+            ],
             'immutable_date - null' => ['immutable_date', null, null, 'null'],
-            'immutable_datetime - dateTime' => ['immutable_datetime', $date, $date->toImmutable(), 'datetime_immutable', false],
-            'immutable_datetime - string' => ['immutable_datetime', $date->format('Y-m-d H:i:s.uO'), $date->toImmutable(), 'datetime_immutable', false],
-            'immutable_datetime - timestamp' => ['immutable_datetime', $date->timestamp, $date->copy()->startOfSecond()->toImmutable(), 'datetime_immutable', false],
-            'immutable_datetime - string timestamp' => ['immutable_datetime', (string)$date->timestamp, $date->copy()->startOfSecond()->toImmutable(), 'datetime_immutable', false],
+            'immutable_datetime - dateTime' => [
+                'immutable_datetime',
+                $date,
+                $date->toImmutable(),
+                'datetime_immutable',
+                false
+            ],
+            'immutable_datetime - string' => [
+                'immutable_datetime',
+                $date->format('Y-m-d H:i:s.uO'),
+                $date->toImmutable(),
+                'datetime_immutable',
+                false
+            ],
+            'immutable_datetime - timestamp' => [
+                'immutable_datetime',
+                $date->timestamp,
+                $date->copy()->startOfSecond()->toImmutable(),
+                'datetime_immutable',
+                false
+            ],
+            'immutable_datetime - string timestamp' => [
+                'immutable_datetime',
+                (string)$date->timestamp,
+                $date->copy()->startOfSecond()->toImmutable(),
+                'datetime_immutable',
+                false
+            ],
             'immutable_datetime - null' => ['immutable_datetime', null, null, 'null'],
-            'hashed - string' => ['hashed', 'foo', fn ($result) => password_verify('foo', $result), 'string'],
-            'hashed - int' => ['hashed', 123, fn ($result) => password_verify('123', $result), 'string'],
+            'hashed - string' => [
+                'hashed',
+                'foo',
+                fn ($result) => password_verify('foo', $result),
+                'string'
+            ],
+            'hashed - int' => [
+                'hashed',
+                123,
+                fn ($result) => password_verify('123', $result),
+                'string'
+            ],
             'hashed - null' => ['hashed', null, null, 'null'],
-            'collection - array' => ['collection', ['foo', 'bar'], collect(['foo', 'bar']), 'serialized', false],
-            'collection - eloquent' => ['collection', $model, fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(), 'collection', false],
-            'collection - eloquent collection' => ['collection', $modelCollection, fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(), 'collection', false],
+            'collection - array' => [
+                'collection',
+                ['foo', 'bar'],
+                collect(['foo', 'bar']),
+                'serialized',
+                false
+            ],
+            'collection - eloquent' => [
+                'collection',
+                $model,
+                fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(),
+                'collection',
+                false
+            ],
+            'collection - eloquent collection' => [
+                'collection',
+                $modelCollection,
+                fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(),
+                'collection',
+                false
+            ],
             'collection - null' => ['collection', null, null, 'null'],
-            'stringable - string' => [AsStringable::class, 'foo', new Stringable('foo'), 'stringable', false],
-            'stringable - int' => [AsStringable::class, 123, new Stringable('123'), 'stringable', false],
+            'collection:class - eloquent object' => [
+                'collection:' . SampleMetable::class,
+                $model,
+                fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(),
+                'collection',
+                false
+            ],
+            'collection:class - eloquent array' => [
+                'collection:' . SampleMetable::class,
+                [$model],
+                fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(),
+                'collection',
+                false
+            ],
+            'collection:class - eloquent collection' => [
+                'collection:' . SampleMetable::class,
+                $modelCollection,
+                fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(),
+                'collection',
+                false
+            ],
+            'collection:class - object collection' => [
+                'collection:' . \stdClass::class,
+                collect([$object]),
+                collect([$object]),
+                'serialized',
+                false
+            ],
+            'stringable - string' => [
+                AsStringable::class,
+                'foo',
+                new Stringable('foo'),
+                'stringable',
+                false
+            ],
+            'stringable - int' => [
+                AsStringable::class,
+                123,
+                new Stringable('123'),
+                'stringable',
+                false
+            ],
             'stringable - null' => [AsStringable::class, null, null, 'null'],
             'encrypted - string' => ['encrypted', 'foo', 'foo', 'encrypted:string'],
-            'encrypted - array' => ['encrypted', ['foo' => 'bar'], ['foo' => 'bar'], 'encrypted:serialized'],
+            'encrypted - array' => [
+                'encrypted',
+                ['foo' => 'bar'],
+                ['foo' => 'bar'],
+                'encrypted:serialized'
+            ],
             'encrypted - null' => ['encrypted', null, null, 'null'],
-            'encrypted:collection - array' => ['encrypted:collection', ['foo', 'bar'], collect(['foo', 'bar']), 'encrypted:serialized', false],
-            'encrypted:collection - eloquent' => ['encrypted:collection', $model, fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(), 'encrypted:collection', false],
-            'encrypted:collection - eloquent collection' => ['encrypted:collection', $modelCollection, fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(), 'encrypted:collection', false],
-            'encrypted:string - int' => ['encrypted:string', 123, '123', 'encrypted:string'],
+            'encrypted:collection - array' => [
+                'encrypted:collection',
+                ['foo', 'bar'],
+                collect(['foo', 'bar']),
+                'encrypted:serialized',
+                false
+            ],
+            'encrypted:collection - eloquent' => [
+                'encrypted:collection',
+                $model,
+                fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(),
+                'encrypted:collection',
+                false
+            ],
+            'encrypted:collection - eloquent collection' => [
+                'encrypted:collection',
+                $modelCollection,
+                fn ($result) => $result->modelKeys() === $modelCollection->modelKeys(),
+                'encrypted:collection',
+                false
+            ],
+            'encrypted:string - int' => [
+                'encrypted:string',
+                123,
+                '123',
+                'encrypted:string'
+            ],
+            'class - class' => [\stdClass::class, $object, $object, 'serialized', false],
+            'class - eloquent id' => [
+                SampleMetable::class,
+                99,
+                fn ($result) => $result instanceof SampleMetable
+                    && $result->getKey() === $model->getKey(),
+                'model',
+                false
+            ],
         ];
     }
 
@@ -903,7 +1123,11 @@ class MetableTest extends TestCase
     ): void {
         $this->useDatabase();
 
-        if ($cast === 'collection' || $cast === 'encrypted:collection') {
+        if ($cast === 'collection'
+            || $cast === 'encrypted:collection'
+            || str_starts_with($cast, 'collection:')
+            || $cast === SampleMetable::class
+        ) {
             $model = new SampleMetable();
             $model->id = 99;
             $model->save();
@@ -923,15 +1147,55 @@ class MetableTest extends TestCase
         $this->assertSame($expectedHandlerType, $metable->getMetaRecord($key)->type);
     }
 
-    public function test_it_can_cast_meta_values(): void
+    public static function invalidClassCastProvider(): array
+    {
+        return [
+            'collection:class - string' => ['collection:stdClass', collect('bar')],
+            'collection:class - int' => ['collection:stdClass', collect(123)],
+            'collection:class - other class' => ['collection:stdClass', collect(new SampleSerializable([]))],
+            'class - string' => [\stdClass::class, 'bar'],
+            'class - int' => [\stdClass::class, 123],
+            'class - other class' => [\stdClass::class, new SampleSerializable([])],
+            'eloquent - int' => [SampleMetable::class, 999, ModelNotFoundException::class],
+            'eloquent - string' => [SampleMetable::class, 'abc', ModelNotFoundException::class],
+            'eloquent - other class' => [SampleMetable::class, new \stdClass()],
+        ];
+    }
+
+    public function test_cast_source_hierarchy(): void
     {
         $this->useDatabase();
         $metable = $this->createMetable();
-        $metable->setMeta('castable', 123);
+        $metable->metaCasts = [
+            'prop_cast' => 'string',
+            'cast' => 'string',
+        ];
+        $metable->methodMetaCasts = ['cast' => 'integer'];
 
-        $result = SampleMetable::first();
+        $metable->setMeta('prop_cast', 123);
+        $this->assertSame('123', $metable->getMeta('prop_cast'));
+        $metable->setMeta('cast', 123);
+        $this->assertSame(123, $metable->getMeta('cast'));
 
-        $this->assertSame('123', $result->getMeta('castable'));
+        $date = Carbon::now()->startOfSecond();
+        $metable->mergeMetaCasts(['prop_cast' => 'datetime', 'cast' => 'datetime']);
+        $metable->setMeta('prop_cast', $date->timestamp);
+        $metable->setMeta('cast', $date->timestamp);
+        $this->assertEquals($date, $metable->getMeta('prop_cast'));
+        $this->assertEquals($date, $metable->getMeta('cast'));
+    }
+
+    /** @dataProvider invalidClassCastProvider */
+    public function test_it_throws_for_invalid_class_cast(
+        string $cast,
+        mixed $invalidValue,
+        string $expectedException = CastException::class
+    ): void {
+        $this->expectException($expectedException);
+        $this->useDatabase();
+        $metable = $this->createMetable();
+        $metable->mergeMetaCasts(['foo' => $cast]);
+        $metable->setMeta('foo', $invalidValue);
     }
 
     private function makeMeta(array $attributes = []): Meta

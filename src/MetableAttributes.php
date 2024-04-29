@@ -52,7 +52,7 @@ trait MetableAttributes
             return $this->hasMeta($this->metaAttributeToKey($key));
         }
 
-        return parent::isset($key);
+        return parent::offsetExists($key);
     }
 
     public function offsetUnset($key): void

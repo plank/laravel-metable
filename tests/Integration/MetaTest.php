@@ -86,6 +86,13 @@ class MetaTest extends TestCase
         $this->assertEquals($hmac, $meta->hmac);
         $this->assertEquals('encrypted:string', $meta->type);
         $this->assertNull($meta->numeric_value);
+
+
+        $rawValue = $meta->getRawValue();
+        // should not re-encrypt
+        $meta->encrypt();
+        $this->assertEquals($rawValue, $meta->getRawValue());
+        $this->assertEquals('encrypted:string', $meta->type);
     }
 
     private function makeMeta(array $attributes = []): Meta
