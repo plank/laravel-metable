@@ -2,42 +2,38 @@
 
 namespace Plank\Metable\DataType;
 
-/**
- * Handle serialization of plain objects.
- * @deprecated Use SignedSerializeHandler instead.
- */
-class ObjectHandler implements HandlerInterface
+class PureEnumHandler implements HandlerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDataType(): string
     {
-        return 'object';
+        return 'enum';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function canHandleValue(mixed $value): bool
     {
-        return is_object($value);
+        return $value instanceof \UnitEnum && !($value instanceof \BackedEnum);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function serializeValue(mixed $value): string
     {
-        return json_encode($value);
+        return sprintf(
+            '%s#%s',
+            $value::class,
+            $value->name
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unserializeValue(string $serializedValue): mixed
     {
-        return json_decode($serializedValue, false);
+        [$class, $name] = explode('#', $serializedValue, 2);
+
+        if (!class_exists($class)
+            || !is_a($class, \UnitEnum::class, true)
+        ) {
+            return null;
+        }
+
+        return constant("$class::$name");
     }
 
     public function getNumericValue(mixed $value): null|int|float

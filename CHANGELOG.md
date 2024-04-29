@@ -1,5 +1,73 @@
 # Changelog
 
+## 6.0.0
+
+Version 6 contains a number of changes to improve the usability, performance and security of the package. Refer to the [UPGRADING.md](UPGRADING.md) file for detailed instructions on how to upgrade from version 5.
+
+### Compatibility
+
+- Added support for PHP 8.3
+- Droppped support for PHP 8.0 and below
+- Added support for Laravel 10 and 11
+- Dropped support Laravel versions 9 and below
+- New schema migration adding new columns and improving indexing for searching by meta values. See [UPGRADING.md](UPGRADING.md) for details
+
+### Data Types
+
+- Added `SignedSerializeHandler` as a catch-all datatype, which will attempt to serialize the data using PHP's `serialize()` function. The payload is cryptographically signed with an HMAC before being stored in the database to prevent PHP object injection attacks.
+- Deprecated `SerializableHandler` in favor of the new `SignedSerializeHandler` datatype. The `SerializableHandler` will be removed in a future release. In the interim, added the `metable.options.serializable.allowedClasses` config to protect against unserializing untrusted data.
+- Deprecated `ArrayHandler` and `ObjectHandler`, due to the ambiguity of nested array/objects switching type. These will be removed in a future release. The `SignedSerializeHandler` should be used instead.
+- Added `PureEnumHandler` and `BackedEnumHandler` which adds support for storing enum values as Meta.
+- Added `StringableHandler` which adds support for storing `Illuminate\Support\Stringable` objects as Meta.
+- Added `DateTimeImmutableHandler` which adds support for storing `DateTimeImmutable`/`CarbonImmutable` objects as Meta.
+- The `ModelHandler` will now validate that the encoded class is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, the meta value will return `null`.
+- The `ModelHandler` will no longer throw a model not found exception if the model no longer exists. Instead, the meta value will return `null`. This is more in line with the existing behavior of the `ModelCollectionHandler`.
+- The `ModelCollectionHandler` will now validate that the encoded collection class is a valid Eloquent collection before attempting to instantiate it during unserialization. If the class is invalid,  an instance of `Illuminate\Database\Eloquent\Collection` will be used instead.
+- The `ModelCollectionHandler` will now validate that the encoded class of each entry is a valid Eloquent Model before attempting to instantiate it during unserialization. If the class is invalid, that entry in the collection will be omitted.
+- Added `getNumericValue(): null|int|float` method to `HandlerInterface` which should convert the original value into a numeric format for indexing, if relevant for the data type.
+- Added `useHmacVerification(): bool` method to `HandlerInterface` which should indicate whether the integrity of the serialized data should be verified with an HMAC.
+
+### New Commands
+
+- Added `metable:refresh` artisan command which will decode and re-encode all meta values in the database. This is useful if you have changed the data type handlers and need to update the serialized data and indexes in the database.
+
+### Efficient Value Search 
+
+- The Metable `whereMeta()`, `whereMetaIn()`, and `orderByMeta()` query scopes can now leverage a prefix index on the ``meta.value`` column. This greatly improves performance when searching for meta values against larger datasets when using applicable operators, e.g. `=`, `%`, `>`, `>=`, `<`, `<=`, `<>`, `LIKE` (no leading wildcard). This index is only supported by the `'mysql'`, `'mariadb'`, `'pgsql'`, and `'sqlite'` drivers.
+- The `whereMetaNumeric()` and `orderByMetaNumeric()` query scopes will now scan the indexed `numeric_value` column instead of the serialized `value` column. This greatly improves performance when searching for meta values against larger datasets.
+- `whereMetaNumeric()` query scope will now accept a value of any type. It will be converted to an integer or float by the handler. This is more consistent with the behaviour of the other query scopes.
+- Added additional query scopes to more easily search meta values based on different criteria:
+  - `whereMetaInNumeric()`
+  - `whereMetaNotIn()`
+  - `whereMetaNotInNumeric()`
+  - `whereMetaBetween()`
+  - `whereMetaBetweenNumeric()`
+  - `whereMetaNotBetween()`
+  - `whereMetaNotBetweenNumeric()`
+  - `whereMetaIsNull()`
+  - `whereMetaIsModel()`
+- If the data type handlers cannot convert the search value provided to a ``whereMeta*Numeric()`` query scope to a numeric value, then an exception will be thrown.
+
+### Metable Casting
+
+- Added support for casting meta values to specific types by defining the `$castMeta` property or `castMeta(): array` method on the model. This is similar to the `casts` property of Eloquent Models used for attributes. All cast types supported by Eloquent Models are also available for Meta values.Values will be cast before values are stored in the database to ensure that they are indexed consistently
+- Added `mergeMetaCasts()` method which can be used to override the defined cast on a meta key at runtime.
+
+### Encrypt Meta
+
+- Added the `setMetaEncrypted()` method which will encrypt data before storing it in the database and decrypt it when retrieving it. This is useful for storing sensitive data in the meta table. 
+- Prefixing a meta cast with `encrypted:` will automatically encrypt all values for that meta key.
+
+### Metable Attributes
+
+- Added optional trait `MetableAttributes` which can further extend the `Metable` trait allowing access to meta values as model attributes using a `meta_` prefix. This can be useful for type hinting, IDE autocompletion, static analysis, and usage in Blade templates. 
+
+### Meta
+- Added `$meta->numeric_value` attributes, which are used for optimizing queries filtering by meta value
+- Added `$meta->hmac` attribute, which is used by some data type handlers to validate that the payload has not been tampered with.
+- Added `$meta->raw_value` virtual attribute, which exposes the raw serialized value of the meta key. This is useful for debugging purposes.
+- Added `encrypt()` method, used internally by the `Metable::setMetaEncrypted()` method
+
 # 5.0.1 - 2021-09-19
 - Fixed `setManyMeta()` not properly serializing certain types of data.
 

@@ -3,45 +3,35 @@
 namespace Plank\Metable\DataType;
 
 /**
- * Handle serialization of arrays.
- * @deprecated Use SignedSerializeHandler instead.
+ * Securely handle any type of value using php serialize with encryption.
  */
-class ArrayHandler implements HandlerInterface
+final class SignedSerializeHandler implements HandlerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDataType(): string
     {
-        return 'array';
+        return 'serialized';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function canHandleValue(mixed $value): bool
     {
-        return is_array($value);
+        return !is_resource($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function serializeValue(mixed $value): string
     {
-        return json_encode($value, JSON_THROW_ON_ERROR);
+        return serialize($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unserializeValue(string $serializedValue): mixed
     {
-        return json_decode(
+        return unserialize(
             $serializedValue,
-            true,
-            512,
-            JSON_THROW_ON_ERROR
+            [
+                'allowed_classes' => config(
+                    'metable.signedSerializeHandlerAllowedClasses',
+                    true
+                )
+            ]
         );
     }
 
@@ -52,6 +42,6 @@ class ArrayHandler implements HandlerInterface
 
     public function useHmacVerification(): bool
     {
-        return false;
+        return true;
     }
 }

@@ -2,12 +2,10 @@
 
 namespace Plank\Metable\Exceptions;
 
-use Exception;
-
 /**
  * Data Type registry exception.
  */
-class DataTypeException extends Exception
+class DataTypeException extends \LogicException
 {
     public static function handlerNotFound(string $type): self
     {

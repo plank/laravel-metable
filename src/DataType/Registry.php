@@ -90,4 +90,9 @@ class Registry
 
         throw DataTypeException::handlerNotFoundForValue($value);
     }
+
+    public function getHandlerForValue($value): HandlerInterface
+    {
+        return $this->getHandlerForType($this->getTypeForValue($value));
+    }
 }

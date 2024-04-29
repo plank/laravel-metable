@@ -1,42 +1,48 @@
 name: PHPUnit Tests
-on: [push, pull_request]
+on: [push]
 jobs:
   phpunit:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [7.4, 8.0, 8.1, 8.2]
-        laravel: [10.*, 9.*]
-        stability: [prefer-lowest, prefer-stable]
-        exclude:
-          - laravel: 10.*
-            php: 7.4
-          - laravel: 10.*
-            php: 8.0
-    name: PHP ${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability}}
+        php-versions: ['8.1', '8.2', '8.3']
+        prefer-lowest: ['','--prefer-lowest']
+    name: PHP ${{ matrix.php-versions }} ${{ matrix.prefer-lowest }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: ${{ matrix.php-versions }}
           coverage: pcov
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer/cache/files
+            ~/.cache/composer/files
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--prefer-dist --${{ matrix.stability }}"
+        run: composer update --prefer-dist ${{ matrix.prefer-lowest }}
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run phpunit
-        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml -v
+        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
       - name: Upload coverage results to Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_PARALLEL: true
-          COVERALLS_FLAG_NAME: php-${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability}}
+          COVERALLS_FLAG_NAME: php-${{ matrix.php-versions }}${{ matrix.prefer-lowest }}
         run: vendor/bin/php-coveralls --coverage_clover=build/logs/clover.xml -vvv
 
   finish-coverage:

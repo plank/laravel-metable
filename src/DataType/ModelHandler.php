@@ -20,7 +20,7 @@ class ModelHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value): bool
+    public function canHandleValue(mixed $value): bool
     {
         return $value instanceof Model;
     }
@@ -28,7 +28,7 @@ class ModelHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value): string
+    public function serializeValue(mixed $value): string
     {
         if ($value->exists) {
             return get_class($value) . '#' . $value->getKey();
@@ -40,16 +40,30 @@ class ModelHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function unserializeValue(string $value)
+    public function unserializeValue(string $serializedValue): mixed
     {
         // Return blank instances.
-        if (strpos($value, '#') === false) {
-            return new $value();
+        if (strpos($serializedValue, '#') === false) {
+            return new $serializedValue();
         }
 
         // Fetch specific instances.
-        list($class, $id) = explode('#', $value);
+        /** @var class-string<Model> $class */
+        [$class, $id] = explode('#', $serializedValue);
+        if (!is_a($class, Model::class, true)) {
+            return null;
+        }
 
-        return with(new $class())->findOrFail($id);
+        return $class::query()->find($id);
+    }
+
+    public function getNumericValue(mixed $value): null|int|float
+    {
+        return null;
+    }
+
+    public function useHmacVerification(): bool
+    {
+        return false;
     }
 }

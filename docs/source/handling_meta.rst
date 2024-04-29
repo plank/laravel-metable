@@ -54,6 +54,19 @@ To replace existing meta with a new set of meta, you can pass an associative arr
         'age' => 18,
     ]);
 
+Encrypting Meta
+---------------
+
+If storing sensitive data, you can instruct the package to encrypt a meta value when it is stored in the database. Encrypted values are automatically decrypted when retrieved. To encrypt a value, use the ``setMetaEncrypted()`` method or pass ``true`` as the third argument to the ``setMeta()`` method.
+
+::
+
+        <?php
+        $model->setMetaEncrypted('secret', 'sensitive data');
+        $model->setMeta('secret', 'sensitive data', true);
+
+Data of any type can be encrypted. Encrypted values are never searchable or sortable with query scopes.
+
 Retrieving Meta
 ---------------
 
@@ -106,6 +119,7 @@ Alternatively, you may set default values as key-value pairs on the model itself
 
         //...
     }
+
 ::
 
     <?php
@@ -115,6 +129,48 @@ Alternatively, you may set default values as key-value pairs on the model itself
 
 
 .. note:: If a falsey value (e.g. ``0``, ``false``, ``null``, ``''``) has been manually set for the key, that value will be returned instead of the default value. The default value will only be returned if no meta exists at the key.
+
+Casting Meta
+------------
+
+You can enforce that any meta attached to a particular key is always of a particular data type by specifying casts on the Metable model. Casts can be defined by specifying a $metaCasts attribute, or by adding a ``metaCasts(): array`` methods to the model.
+
+::
+
+    <?php
+    class ExampleMetable extends Model {
+        use Metable;
+
+        protected $metaCasts = [
+            'optin' => 'boolean',
+            'age' => 'integer',
+            'secret' => 'encrypted:string',
+            'parent' => ExampleMetable::class,
+            'children' => 'collection:\App\ExampleMetable',
+        ];
+
+        // equivalent to:
+        protected function metaCasts(): array
+        {
+            return [
+                'optin' => 'boolean',
+                'age' => 'integer',
+                'secret' => 'encrypted:string',
+                'parent' => ExampleMetable::class,
+                'children' => 'collection:\App\ExampleMetable',
+            ];
+        }
+
+    }
+
+All `cast types supported by Eloquent<https://laravel.com/docs/11.x/eloquent-mutators#attribute-casting>`_ are supported, with the following modifications:
+
+- Casts are applied on write, not read. This means that the value will be serialized and stored in the database in the specified format, and indexes will be populated in a consistent manner. However, old data prior to the addition of the cast will not be automatically converted.
+- All casts ignore values of ``null``. If a value is set to ``null``, it will be stored as ``null`` in the database, and will not be cast to the specified type.
+- The ``encrypted`` cast will tell the package to always encrypt the value of that key, even if the 3rd parameter of ``setMeta()`` is not set to ``true``.
+- The ``encrypted:`` cast prefix can be combined with any other cast type to convert the value to the specified type before encrypting it.
+- when a class name is provided as a cast, if it implements ``\Illuminate\Contracts\Database\Eloquent\Castable``, it will be used to cast the value per the interface. Otherwise, it will enforce that the value is an instance of that class. If an instance of a different class is provided, an exception will be thrown. If the class is an Eloquent model, and an an integer or string is provided, it will attempt to retrieve the model from the database.
+- The ``collection`` cast will preserve ``Illuminate\Database\Eloquent\Collection`` instances and contents, using the ``Plank\Metable\DataType\ModelCollection`` data type to store them. If passed a single model instance, it will be wrapped in an eloquent collection. A class name can be provided as an argument to enforce that the collection contains only instances of that class.
 
 Retrieving All Meta
 -------------------
@@ -209,3 +265,54 @@ You can also instruct your model class to `always` eager load the meta relations
 
         protected $with = ['meta'];
     }
+
+
+Meta As Attributes
+------------------
+
+If you prefer to access meta as if they were attributes of the model, you can use the ``MetableAttributes`` trait insin addition to the ``Metable`` trait. This will allow you to access meta as if they were attributes of the model by prefixing them with ``meta_``. Meta attributes can be combined with type annotations, casts and/or default values to provide consistent typing. This can be useful for IDE completions and static analysis, as well as for use in Blade templates.
+
+::
+
+    <?php
+
+    namespace App;
+
+    use Plank\Metable\Metable;
+    use Plank\Metable\MetableAttributes;
+    use Illuminate\Database\Eloquent\Model;
+
+    /**
+        * @property bool $meta_approved
+        * @property \Carbon\Carbon $meta_published_at
+        * @property int $meta_likes
+        */
+    class Page extends Model
+    {
+        use Metable, MetableAttributes;
+
+        $metaCasts = [
+            'approved' => 'boolean',
+            'published_at' => 'datetime',
+            'likes' => 'integer',
+        ];
+
+        $defaultMetaValues = [
+            'approved' => false,
+            'published_at' => null,
+            'likes' => 0,
+        ];
+
+        // ...
+    }
+
+    $page = new Page();
+    $page->meta_likes = 5; // equivalent to $page->setMeta('likes', 5);
+    $page->fill(['meta_approved' => true, 'meta_published_at' => now()]); // equivalent to $page->setManyMeta([...]);
+    if ($page->meta_likes > 0) {} // equivalent $page->getMeta('likes');
+    unset($page->meta_likes); // equivalent to $page->removeMeta('likes');
+
+
+Most attribute operations will translate meta attributes to their corresponding meta operations. However, the ``getAttributes()`` method will **not** include meta attributes. The ``getMetaAttributes()`` method can be used to retrieve all meta values keyed by their attribute name.
+
+The ``toArray()`` method will include meta attributes by default. The ``$visible``/``$hidden`` properties of the model will be respected if any meta attributes are listed. The ``makeMetaHidden()`` method can be used to quickly hide all currently assigned meta attributes from the array representation of the model.

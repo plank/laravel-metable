@@ -21,7 +21,7 @@ interface HandlerInterface
      *
      * @return bool
      */
-    public function canHandleValue($value): bool;
+    public function canHandleValue(mixed $value): bool;
 
     /**
      * Convert the value to a string, so that it can be stored in the database.
@@ -30,7 +30,9 @@ interface HandlerInterface
      *
      * @return string
      */
-    public function serializeValue($value): string;
+    public function serializeValue(mixed $value): string;
+
+    public function getNumericValue(mixed $value): null|int|float;
 
     /**
      * Convert a serialized string back to its original value.
@@ -39,5 +41,7 @@ interface HandlerInterface
      *
      * @return mixed
      */
-    public function unserializeValue(string $serializedValue);
+    public function unserializeValue(string $serializedValue): mixed;
+
+    public function useHmacVerification(): bool;
 }

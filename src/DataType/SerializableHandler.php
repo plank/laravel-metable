@@ -6,6 +6,7 @@ use Serializable;
 
 /**
  * Handle serialization of Serializable objects.
+ * @deprecated Use SignedSerializeHandler instead.
  */
 class SerializableHandler implements HandlerInterface
 {
@@ -20,7 +21,7 @@ class SerializableHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value): bool
+    public function canHandleValue(mixed $value): bool
     {
         return $value instanceof Serializable;
     }
@@ -28,7 +29,7 @@ class SerializableHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value): string
+    public function serializeValue(mixed $value): string
     {
         return serialize($value);
     }
@@ -36,8 +37,19 @@ class SerializableHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function unserializeValue(string $value)
+    public function unserializeValue(string $serializedValue): mixed
     {
-        return unserialize($value);
+        $allowedClasses = config('metable.serializableHandlerAllowedClasses', false);
+        return unserialize($serializedValue, ['allowed_classes' => $allowedClasses]);
+    }
+
+    public function getNumericValue(mixed $value): null|int|float
+    {
+        return null;
+    }
+
+    public function useHmacVerification(): bool
+    {
+        return false;
     }
 }

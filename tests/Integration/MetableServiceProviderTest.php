@@ -12,7 +12,7 @@ class MetableServiceProviderTest extends TestCase
         return [];
     }
 
-    public function testBootSkipsMigrations()
+    public function testBootSkipsMigrations(): void
     {
         config()->set('metable.applyMigrations', false);
         $provider = new MetableServiceProvider(app());
@@ -20,7 +20,7 @@ class MetableServiceProviderTest extends TestCase
         $this->assertEmpty(app('migrator')->paths());
     }
 
-    public function testBootAppliesMigrations()
+    public function testBootAppliesMigrations(): void
     {
         config()->set('metable.applyMigrations', true);
         $provider = new MetableServiceProvider(app());

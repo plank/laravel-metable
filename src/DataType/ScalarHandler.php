@@ -25,7 +25,7 @@ abstract class ScalarHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value): bool
+    public function canHandleValue(mixed $value): bool
     {
         return gettype($value) == $this->type;
     }
@@ -33,7 +33,7 @@ abstract class ScalarHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value): string
+    public function serializeValue(mixed $value): string
     {
         settype($value, 'string');
 
@@ -43,10 +43,15 @@ abstract class ScalarHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function unserializeValue(string $value)
+    public function unserializeValue(string $serializedValue): mixed
     {
-        settype($value, $this->type);
+        settype($serializedValue, $this->type);
 
-        return $value;
+        return $serializedValue;
+    }
+
+    public function useHmacVerification(): bool
+    {
+        return false;
     }
 }

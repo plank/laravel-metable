@@ -9,7 +9,7 @@ use Plank\Metable\Tests\TestCase;
 
 class MorphTest extends TestCase
 {
-    public function test_it_can_get_and_set_meta_value_by_key()
+    public function test_it_can_get_and_set_meta_value_by_key(): void
     {
         $this->useDatabase();
         $child = $this->createChild();
@@ -21,7 +21,7 @@ class MorphTest extends TestCase
         $this->assertEquals('bar', $child->getMeta('foo'));
     }
 
-    public function test_it_can_get_meta_record()
+    public function test_it_can_get_meta_record(): void
     {
         $this->useDatabase();
         $child = $this->createChild();
@@ -35,7 +35,7 @@ class MorphTest extends TestCase
         $this->assertEquals($class, $record->metable_type);
     }
 
-    public function test_it_can_join_correctly_from_morphed_class()
+    public function test_it_can_join_correctly_from_morphed_class(): void
     {
         $this->useDatabase();
         $metable1 = $this->createMetable(['id' => 1]);
@@ -49,7 +49,7 @@ class MorphTest extends TestCase
         $results1 = SampleMorph::orderByMeta('foo', 'asc')->get();
         $results2 = Meta::select('metable_type')->get();
 
-        $this->assertCount(3, $results1->pluck('id')->toArray());
+        $this->assertEquals([3, 1, 2], $results1->modelKeys());
         $this->assertEquals([$class, $class, $class], $results2->pluck('metable_type')->toArray());
     }
 

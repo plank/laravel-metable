@@ -3,6 +3,7 @@
 namespace Plank\Metable\DataType;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Handle serialization of Eloquent collections.
@@ -20,7 +21,7 @@ class ModelCollectionHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function canHandleValue($value): bool
+    public function canHandleValue(mixed $value): bool
     {
         return $value instanceof Collection;
     }
@@ -28,7 +29,7 @@ class ModelCollectionHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function serializeValue($value): string
+    public function serializeValue(mixed $value): string
     {
         $items = [];
         foreach ($value as $key => $model) {
@@ -44,16 +45,34 @@ class ModelCollectionHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function unserializeValue(string $value)
+    public function unserializeValue(string $serializedValue): mixed
     {
-        $data = json_decode($value, true);
+        $data = json_decode($serializedValue, true);
 
-        $collection = new $data['class']();
+        $collectionClass = (string)($data['class'] ?? '');
+
+        if (class_exists($collectionClass)
+            && is_a($collectionClass, Collection::class, true)
+        ) {
+            $collection = new $collectionClass();
+        } else {
+            // attempt to gracefully fall back to a standard collection
+            // if the defined collection class is not found
+            $collection = new Collection();
+        }
+
         $models = $this->loadModels($data['items']);
+
 
         // Repopulate collection keys with loaded models.
         foreach ($data['items'] as $key => $item) {
-            if (is_null($item['key'])) {
+            if (empty($item['key'])) {
+                $class = (string)($item['class'] ?? '');
+                if (!class_exists($class)
+                    || !is_a($class, Model::class, true)
+                ) {
+                    continue;
+                }
                 $collection[$key] = new $item['class']();
             } elseif (isset($models[$item['class']][$item['key']])) {
                 $collection[$key] = $models[$item['class']][$item['key']];
@@ -77,17 +96,35 @@ class ModelCollectionHandler implements HandlerInterface
 
         // Retrieve a list of keys to load from each class.
         foreach ($items as $item) {
-            if (!is_null($item['key'])) {
-                $classes[$item['class']][] = $item['key'];
+            $class = (string)($item['class'] ?? '');
+
+            if (!empty($item['key'])) {
+                $classes[$class][] = $item['key'];
             }
         }
 
         // Iterate list of classes and load all records matching a key.
         foreach ($classes as $class => $keys) {
-            $model = new $class();
-            $results[$class] = $model->whereIn($model->getKeyName(), $keys)->get()->keyBy($model->getKeyName());
+            if (!class_exists($class)
+                || !is_a($class, Model::class, true)
+            ) {
+                continue;
+            }
+
+            $results[$class] = $class::query()->findMany($keys)
+                ->keyBy(fn (Model $model) => $model->getKey());
         }
 
         return $results;
+    }
+
+    public function getNumericValue(mixed $value): null|int|float
+    {
+        return null;
+    }
+
+    public function useHmacVerification(): bool
+    {
+        return false;
     }
 }

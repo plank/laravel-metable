@@ -8,7 +8,7 @@ use Plank\Metable\Tests\TestCase;
 
 class ModelHandlerTest extends TestCase
 {
-    public function test_it_reloads_a_model_instance()
+    public function test_it_reloads_a_model_instance(): void
     {
         $this->useDatabase();
 
@@ -21,5 +21,14 @@ class ModelHandlerTest extends TestCase
         $this->assertInstanceOf(SampleMetable::class, $unserialized);
         $this->assertEquals(12, $unserialized->getKey());
         $this->assertTrue($unserialized->exists);
+    }
+
+    public function test_it_handles_invalid_model_class(): void
+    {
+        $handler = new ModelHandler();
+        $serialized = 'stdClass#1';
+        $unserialized = $handler->unserializeValue($serialized);
+
+        $this->assertNull($unserialized);
     }
 }

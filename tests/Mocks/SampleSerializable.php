@@ -8,7 +8,7 @@ class SampleSerializable implements Serializable
 {
     public $data;
 
-    public function __construct($data)
+    public function __construct(mixed $data)
     {
         $this->data = $data;
     }
@@ -18,9 +18,9 @@ class SampleSerializable implements Serializable
         return serialize($this->data);
     }
 
-    public function unserialize($serialized)
+    public function unserialize(string $data): void
     {
-        $this->data = unserialize($serialized);
+        $this->data = unserialize($data);
     }
 
     public function __serialize(): array
@@ -28,8 +28,8 @@ class SampleSerializable implements Serializable
         return $this->data;
     }
 
-    public function __unserialize(array $data)
+    public function __unserialize(array $data): void
     {
-        return $this->data = $data;
+        $this->data = $data;
     }
 }

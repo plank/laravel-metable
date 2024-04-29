@@ -11,4 +11,9 @@ class BooleanHandler extends ScalarHandler
      * {@inheritdoc}
      */
     protected $type = 'boolean';
+
+    public function getNumericValue(mixed $value): null|int|float
+    {
+        return $value ? 1 : 0;
+    }
 }

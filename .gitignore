@@ -2,4 +2,5 @@
 /composer.lock
 /coverage/
 /.idea/
-.phpunit.result.cache
+/.phpunit.result.cache
+/.phpunit.cache

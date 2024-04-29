@@ -19,4 +19,9 @@ class NullHandler extends ScalarHandler
     {
         return 'null';
     }
+
+    public function getNumericValue(mixed $value): null|int|float
+    {
+        return null;
+    }
 }
