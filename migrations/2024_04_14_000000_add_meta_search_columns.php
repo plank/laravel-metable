@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -22,15 +23,29 @@ return new class extends Migration {
             $table->index(['key', 'metable_type', 'numeric_value']);
 
             $stringIndexLength = (int)config('metable.stringValueIndexLength', 255);
-            if ($stringIndexLength > 0 && $driver = $this->detectDriverName()) {
+            $connection = $this->detectConnectionInUse();
+            if ($stringIndexLength > 0 && $driver = $connection?->getDriverName()) {
+                $grammar = $connection->getQueryGrammar();
                 if (in_array($driver, ['mysql', 'mariadb'])) {
                     $table->rawIndex(
-                        "`metable_type`, `key`, `value`($stringIndexLength)",
+                        sprintf(
+                            "%s, %s, %s(%d)",
+                            $grammar->wrap('metable_type'),
+                            $grammar->wrap('key'),
+                            $grammar->wrap('value'),
+                            $stringIndexLength
+                        ),
                         'value_string_prefix_index'
                     );
                 } elseif (in_array($driver, ['pgsql', 'sqlite'])) {
                     $table->rawIndex(
-                        "`metable_type`, `key`, SUBSTR(`value`, 1, $stringIndexLength)",
+                        sprintf(
+                            "%s, %s, SUBSTR(%s, 1, %d)",
+                            $grammar->wrap('metable_type'),
+                            $grammar->wrap('key'),
+                            $grammar->wrap('value'),
+                            $stringIndexLength
+                        ),
                         'value_string_prefix_index'
                     );
                 }
@@ -48,7 +63,10 @@ return new class extends Migration {
         Schema::table('meta', function (Blueprint $table) {
             $stringIndexLength = (int)config('metable.stringValueIndexLength', 255);
             if ($stringIndexLength > 0
-                && in_array($this->detectDriverName(), ['mysql', 'mariadb', 'pgsql', 'sqlite'])
+                && in_array(
+                    $this->detectConnectionInUse()?->getDriverName(),
+                    ['mysql', 'mariadb', 'pgsql', 'sqlite']
+                )
             ) {
                 $table->dropIndex('value_string_prefix_index');
             }
@@ -61,7 +79,7 @@ return new class extends Migration {
         });
     }
 
-    private function detectDriverName(): ?string
+    private function detectConnectionInUse(): ?Connection
     {
         /** @var \Illuminate\Database\Migrations\Migrator $migrator */
         $migrator = app('migrator');
@@ -73,8 +91,10 @@ return new class extends Migration {
             $resolver = DB::getFacadeRoot();
         }
 
-        return $resolver->connection(
+        $connection = $resolver->connection(
             $this->getConnection() ?? $migrator->getConnection()
-        )->getDriverName();
+        );
+
+        return $connection instanceof Connection ? $connection : null;
     }
 };

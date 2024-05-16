@@ -30,7 +30,7 @@
         "guzzlehttp/promises": "^1.4",
         "mockery/mockery": "^1.4.2",
         "nesbot/carbon" : "^2.62.1",
-        "php-coveralls/php-coveralls": "^2.5.2"
+        "php-coveralls/php-coveralls": "^2.7.0"
     },
     "autoload-dev":{
         "psr-4": {
