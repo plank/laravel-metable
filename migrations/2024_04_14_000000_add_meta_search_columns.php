@@ -28,7 +28,8 @@ return new class extends Migration {
                 $grammar = $connection->getQueryGrammar();
                 if (in_array($driver, ['mysql', 'mariadb'])) {
                     $table->rawIndex(
-                        sprintf("%s, %s, %s(%d)",
+                        sprintf(
+                            "%s, %s, %s(%d)",
                             $grammar->wrap('metable_type'),
                             $grammar->wrap('key'),
                             $grammar->wrap('value'),
@@ -38,7 +39,8 @@ return new class extends Migration {
                     );
                 } elseif (in_array($driver, ['pgsql', 'sqlite'])) {
                     $table->rawIndex(
-                        sprintf("%s, %s, SUBSTR(%s, 1, %d)",
+                        sprintf(
+                            "%s, %s, SUBSTR(%s, 1, %d)",
                             $grammar->wrap('metable_type'),
                             $grammar->wrap('key'),
                             $grammar->wrap('value'),
@@ -61,7 +63,8 @@ return new class extends Migration {
         Schema::table('meta', function (Blueprint $table) {
             $stringIndexLength = (int)config('metable.stringValueIndexLength', 255);
             if ($stringIndexLength > 0
-                && in_array($this->detectConnectionInUse()?->getDriverName(),
+                && in_array(
+                    $this->detectConnectionInUse()?->getDriverName(),
                     ['mysql', 'mariadb', 'pgsql', 'sqlite']
                 )
             ) {
