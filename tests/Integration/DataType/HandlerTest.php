@@ -245,15 +245,15 @@ class HandlerTest extends TestCase
         HandlerInterface $handler,
         string $type,
         mixed $value,
-        array $incompatible,
+        array $invalid,
         null|int|float $numericValue,
         bool $usesHmac
     ): void {
         $this->assertEquals($type, $handler->getDataType());
         $this->assertTrue($handler->canHandleValue($value));
 
-        foreach ($incompatible as $incompatibleValue) {
-            $this->assertFalse($handler->canHandleValue($incompatibleValue), "Failed for ". get_debug_type($incompatibleValue));
+        foreach ($invalid as $invalidValue) {
+            $this->assertFalse($handler->canHandleValue($invalidValue), "Failed for ". get_debug_type($invalidValue));
         }
 
         $serialized = $handler->serializeValue($value);
