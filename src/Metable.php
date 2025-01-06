@@ -792,7 +792,7 @@ trait Metable
      * @return Meta
      */
     protected function makeMeta(
-        string $key = null,
+        null|string $key = null,
         mixed $value = null,
         bool $encrypt = false
     ): Meta {
