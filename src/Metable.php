@@ -215,7 +215,7 @@ trait Metable
     {
         return collect($this->getAllDefaultMeta())->merge(
             $this->getMetaCollection()->toBase()->map(
-                fn(Meta $meta) => $meta->getAttribute('value')
+                fn (Meta $meta) => $meta->getAttribute('value')
             )
         );
     }
@@ -571,7 +571,7 @@ trait Metable
                 $q->whereIn(
                     $q->raw("SUBSTR(value, 1, $indexLength)"),
                     array_map(
-                        fn($val) => substr($val, 0, $indexLength),
+                        fn ($val) => substr($val, 0, $indexLength),
                         $values
                     ),
                     'and',
