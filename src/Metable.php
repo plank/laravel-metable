@@ -792,7 +792,7 @@ trait Metable
      * @return Meta
      */
     protected function makeMeta(
-        string $key = null,
+        ?string $key = null,
         mixed $value = null,
         bool $encrypt = false
     ): Meta {
@@ -855,7 +855,8 @@ trait Metable
             return $this->castMetaToCollection($cast, $value);
         }
 
-        if (class_exists($cast)
+        if (
+            class_exists($cast)
             && !is_a($cast, Castable::class, true)
             && $cast != 'datetime'
         ) {
@@ -888,7 +889,8 @@ trait Metable
             }
         }
 
-        if (property_exists($this, 'metaCasts')
+        if (
+            property_exists($this, 'metaCasts')
             && isset($this->metaCasts[$key])
         ) {
             return $this->metaCasts[$key];
@@ -1040,7 +1042,8 @@ trait Metable
             return $value;
         }
 
-        if (is_a($cast, Model::class, true)
+        if (
+            is_a($cast, Model::class, true)
             && (is_string($value) || is_int($value))
         ) {
             return $cast::findOrFail($value);
