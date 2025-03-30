@@ -34,7 +34,7 @@ trait MetableAttributes
             }
         }
 
-        parent::fill($attributes);
+        return parent::fill($attributes);
     }
 
     public function getMetaAttributes(): Collection
