@@ -45,14 +45,14 @@ class RegistryTest extends TestCase
     {
         $stringHandler = $this->mockHandlerWithType('str');
         $stringHandler->method('canHandleValue')
-            ->will($this->returnCallback(function ($value) {
+            ->willReturnCallback(function ($value) {
                 return is_string($value);
-            }));
+            });
         $integerHandler = $this->mockHandlerWithType('int');
         $integerHandler->method('canHandleValue')
-            ->will($this->returnCallback(function ($value) {
+            ->willReturnCallback(function ($value) {
                 return is_int($value);
-            }));
+            });
         $registry = new Registry();
         $registry->addHandler($stringHandler);
         $registry->addHandler($integerHandler);

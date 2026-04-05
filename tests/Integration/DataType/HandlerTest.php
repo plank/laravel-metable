@@ -5,6 +5,7 @@ namespace Plank\Metable\Tests\Integration\DataType;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Stringable;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Plank\Metable\DataType\ArrayHandler;
 use Plank\Metable\DataType\BackedEnumHandler;
 use Plank\Metable\DataType\BooleanHandler;
@@ -238,9 +239,7 @@ class HandlerTest extends TestCase
         parent::tearDownAfterClass();
     }
 
-    /**
-     * @dataProvider handlerProvider
-     */
+    #[DataProvider('handlerProvider')]
     public function test_it_can_verify_and_serialize_data(
         HandlerInterface $handler,
         string $type,
