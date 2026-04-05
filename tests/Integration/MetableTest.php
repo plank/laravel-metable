@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Stringable;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Plank\Metable\Exceptions\CastException;
 use Plank\Metable\Meta;
 use Plank\Metable\Tests\Mocks\SampleMetable;
@@ -1113,7 +1114,7 @@ class MetableTest extends TestCase
         ];
     }
 
-    /** @dataProvider castProvider */
+    #[DataProvider('castProvider')]
     public function test_it_casts_meta_values(
         string $cast,
         mixed $original,
@@ -1185,7 +1186,7 @@ class MetableTest extends TestCase
         $this->assertEquals($date, $metable->getMeta('cast'));
     }
 
-    /** @dataProvider invalidClassCastProvider */
+    #[DataProvider('invalidClassCastProvider')]
     public function test_it_throws_for_invalid_class_cast(
         string $cast,
         mixed $invalidValue,
